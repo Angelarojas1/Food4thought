@@ -15,7 +15,7 @@
    ** NOTES:
    ** WRITTEN BY:       Xinyu Ren
    ** EDITTED BY:       Angela Rojas
-   ** Last date modified: 
+   ** Last date modified: Dec 12, 2023
 
 ****************************************
 * Data cleaning for geographical control data
@@ -67,9 +67,9 @@ assert `r(sum)' == 135
 sum al_mn pt_mn ph_mn cl_md // ph_mn only have information for 123 countries
 
 * Label variables
-label var al_mn "Average altitude (mts)"
-label var pt_mn "Total precipitation in 1999 (mm)"
-label var ph_mn "Average pH"
-label var cl_md "Most common climate zone (KG2)"
+label var al_mn "Average altitude (mts)"  // 135 countries
+label var pt_mn "Total precipitation in 1999 (mm)" // 134 countries (Tonga)
+label var ph_mn "Average pH" // 123 countries
+label var cl_md "Most common climate zone (KG2)" // 135 countries
 
 save "${codedata}/iv_versatility/geographical.dta", replace

@@ -66,13 +66,13 @@
 	*      Prepare Recipe data by country and FLFP data     *
 	* ***************************************************** *
 
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Merge recipe data and FLFP in 2019
 	* 		- 134 countries with FLFP information
 	
 		do "$code/1_recipes_flfp.do" 
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	* 		- Raw correlations of FLFP and cuisine complexity
 		
 		do "$code/2_recipes_flfp_rawcorr.do"
@@ -82,7 +82,7 @@
 	*              Time Use Survey Data Coding              *
 	* ***************************************************** *
 
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		-  compare time use survey with recipe data
 
 		do "$code/3_time_use_survey.do"
@@ -92,7 +92,7 @@
 	*                 Cookpad Data Coding                   *
 	* ***************************************************** *
 
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		-  Clean cookpad data
 
 		do "$code/4_cookpad_clean.do"
@@ -103,7 +103,7 @@
 	*               Native & Imported versatility           *
 	* ***************************************************** *
 
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		-  Read in crop suitability data from FAO
 	*  		-  Don't run this part. Treat the suitability data as raw
 	
@@ -111,7 +111,7 @@
 	
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		-  Clean data from CIAT Map
 	*		-  This gets native ingredient by country and region.
 	*       -  Merge data with recipes and FLFP database.
@@ -121,14 +121,14 @@
 
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		-  Clean data from suitability databases
 
 		do "$code/7_suitability_clean.do"
 
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Clean data for calculating versatility.
 	*       - Creates native versatility and imported versatility and 
 	*       - Creates common flavor (between 2 and 3 ingredients) files.
@@ -137,28 +137,28 @@
 
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Calculate the distance between any two countries
 
 		do "$code/9_distance_clean.do"
 
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Generate geographical controls for all countries
 
 		do "$code/10_geographical_clean.do"
 
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Generate native versatility by country
 
 		do "$code/11_native_versatility.do"
 
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Generate imported versatility by country
 
 		do "$code/12_imported_versatility.do"
@@ -168,16 +168,30 @@
 	*              	 	 Regressions                	    *
 	* ***************************************************** *
 	
-	* 	The purpose of this dofiles is:
+	* 	The purpose of this dofile is:
 	*		- Find the best performance 1st stage
 
 		do "$code/13_1ststage_best.do"
 
 	* ***************************************************** *
 		
-	* 	The purpose of this dofiles is:
-	*		- Run the regressions for the best performance
+	* 	The purpose of this dofile is:
+	*		- Merge the different databases created to run the regressions
 
-		do "$code/14_ivreg.do"
-	
+		do "$code/14_merge_reg.do"
+
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
+	*		- Run IV regressions
+
+		do "$code/15_IV_reg.do"
+		
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
+	*		- Merge cookpad and CIAT databases
+	*		- Run regressions
+
+		do "$code/16_cookpad_ciat.do"
 	
