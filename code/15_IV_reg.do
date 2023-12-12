@@ -25,28 +25,28 @@ use "${codedata}/merge/`val'.dta", clear
 foreach var of varlist logmtime mIng mSpice{
 	
 	* 1st stage
-	reghdfe `var' std_native std_import numNative al_mn cl_md [aweight=num_recipes] , absorb(continentFactor)  
+	reghdfe `var' std_native std_import numNative al_mn cl_md pt_mn [aweight=num_recipes] , absorb(continentFactor)  
 	eststo reg1
 	sum `var' if e(sample)
 	local mean = r(mean)
 	estadd scalar mean = `mean'
 	
 	* iv
-	ivreg2 FLFP numNative al_mn cl_md i.continentFactor (`var' = std_native std_import)[aweight=num_recipes]
+	ivreg2 FLFP numNative al_mn cl_md pt_mn i.continentFactor (`var' = std_native std_import)[aweight=num_recipes]
 	eststo reg2
 	sum FLFP if e(sample)
 	local mean = r(mean)
 	estadd scalar mean = `mean'
 	
 	* OLS form
-	reghdfe FLFP `var' numNative al_mn cl_md [aweight=num_recipes], absorb(continentFactor)  
+	reghdfe FLFP `var' numNative al_mn cl_md pt_mn [aweight=num_recipes], absorb(continentFactor)  
 	eststo reg3
 	sum FLFP if e(sample)
 	local mean = r(mean)
 	estadd scalar mean = `mean'
 	
 	*reduced form
-	reghdfe FLFP std_native std_import numNative al_mn cl_md [aweight=num_recipes], absorb(continentFactor) 
+	reghdfe FLFP std_native std_import numNative al_mn cl_md pt_mn [aweight=num_recipes], absorb(continentFactor) 
 	eststo reg4
 	sum FLFP if e(sample)
 	local mean = r(mean)
