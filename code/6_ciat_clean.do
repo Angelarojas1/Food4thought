@@ -1,3 +1,21 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *        This dofile merges recipe, region, country dataset      	  *
+   *																	  *
+   * - Inputs: "${rawdata}/CIAT/food_supplies_countries_regions_all_merge.csv"
+   *           "${codedata}/recipes/recipe_FLFP2019.dta"			      *
+   *		   "${rawdata}/CIAT/ingredients_category.xlsx"				  *
+   *		   "${rawdata}/CIAT/region_ingredients.xlsx"				  *
+   * - Output: "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 24, 2023
+
 ****************************************
 * Data cleaning for CIAT data
 ****************************************
