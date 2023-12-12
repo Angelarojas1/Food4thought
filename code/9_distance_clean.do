@@ -1,3 +1,20 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   * This dofile calculate distance between any two countries in the world*
+   *																	  *
+   * - Inputs: "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
+   *           "${rawdata}/distance/geo_cepii.dta"				          *
+   * - Output: "${codedata}/iv_versatility/distance_capital.dta"          *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 17, 2023
+
+
 ****************************************
 * Data cleaning for distance data
 ****************************************

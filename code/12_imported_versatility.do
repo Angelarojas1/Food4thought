@@ -1,3 +1,21 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *            This dofile creates imported versatility files   		  *
+   *																	  *
+   * - Inputs: "${codedata}/iv_versatility/imported_`x'.csv"              *
+   *           "${codedata}/iv_versatility/common_flavor_clean.dta"       *
+   *           "${codedata}/iv_versatility/native_clean_`x'.dta"          *
+   *           "${codedata}/iv_versatility/distance_capital.dta"          *
+   * - Output: "${codedata}/iv_versatility/importbycountry_`x'.dta"       *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 17, 2023
+
 ****************************************
 * Generate imported flavor versatility by country
 ****************************************

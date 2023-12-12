@@ -1,3 +1,23 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *      This dofile creates files to generate versatility variables 	  *
+   *																	  *
+   * - Inputs: "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta"	  *
+   *           "${codedata}/iv_versatility/median_suitability.dta"        *
+   *		   "${codedata}/iv_versatility/recipe_suit.dta"				  *
+   * - Output: "${codedata}/iv_versatility/native_clean_`var'.dta"        *
+   *		   "${codedata}/iv_versatility/imported_`var'.dta"			  *
+   *		   "${codedata}/iv_versatility/common_flavor.dta"             *
+   *		   "${codedata}/iv_versatility/common_flavor_3ing.csv"		  *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 28, 2023
+
 ****************************************
 * Data cleaning for versatility data
 ****************************************

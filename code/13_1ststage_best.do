@@ -1,3 +1,23 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *            This dofile gets regressions results to identify most     *
+   *            accurate one 											  *
+   *																	  *
+   * - Inputs: "${codedata}/recipes/recipe_FLFP2019.dta"	              *
+   *           "${codedata}/iv_versatility/geographical.dta"              *
+   *           "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
+   *           "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"   *
+   *           "${codedata}/iv_versatility/importbycountry_`z'.dta"       *
+   * - Output:                                                            *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 24, 2023
+
 ****************************************
 * Find the best 1st stage regression
 ****************************************

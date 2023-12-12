@@ -176,7 +176,7 @@
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
-	*		- Merge the different databases created to run the regressions
+	*		- Merge the different databases created to procede with analysis
 
 		do "$code/14_merge_reg.do"
 

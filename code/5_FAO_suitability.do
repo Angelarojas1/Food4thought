@@ -1,3 +1,20 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *         			This dofile cleans FAO information    		  	  *
+   *																	  *
+   * - Inputs: "${rawdata}/suitability/FAO/crop_suitability_country/     ///
+   *			`k'_ctr_Low_CRUTS32/`k'_CRUTS32_Hist_8110Lr_ctr.csv"      *
+   *		   "${precodedata}/suitability/crop_name.dta"				  *
+   * - Output: "${precodedata}/suitability/suitability_FAO.dta"	          *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 24, 2023
+
 ****************DATA CLEANING FOR CROP NAME***********************
 
 * import data

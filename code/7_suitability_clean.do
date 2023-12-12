@@ -1,3 +1,24 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *        This dofile create suitability data for all ingredients 	  *
+   *																	  *
+   * - Inputs: "${precodedata}/suitability/staple_suitability.dta"		  *
+   *           "${precodedata}/suitability/spices_suitability.dta"        *
+   *		   "${precodedata}/suitability/spices_suitability_10nov23.dta"*
+   *		   "${precodedata}/suitability/crop_suitability.dta"		  *
+   *           "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
+   * - Output: "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta"     *
+   *		   "${codedata}/iv_versatility/median_suitability.dta"		  *
+   *		   "${codedata}/iv_versatility/recipe_suit.dta"		          *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       
+   ** Last date modified: Nov 28, 2023
+
 ****************************************
 * Data cleaning for suitability data
 ****************************************
