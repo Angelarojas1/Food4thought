@@ -22,7 +22,7 @@ foreach val of local perc {
 * Import dataset
 use "${codedata}/merge/`val'.dta", clear
 
-foreach var of varlist logmtime mIng mSpice{
+foreach var of varlist logtime_mean ingredients_mean spices_mean{
 	
 	* 1st stage
 	reghdfe `var' std_native std_import numNative al_mn cl_md pt_mn [aweight=num_recipes] , absorb(continentFactor)  

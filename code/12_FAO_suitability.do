@@ -5,8 +5,8 @@
    *																	  *
    * - Inputs: "${rawdata}/suitability/FAO/crop_suitability_country/     ///
    *			`k'_ctr_Low_CRUTS32/`k'_CRUTS32_Hist_8110Lr_ctr.csv"      *
-   *		   "${precodedata}/suitability/crop_name.dta"				  *
-   * - Output: "${precodedata}/suitability/suitability_FAO.dta"	          *
+   *		   "${codedata}/FAO_suitability/crop_name.dta"				  *
+   * - Output: "${codedata}/FAO_suitability/suitability_FAO.dta"	          *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -21,7 +21,7 @@
 import excel "${rawdata}/suitability/FAO/crop_name.xlsx", sheet("Sheet1") firstrow clear
 
 * save as dta file
-save "${precodedata}/suitability/crop_name.dta", replace
+save "${codedata}/FAO_suitability/crop_name.dta", replace
 
 
 ****************SUITABILITY FOR STAPLES FROM FAO***********************
@@ -48,7 +48,7 @@ soy spo srg sub suc swg tea tob tom whe wpo yam{
 }
 
 * merge with crop_name
-merge m:1 crp using "${precodedata}/suitability/crop_name.dta", keep(1 3) nogen
+merge m:1 crp using "${codedata}/FAO_suitability/crop_name.dta", keep(1 3) nogen
 
 * lavel variables
 la var adm0 "Country-level administrative ISO"
@@ -69,4 +69,4 @@ keep adm0 admin0_name crp extents suit_vs suit_s suit_ms suit_vms suit_ns ingred
 gen suitability = (suit_s + suit_vs)/extents
 
 * save data
-save "${precodedata}/suitability/suitability_FAO.dta", replace
+save "${codedata}/FAO_suitability/suitability_FAO.dta", replace

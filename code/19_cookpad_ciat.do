@@ -5,20 +5,20 @@
    * relaciona la complejidad de la cocina con variables del mercado      *
    *             laboral teniendo en cuenta la pandemia de 2020.          *
    *																	  *
-   * - Inputs: "${rawdata}\cookpad\Cookpad_032023.dta"	                  *
+   * - Inputs: "${rawdata}/cookpad/Cookpad_032023.dta"	                  *
    *           "${codedata}/merge/p50.dta"                                *
    * - Output: "${outputs}/Tables/ivreg_`val'_`var'.tex"     			  *
    * ******************************************************************** *
 
-   ** IDS VAR:                 // Uniquely identifies countries 
+   ** IDS VAR:     wp5889    // Uniquely identifies people
    ** NOTES:
    ** WRITTEN BY:       Paola Poveda
    ** EDITTED BY:       Angela Rojas
-   ** Last date modified: 
+   ** Last date modified: Dec 12, 2023
 
    
 	* Import data
-	use "${rawdata}\cookpad\Cookpad_032023.dta", clear
+	use "${rawdata}/cookpad/Cookpad_032023.dta", clear
 	rename *, lower
 
 	* Organize gender variable
@@ -32,10 +32,9 @@
 	* Organize country variable
 	rename countrynew country
 
-	replace country="Bosnia and Herzegovina" if country=="Bosnia Herzegovina"
-	replace country="Cote d'Ivoire" if country=="Ivory Coast"
+	replace country="Bosnia And Herzegovina" if country=="Bosnia Herzegovina"
+	replace country="Cote D'Ivoire" if country=="Ivory Coast"
 	
-*use "${codedata}/merge/p50.dta", clear
 	* Three letter country code
 	rename country_iso3 adm0
 	encode adm0, gen(niso)
@@ -62,16 +61,24 @@
 	keep wp5889 country adm0 working emp_ftemp_pop emp_lfpr emp_work_hours niso ym fem hhsize covid cov_fem
 
 	* Add recipes vbs (time, ingredients, spices)
-	merge m:1 adm0 using "${codedata}/merge/p50.dta"
-	levelsof country if _merge == 2
-	display "`r(r)'"
+	merge m:1 country using "${codedata}/recipes/recipe_sum_all.dta"
+	*merge m:1 country using "${codedata}/merge/p50.dta"
+	
+	tab country if _merge==1
+	levelsof country if _merge == 3
+	display "`r(r)'" ingredients_mean
 	* merge == 1 -> 36
 	* merge == 2 -> 21
 	* merge == 3 -> 114
 	
 	* Create interaction between gender and IV variable
-	gen fem_nat = fem*std_native
-	gen fem_imp = fem*std_import
+	*gen fem_nat = fem*std_native
+	*gen fem_imp = fem*std_import
+	
+	* Create log time 
+	foreach v of varlist time* {
+		gen l`v'=log(`v')
+	}
 	
 	* Label variables
 	la var working 			"Employed"
@@ -80,41 +87,70 @@
 	la var emp_work_hours 	"Hours worked per week"
 	la var fem 				"Women"
 	la var cov_fem 			"Covid x Women"
-	la var fem_nat 			"Women x Native versatility"
-	la var fem_imp 			"Women x Imported versatility"
-	la var logmtime			"Log time"
+	*la var fem_nat 		"Women x Native versatility"
+	*la var fem_imp 		"Women x Imported versatility"
+	
+	local time "Time recipes"
+	local ingredients "Num ingredients"
+	local spices "Num spices"
+	
+	foreach v in time ingredients spices {
+		foreach k in mean median p10 p25 p75 p90 {
+			la var `v'_`k' "``v'' `k'"	
+		}
+	}
+
+	foreach k in mean median p10 p25 p75 p90 {
+ 		la var ltime_`k' "Log time `k'"	
+	}
 
 *------------------------------------------------------------------------------*
 	* Regressions
 	
-	* Whole sample
+	* Using database without versatility variables
+	
+		*pre covid
+		foreach w of varlist ltime* ingredients* spices* {
+    
+			gen femx = fem*`w'
+			la var femx "Women x Complexity"
+	
+			local lb: variable label `w'
+	
+			foreach v of varlist working emp_ftemp_pop emp_lfpr emp_work_hours {
+	
+			reghdfe `v' fem femx hhsize if covid==0, absorb(niso ym) cluster(niso)
+ 
+			sum `v' if e(sample)
+			local m `r(mean)'
+
+			outreg2 using "${outputs}\Tables\reg_summary_pre.xls", lab dec(4) excel par(se) stats(coef se) keep(fem femx) addstat(mean.dep.var, `m') addtext(Complexity, "`lb'", period, "pre covid") nocons
+}
+drop femx
+}
+erase "${outputs}\Tables\reg_summary_pre.txt"
+
+/*
+	* Pre-covid
 	foreach w of varlist logmtime mIng mSpice {
+	
+		gen comp = fem*`w'	
     
 		local lb: variable label `w'
 		
-		reghdfe `w' std_native std_import fem_nat fem_imp fem hhsize, absorb(niso ym) cluster(niso)
- 
-			sum `w' if e(sample)
-			local m `r(mean)'
+		* OLS		
+		reghdfe working fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
+		
+		* First Stage. Should I add controls?
+		* reghdfe comp fem fem_nat fem_imp hhsize, absorb(niso ym) cluster(niso)
+		*reghdfe comp fem fem_nat fem_imp hhsize, absorb(continentFactor ym) cluster(niso) 
 
-*	outreg2 using "${outputs}\Tables\reg-fem-vers.xls", lab dec(4) excel par(se) stats(coef se) keep(fem fem_nat fem_imp) addstat(mean.dep.var, `m') addtext(Complexity, "`lb'", period, "2018-2023") nocons
+		drop comp
+	*		sum `w' if e(sample)
+	*		local m `r(mean)'
+
+*	outreg2 using "${outputs}\Tables\reg-fem-pre-vers.xls", lab dec(4) excel par(se) stats(coef se) keep(fem fem_nat fem_imp) addstat(mean.dep.var, `m') addtext(Complexity, "`lb'", period, "2018-2023") nocons
 }
-
-
-	* pre covid
-	
-	foreach w of varlist logmtime mIng mSpice {
-	
-	local lb: variable label `w'
-	
-	reghdfe `w' std_native std_import fem_nat fem_imp fem hhsize if covid==0, absorb(niso ym) cluster(niso)
- 
- 	sum `w' if e(sample)
-	local m `r(mean)'
-
-*	outreg2 using "${outputs}\Tables\reg-fem-pre-vers.xls", lab dec(4) excel par(se) stats(coef se) keep(fem femx) addstat(mean.dep.var, `m') addtext(Complexity, "`lb'", period, "pre covid") nocons
-}
-
 
 
 *estadisticas descriptivas

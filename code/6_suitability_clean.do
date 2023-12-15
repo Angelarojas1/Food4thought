@@ -7,10 +7,10 @@
    *           "${precodedata}/suitability/spices_suitability.dta"        *
    *		   "${precodedata}/suitability/spices_suitability_10nov23.dta"*
    *		   "${precodedata}/suitability/crop_suitability.dta"		  *
-   *           "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
-   * - Output: "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta"     *
-   *		   "${codedata}/iv_versatility/median_suitability.dta"		  *
-   *		   "${codedata}/iv_versatility/recipe_suit.dta"		          *
+   *           "${versatility}/cuisine_ciat.dta"         	 			  *
+   * - Output: "${versatility}/cuisine_ciat_suit.dta"     	 			  *
+   *		   "${versatility}/median_suitability.dta"		 			  *
+   *		   "${versatility}/cuisine_suit.dta"		     			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -117,7 +117,7 @@ tab ingredient
  save `rest', replace
  restore
  
- merge 1:1 adm0 ingredient using "${codedata}/iv_versatility/recipe_flfp_ciat.dta"
+ merge 1:1 adm0 ingredient using "${versatility}/cuisine_ciat.dta"
  tab _merge
  assert inlist(_merge, 1, 2, 3)
  drop if _merge == 1
@@ -142,7 +142,7 @@ tab ingredient
  assert !missing(country)
  
  unique adm0
- assert `r(sum)' == 135
+ assert `r(sum)' == 136
  
  ** drop ingredients that we don't have suitability data at all
  gen flag = 0
@@ -155,17 +155,17 @@ tab ingredient
  sort adm0 ingredient
  
  unique adm0
- assert `r(sum)' == 131
+ assert `r(sum)' == 132
  
- save "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta", replace
+ save "${versatility}/cuisine_ciat_suit.dta", replace
 
 * Find median of suitability for native ingredients  *******************
  collapse (p10) p10 = suitability (p25) p25 = suitability (median) p50 = suitability (p60) p60 = suitability (p70) p70 = suitability, by(ingredient)
  isid ingredient
- save "${codedata}/iv_versatility/median_suitability.dta", replace
+ save "${versatility}/median_suitability.dta", replace
   
 * limit to suitability data of all ingredients that are from CIAT map  *******************
- use "${codedata}/iv_versatility/recipe_flfp_ciat.dta", clear
+ use "${versatility}/cuisine_ciat.dta", clear
 
  preserve
  keep adm0 country
@@ -206,9 +206,9 @@ tab ingredient
  list if _merge == 2
  drop if _merge == 2
  tab adm0 if _merge1 == 2 & _merge == 1
- assert inlist(adm0, "ABW", "MDV", "MLT", "SGP") if _merge1 == 2 & _merge == 1
+ assert inlist(adm0, "ABW", "MDV", "MLT", "SGP", "XXK") if _merge1 == 2 & _merge == 1
  tab country if _merge1 == 2 & _merge == 1
- assert inlist(country, "Aruba", "Maldives", "Malta", "Singapore") if _merge1 == 2 & _merge == 1
+ assert inlist(country, "Aruba", "Maldives", "Malta", "Singapore", "Kosovo") if _merge1 == 2 & _merge == 1
  drop if _merge1 == 2 & _merge == 1
  assert _merge1 == 3 & _merge == 3
  drop _merge1 _merge
@@ -216,6 +216,10 @@ tab ingredient
  append using `rest_suit'
  replace country = "Aruba" if missing(adm0)
  replace adm0 = "ABW" if missing(adm0)
+ 
+  append using `rest_suit'
+ replace country = "Kosovo" if missing(adm0)
+ replace adm0 = "XXK" if missing(adm0)
  
  append using `rest_suit'
  replace country = "Maldives" if missing(adm0)
@@ -232,7 +236,7 @@ tab ingredient
  sort adm0 ingredient
  isid adm0 ingredient
  
- save "${codedata}/iv_versatility/recipe_suit.dta", replace
+ save "${versatility}/cuisine_suit.dta", replace
 
  notes
  

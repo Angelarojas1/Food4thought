@@ -33,98 +33,94 @@
 	global code					"$github/analysis23/code"
 	
 	global precode				"$projectfolder/precode"
-	global precode_ing_tagger	"$precode/recipes/ingredient_tagger"
-	global precode_scrape		"$precode/recipes/scrape_recipe_data"
-	global precode_vb_const		"$precode/recipes/variable_construction"
+	global recipes              "$precode/recipes"	
 	
 	* Dataset sub-folder globals
 	global precodedata			"$projectfolder/data/precoded"
 	global rawdata				"$projectfolder/data/raw"
 	global codedata				"$projectfolder/data/coded"
+	global versatility          "$codedata/iv_versatility"
 	
 	* Output sub-folder globals
 	global outputs				"$projectfolder/outputs"
+	
+	* ***************************************************** *
 
-
+	** Install packages (run once)
+	
+	* ssc install aaplot
+	
 	* ***************************************************** *
 	*                Recipe Data Coding                     *
 	* ***************************************************** *
 
-	* Scrape recipe data by country
+	* Scrape recipe data by country - Python
 	// Don't run this part. Treat the recipe data as raw
-	// $precode_scrape
+	// "$recipes/scrape_recipe_data"
 	
-	* Clean recipe data by country
+	* Clean recipe data by country - Python
 	// Don't run this part. Treat the recipe data as raw
-	// $precode_ing_tagger
+	// "$recipes/ingredient_tagger"
 	
-	* Construct variables
+	* Construct variables - Python
 	// Don't run this part. Treat the recipe data as raw
-	// $precode_vb_const
+	// "$recipes/variable_construction"
 	
+	* 	The purpose of this dofile is:
+	*		- Merge recipe data for 139 countries.
+	*		- Run only if you are adding a country.
+	
+	*	do "$code/1_merge_recipes.do" 	
+
+	* 	The purpose of this dofile is:
+	* 		- Create time, ingredients and spices variables for 
+	*         different percentiles (cuisine complexity variables)
+	*		- Country level databases
+	
+		do "$code/2_cuisine_variables.do" 
+		
 	* ***************************************************** *
-	*      Prepare Recipe data by country and FLFP data     *
+	*     				FLFP Data Coding				    *
 	* ***************************************************** *
 
 	* 	The purpose of this dofile is:
-	*		- Merge recipe data and FLFP in 2019
+	*		- Clean FLFP data
 	* 		- 134 countries with FLFP information
 	
-		do "$code/1_recipes_flfp.do" 
+		do "$code/3_flfp_clean.do" 	
 	
-	* 	The purpose of this dofile is:
-	* 		- Raw correlations of FLFP and cuisine complexity
+	* ***************************************************** *
+	*                 Distance Data Coding                  *
+	* ***************************************************** *	
 		
-		do "$code/2_recipes_flfp_rawcorr.do"
-
-		
-	* ***************************************************** *
-	*              Time Use Survey Data Coding              *
-	* ***************************************************** *
-
 	* 	The purpose of this dofile is:
-	*		-  compare time use survey with recipe data
+	*		- Calculate the distance between any two countries
+	*		- Info for 139 countries
+	*       - This is for imported versatility variable
 
-		do "$code/3_time_use_survey.do"
-
+		do "$code/4_distance_clean.do"	
 		
-	* ***************************************************** *
-	*                 Cookpad Data Coding                   *
-	* ***************************************************** *
-
-	* 	The purpose of this dofile is:
-	*		-  Clean cookpad data
-
-		do "$code/4_cookpad_clean.do"
-	
-	
 	* ***************************************************** *
 	*              		 IV Data Coding             	    *
 	*               Native & Imported versatility           *
 	* ***************************************************** *
-
-	* 	The purpose of this dofile is:
-	*		-  Read in crop suitability data from FAO
-	*  		-  Don't run this part. Treat the suitability data as raw
-	
-	*	do "$code/5_FAO_suitability.do"
-	
-	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		-  Clean data from CIAT Map
-	*		-  This gets native ingredient by country and region.
-	*       -  Merge data with recipes and FLFP database.
-	*       -  135 countries with native ingredient information
+	*		-  This gets native ingredients by country and region.
+	*       -  Merges ingredient data with recipes and FLFP database.
+	*       -  136 countries with native ingredient information
 	
-		do "$code/6_ciat_clean.do"  
+		do "$code/5_ciat_clean.do"  
 
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		-  Clean data from suitability databases
+	*		- 132 countries with suitability data
+	*       - For the other 3 countries we create the suitability data
 
-		do "$code/7_suitability_clean.do"
+		do "$code/6_suitability_clean.do"
 
 	* ***************************************************** *
 	
@@ -133,59 +129,107 @@
 	*       - Creates native versatility and imported versatility and 
 	*       - Creates common flavor (between 2 and 3 ingredients) files.
 
-		do "$code/8_versatility_clean.do" 
-
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	*		- Calculate the distance between any two countries
-
-		do "$code/9_distance_clean.do"
-
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	*		- Generate geographical controls for all countries
-
-		do "$code/10_geographical_clean.do"
+		do "$code/7_versatility_clean.do" 
 
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		- Generate native versatility by country
 
-		do "$code/11_native_versatility.do"
+		do "$code/8_native_versatility.do"
 
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		- Generate imported versatility by country
 
-		do "$code/12_imported_versatility.do"
+		do "$code/9_imported_versatility.do"
+		
+		
+	* ***************************************************** *
+	*              Geographical Data Coding                 *
+	* ***************************************************** *	
+	
+	* 	The purpose of this dofile is:
+	*		- Generate geographical controls for all countries
+	*		- Info for 138 countries (Kosovo pending)
 
+		do "$code/10_geographical_clean.do"
+		
+		
+	* ***************************************************** *
+	*                 Cookpad Data Coding                   *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean cookpad data
+
+		do "$code/11_cookpad_clean.do"
+		
+	* ***************************************************** *
+	*             FAO suitability Data Coding               *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Read in crop suitability data from FAO
+	*		- Creates suitability variable
+	*  		- Don't run this part. Treat the suitability data as raw
+	
+	*	do "$code/12_FAO_suitability.do"
+	
+	* ***************************************************** *
+	*              Time Use Survey Data Validation          *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Compare time variable from survey data vs 
+	*		  recipe data
+
+		do "$code/13_time_use_survey.do"
+	
+	* ***************************************************** *
+	*          		 FLFP raw correlations     	 	        *
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	* 		- Raw correlations of FLFP and cuisine complexity
+	*		- 134 countries with FLFP information
+		
+		do "$code/14_cuisine_flfp_rawcorr.do"
+				
 		
 	* ***************************************************** *
 	*              	 	 Regressions                	    *
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
+	*		- Runs regressions ussing cookpad, FLFP and cuisine 
+	*			complexity variables
+	* 		- Creates scatter plots:
+	*		  	Complexity variables vs avg meals cooked
+		
+		do "$code/15_cookpad_flfp_cuisine_reg.do"
+
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
 	*		- Find the best performance 1st stage
 
-		do "$code/13_1ststage_best.do"
+		do "$code/16_1ststage_best.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
 	*		- Merge the different databases created to procede with analysis
 
-		do "$code/14_merge_reg.do"
+		do "$code/17_merge_reg.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
 	*		- Run IV regressions
 
-		do "$code/15_IV_reg.do"
+		do "$code/18_IV_reg.do"
 		
 	* ***************************************************** *
 		
@@ -193,5 +237,7 @@
 	*		- Merge cookpad and CIAT databases
 	*		- Run regressions
 
-		do "$code/16_cookpad_ciat.do"
+		do "$code/19_cookpad_ciat.do"
+		
+
 	

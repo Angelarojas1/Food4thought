@@ -3,7 +3,7 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    * This dofile calculate distance between any two countries in the world*
    *																	  *
-   * - Inputs: "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
+   * - Inputs: "${codedata}/recipes/cuisine_complexity_sum.dta"	          *
    *           "${rawdata}/distance/geo_cepii.dta"				          *
    * - Output: "${codedata}/iv_versatility/distance_capital.dta"          *
    * ******************************************************************** *
@@ -21,7 +21,7 @@
 
 * calculate distance between any two countries in the world **********************
 
- use "${codedata}/iv_versatility/recipe_flfp_ciat.dta", clear
+ use "${codedata}/recipes/cuisine_complexity_sum.dta", clear
 
  preserve
  keep adm0 country
@@ -51,6 +51,9 @@
  drop country_r _merge
  
 ** fill in the lat and lon for missing countries
+ replace lat = 42.67 if country == "Kosovo"
+ replace lon = 21.17 if country == "Kosovo"
+ 
  replace lat = 47.17 if country == "Liechtenstein"
  replace lon = 9.51 if country == "Liechtenstein"
 
@@ -62,7 +65,7 @@
 
  assert !missing(lat) & !missing(lon)
  unique adm0
- assert `r(N)' == 135
+ assert `r(N)' == 139
 
 ** create every combinations of country
  gen country2 = country

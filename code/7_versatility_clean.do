@@ -3,13 +3,13 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *      This dofile creates files to generate versatility variables 	  *
    *																	  *
-   * - Inputs: "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta"	  *
-   *           "${codedata}/iv_versatility/median_suitability.dta"        *
-   *		   "${codedata}/iv_versatility/recipe_suit.dta"				  *
-   * - Output: "${codedata}/iv_versatility/native_clean_`var'.dta"        *
-   *		   "${codedata}/iv_versatility/imported_`var'.dta"			  *
-   *		   "${codedata}/iv_versatility/common_flavor.dta"             *
-   *		   "${codedata}/iv_versatility/common_flavor_3ing.csv"		  *
+   * - Inputs: "${versatility}/cuisine_ciat_suit.dta"	  	 			  *
+   *           "${versatility}/median_suitability.dta"        			  *
+   *		   "${versatility}/cuisine_suit.dta"			  			  *
+   * - Output: "${versatility}/native/native_clean_`var'.dta"			  *
+   *		   "${versatility}/imported/imported_`var'.dta"	  			  *
+   *		   "${versatility}/common_flavor.dta"             			  *
+   *		   "${versatility}/common_flavor_3ing.csv"		  			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -26,8 +26,8 @@
 
 * prep for native versatility **************************
 
- use  "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta", clear
- merge m:1 ingredient using "${codedata}/iv_versatility/median_suitability.dta"
+ use  "${versatility}/cuisine_ciat_suit.dta", clear
+ merge m:1 ingredient using "${versatility}/median_suitability.dta"
  tab _merge
  assert _merge == 3
  drop _merge
@@ -40,14 +40,14 @@
 	keep if aboveCutoff == 1
 	
 	** save to csv file
-	outsheet using "${codedata}/iv_versatility/native_`var'.csv", replace
+	outsheet using "${versatility}/native/native_`var'.csv", replace
 	
 	* Save native ingredients files based on cutoff
 	keep adm0 country ingredient
 	rename adm0 nativeadm0
 	rename country nativecountry
 	
-	save "${codedata}/iv_versatility/native_clean_`var'.dta", replace
+	save "${versatility}/native/native_clean_`var'.dta", replace
 	
 	restore
  	
@@ -55,15 +55,15 @@
 
 * prep for imported versatility **************************
 
- use "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta", clear
+ use "${versatility}/cuisine_ciat_suit.dta", clear
  keep adm0 ingredient
  rename ingredient nativeIng
  duplicates drop
  tempfile native
  save `native', replace
  
- use  "${codedata}/iv_versatility/recipe_suit.dta", clear
- merge m:1 ingredient using "${codedata}/iv_versatility/median_suitability.dta"
+ use  "${versatility}/cuisine_suit.dta", clear
+ merge m:1 ingredient using "${versatility}/median_suitability.dta"
  tab _merge
  assert _merge == 3 | _merge == 1
  keep if _merge == 3
@@ -84,8 +84,8 @@
  drop nativeIng
 
 ** save to csv file
- outsheet using "${codedata}/iv_versatility/imported_`var'.csv", replace
- save "${codedata}/iv_versatility/imported_`var'.dta", replace
+ outsheet using "${versatility}/imported/imported_`var'.csv", replace
+ save "${versatility}/imported/imported_`var'.dta", replace
  
  restore
  
@@ -96,7 +96,7 @@
 * 2 ingredients as a group **************************
 
 ** import data
- use  "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta", clear
+ use  "${versatility}/cuisine_ciat_suit.dta", clear
  keep ingredient
  duplicates drop
  sort ingredient
@@ -109,10 +109,10 @@
  
  gen common = .
  
- outsheet using "${codedata}/iv_versatility/common_flavor.csv", replace
+ outsheet using "${versatility}/common_flavor.csv", replace
  
 ** calculate number of common flavor componds
-cd "${codedata}/iv_versatility"
+cd "${versatility}"
 
 python
 
@@ -136,7 +136,7 @@ end
 * 3 ingredients as a group **************************
 
 ** import data
- use  "${codedata}/iv_versatility/recipe_flfp_ciat_suit.dta", clear
+ use  "${versatility}/cuisine_ciat_suit.dta", clear
  keep ingredient
  duplicates drop
  sort ingredient
@@ -150,10 +150,10 @@ end
  
  gen common = .
  
- outsheet using "${codedata}/iv_versatility/common_flavor_3ing.csv", replace
+ outsheet using "${versatility}/common_flavor_3ing.csv", replace
  
 ** calculate number of common flavor componds
-cd "${codedata}/iv_versatility"
+cd "${versatility}"
 
 python
 

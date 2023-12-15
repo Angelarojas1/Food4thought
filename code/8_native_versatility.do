@@ -3,11 +3,11 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *            This dofile creates native versatility files        	  *
    *																	  *
-   * - Inputs: "${codedata}/iv_versatility/native_`x'.csv"                *
-   *           "${codedata}/iv_versatility/common_flavor_clean.dta"       *
-   *           "${codedata}/iv_versatility/common_flavor_3ing_clean.dta"  *
-   * - Output: "${codedata}/iv_versatility/nativebycountry_`x'_g2simple.dta" 
-   *		   "${codedata}/iv_versatility/nativebycountry_`x'_g3weight.dta"
+   * - Inputs: "${versatility}/native/native_`x'.csv"              		  *
+   *           "${versatility}/common_flavor_clean.dta"     			  *
+   *           "${versatility}/common_flavor_3ing_clean.dta"  			  *
+   * - Output: "${versatility}/native/nativebycountry_`x'_g2simple.dta"	  * 
+   *		   "${versatility}/native/nativebycountry_`x'_g3weight.dta"   *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -27,7 +27,7 @@
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 	
 * import data
-import delimited "${codedata}/iv_versatility/native_`x'.csv", clear 
+import delimited "${versatility}/native/native_`x'.csv", clear 
 
 * keep variables
 keep adm0 ingredient country
@@ -53,7 +53,7 @@ drop if ingredient == ingredient2
 drop _fillin
 
 * get common flavors 
-merge 1:1 ingredient ingredient2 using "${codedata}/iv_versatility/common_flavor_clean.dta"
+merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 keep if _merge == 3
 drop _merge index
 
@@ -62,7 +62,7 @@ collapse (first)adm0 (first)country (mean)common
 
 rename common nativeVersatility
 
-save "${codedata}/iv_versatility/nativebycountry_`x'_g2simple.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g2simple.dta", replace
 
 restore
 
@@ -87,7 +87,7 @@ foreach l of local level{
 	drop _fillin
 
 	* get common flavors 
-	merge 1:1 ingredient ingredient2 using "${codedata}/iv_versatility/common_flavor_clean.dta"
+	merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 	count if _merge == 3
 	dis "`l'"
 	
@@ -103,14 +103,14 @@ foreach l of local level{
 	rename common nativeVersatility
 	
 	* append to original data 
-	append using "${codedata}/iv_versatility/nativebycountry_`x'_g2simple.dta" 
-	save "${codedata}/iv_versatility/nativebycountry_`x'_g2simple.dta", replace
+	append using "${versatility}/native/nativebycountry_`x'_g2simple.dta" 
+	save "${versatility}/native/nativebycountry_`x'_g2simple.dta", replace
 }
 
 
 * drop duplicates
 duplicates drop
-save "${codedata}/iv_versatility/nativebycountry_`x'_g2simple.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g2simple.dta", replace
 }
 
 ******************************************************
@@ -120,7 +120,7 @@ save "${codedata}/iv_versatility/nativebycountry_`x'_g2simple.dta", replace
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 	
 * import data
-import delimited "${codedata}/iv_versatility/native_`x'.csv", clear 
+import delimited "${versatility}/native/native_`x'.csv", clear 
 
 * keep variables
 keep adm0 ingredient suitability country
@@ -157,7 +157,7 @@ foreach i of local ing{
 }
 
 * get common flavors 
-merge 1:1 ingredient ingredient2 using "${codedata}/iv_versatility/common_flavor_clean.dta"
+merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 keep if _merge == 3
 drop _merge index
 
@@ -170,7 +170,7 @@ gen commonSuit2Suit = commonSuit2 * suitability
 collapse (first)adm0 (first)country (mean)commonSuit2Suit
 rename commonSuit2Suit nativeVersatility
 
-save "${codedata}/iv_versatility/nativebycountry_`x'_g2weight.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g2weight.dta", replace
 
 restore
 
@@ -206,7 +206,7 @@ foreach l of local level{
 	}
 
 	* get common flavors 
-	merge 1:1 ingredient ingredient2 using "${codedata}/iv_versatility/common_flavor_clean.dta"
+	merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 	count if _merge == 3
 	dis "`l'"
 	
@@ -227,14 +227,14 @@ foreach l of local level{
 	rename commonSuit2Suit nativeVersatility
 	
 	* append to original data 
-	append using "${codedata}/iv_versatility/nativebycountry_`x'_g2weight.dta" 
-	save "${codedata}/iv_versatility/nativebycountry_`x'_g2weight.dta", replace
+	append using "${versatility}/native/nativebycountry_`x'_g2weight.dta" 
+	save "${versatility}/native/nativebycountry_`x'_g2weight.dta", replace
 }
 
 
 * drop duplicates
 duplicates drop
-save "${codedata}/iv_versatility/nativebycountry_`x'_g2weight.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g2weight.dta", replace
 }
 
 ********************************************
@@ -244,7 +244,7 @@ save "${codedata}/iv_versatility/nativebycountry_`x'_g2weight.dta", replace
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 	
 * import data
-import delimited "${codedata}/iv_versatility/native_`x'.csv", clear 
+import delimited "${versatility}/native/native_`x'.csv", clear 
 
 * keep variables
 keep adm0 ingredient country
@@ -271,7 +271,7 @@ drop if _fillin == 0
 drop _fillin
 
 * get common flavors 
-merge 1:1 ingredient ingredient2 ingredient3 using "${codedata}/iv_versatility/common_flavor_3ing_clean.dta"
+merge 1:1 ingredient ingredient2 ingredient3 using "${versatility}/common_flavor_3ing_clean.dta"
 keep if _merge == 3
 drop _merge index
 
@@ -279,7 +279,7 @@ drop _merge index
 collapse (first)adm0 (first)country (mean)common
 rename common nativeVersatility
 
-save "${codedata}/iv_versatility/nativebycountry_`x'_g3simple.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g3simple.dta", replace
 
 restore
 
@@ -305,7 +305,7 @@ foreach l of local level{
 	drop _fillin
 
 	* get common flavors 
-	merge 1:1 ingredient ingredient2 ingredient3 using "${codedata}/iv_versatility/common_flavor_3ing_clean.dta"
+	merge 1:1 ingredient ingredient2 ingredient3 using "${versatility}/common_flavor_3ing_clean.dta"
 	count if _merge == 3
 	dis "`l'"
 	
@@ -322,14 +322,14 @@ foreach l of local level{
 	rename common nativeVersatility
 	
 	* append to original data 
-	append using "${codedata}/iv_versatility/nativebycountry_`x'_g3simple.dta" 
-	save "${codedata}/iv_versatility/nativebycountry_`x'_g3simple.dta", replace
+	append using "${versatility}/native/nativebycountry_`x'_g3simple.dta" 
+	save "${versatility}/native/nativebycountry_`x'_g3simple.dta", replace
 }
 
 
 * drop duplicates
 duplicates drop
-save "${codedata}/iv_versatility/nativebycountry_`x'_g3simple.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g3simple.dta", replace
 }
 
 ********************************************
@@ -338,7 +338,7 @@ save "${codedata}/iv_versatility/nativebycountry_`x'_g3simple.dta", replace
 
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 * import data
-import delimited "${codedata}/iv_versatility/native_`x'.csv", clear 
+import delimited "${versatility}/native/native_`x'.csv", clear 
 
 * keep variables
 keep adm0 ingredient country suitability
@@ -388,7 +388,7 @@ foreach i of local ing{
 
 
 * get common flavors 
-merge 1:1 ingredient ingredient2 ingredient3 using "${codedata}/iv_versatility/common_flavor_3ing_clean.dta"
+merge 1:1 ingredient ingredient2 ingredient3 using "${versatility}/common_flavor_3ing_clean.dta"
 keep if _merge == 3
 drop _merge index
 
@@ -403,7 +403,7 @@ gen weightcommon = stdweight * common
 collapse (first)adm0 (first)country (mean)weightcommon
 rename weightcommon nativeVersatility
 
-save "${codedata}/iv_versatility/nativebycountry_`x'_g3weight.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g3weight.dta", replace
 
 restore
 
@@ -451,7 +451,7 @@ foreach l of local level{
 
 
 	* get common flavors 
-	merge 1:1 ingredient ingredient2 ingredient3 using "${codedata}/iv_versatility/common_flavor_3ing_clean.dta"
+	merge 1:1 ingredient ingredient2 ingredient3 using "${versatility}/common_flavor_3ing_clean.dta"
 	count if _merge == 3
 	dis "`l'"
 	
@@ -475,14 +475,14 @@ foreach l of local level{
 
 	
 	* append to original data 
-	append using "${codedata}/iv_versatility/nativebycountry_`x'_g3weight.dta" 
-	save "${codedata}/iv_versatility/nativebycountry_`x'_g3weight.dta", replace
+	append using "${versatility}/native/nativebycountry_`x'_g3weight.dta" 
+	save "${versatility}/native/nativebycountry_`x'_g3weight.dta", replace
 }
 
 
 * drop duplicates
 duplicates drop
-save "${codedata}/iv_versatility/nativebycountry_`x'_g3weight.dta", replace
+save "${versatility}/native/nativebycountry_`x'_g3weight.dta", replace
 
 
 }

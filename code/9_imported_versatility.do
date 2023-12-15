@@ -3,11 +3,11 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *            This dofile creates imported versatility files   		  *
    *																	  *
-   * - Inputs: "${codedata}/iv_versatility/imported_`x'.csv"              *
-   *           "${codedata}/iv_versatility/common_flavor_clean.dta"       *
-   *           "${codedata}/iv_versatility/native_clean_`x'.dta"          *
-   *           "${codedata}/iv_versatility/distance_capital.dta"          *
-   * - Output: "${codedata}/iv_versatility/importbycountry_`x'.dta"       *
+   * - Inputs: "${versatility}/imported/imported_`x'.csv"              	  *
+   *           "${versatility}/common_flavor_clean.dta"      			  *
+   *           "${versatility}/native_clean_`x'.dta"         			  *
+   *           "${versatility}/distance_capital.dta"         			  *
+   * - Output: "${versatility}/imported/importbycountry_`x'.dta"      	  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -25,7 +25,7 @@ clear
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 	
 * imported data
-import delimited "${codedata}/iv_versatility/imported_`x'.csv", clear 
+import delimited "${versatility}/imported/imported_`x'.csv", clear 
 
 * keep variables
 keep adm0 ingredient suitability country ifnative
@@ -75,7 +75,7 @@ foreach i of local ing{
 }
 
 * get common flavors 
-merge 1:1 ingredient ingredient2 using "${codedata}/iv_versatility/common_flavor_clean.dta"
+merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 count if _merge == 3
 	dis "`l'"
 	
@@ -91,8 +91,8 @@ replace weight = 1 if ifnative2 == 1
 
 ** calculate the distance between the country and origin of the ingredient2
 rename (ingredient ingredient2) (ingredientrow ingredient)
-joinby ingredient using "${codedata}/iv_versatility/native_clean_`x'.dta"
-joinby adm0 nativeadm0 using "${codedata}/iv_versatility/distance_capital.dta"
+joinby ingredient using "${versatility}/native_clean_`x'.dta"
+joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 count 
 
@@ -123,8 +123,8 @@ keep if ifnative == 0
 drop ifnative
 
 * calculate the distance between the country and origin of the ingredient
-joinby ingredient using "${codedata}/iv_versatility/native_clean_`x'.dta"
-joinby adm0 nativeadm0 using "${codedata}/iv_versatility/distance_capital.dta"
+joinby ingredient using "${versatility}/native_clean_`x'.dta"
+joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 * calculate imported versatility
 ** keep the nearest distance
@@ -137,7 +137,7 @@ gen commondistance = 1/distance * common
 collapse (first)adm0 (first)country (mean)commondistance
 rename commondistance importVersatility
 
-save "${codedata}/iv_versatility/importbycountry_v2_`x'.dta", replace
+save "${versatility}/imported/importbycountry_v2_`x'.dta", replace
 restore
 
 * loop through rest of countries
@@ -183,7 +183,7 @@ foreach l of local level{
 	replace ifnative2 = `s' if ingredient2 == "`i'"
 	}
 
-	merge 1:1 ingredient ingredient2 using "${codedata}/iv_versatility/common_flavor_clean.dta"
+	merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 	count if _merge == 3
 	if r(N) == 0{
 		continue
@@ -197,8 +197,8 @@ foreach l of local level{
 
 	** calculate the distance between the country and origin of the ingredient2
 	rename (ingredient ingredient2) (ingredientrow ingredient)
-	joinby ingredient using "${codedata}/iv_versatility/native_clean_`x'.dta"
-	joinby adm0 nativeadm0 using "${codedata}/iv_versatility/distance_capital.dta"
+	joinby ingredient using "${versatility}/native_clean_`x'.dta"
+	joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 	count 
 
@@ -234,9 +234,9 @@ foreach l of local level{
 	drop ifnative
 
 	* calculate the distance between the country and origin of the ingredient
-	joinby ingredient using "${codedata}/iv_versatility/native_clean_`x'.dta"
+	joinby ingredient using "${versatility}/native_clean_`x'.dta"
 	dis "`l'"
-	joinby adm0 nativeadm0 using "${codedata}/iv_versatility/distance_capital.dta"
+	joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 	* calculate imported versatility
 	** keep the nearest distance
@@ -250,14 +250,14 @@ foreach l of local level{
 	rename commondistance importVersatility
 	
 	* append to original data 
-	append using "${codedata}/iv_versatility/importbycountry_v2_`x'.dta" 
-	save "${codedata}/iv_versatility/importbycountry_v2_`x'.dta", replace
+	append using "${versatility}/imported/importbycountry_v2_`x'.dta" 
+	save "${versatility}/imported/importbycountry_v2_`x'.dta", replace
 }
 
 
 * drop duplicates
 duplicates drop
 
-save "${codedata}/iv_versatility/importbycountry_`x'.dta", replace
+save "${versatility}/imported/importbycountry_`x'.dta", replace
 
 }

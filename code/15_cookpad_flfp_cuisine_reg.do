@@ -1,20 +1,33 @@
-****************************************
-* Data cleaning for cookpad 
-****************************************
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *This dofile runs regressions using Cookpad, FLFP and cuisine variables*
+   *																	  *
+   * - Inputs: "${codedata}/cookpad/Cookpad_clean.dta"				      *
+   *		   "${codedata}/recipes/cuisine_complexity_sum.dta"			  *
+   *		   "${codedata}/flfp/FLFPlong2019.dta"						  *
+   * - Output: "${outputs}/Tables/cookpad/olsr1.tex"				      *
+   *		   "${outputs}/Tables/cookpad/olsr2.tex"					  *
+   *		   "${outputs}/Tables/cookpad/olsr3.tex"					  *
+   *		   "${outputs}/Tables/cookpad/olsr4.tex"					  *
+   *		   "${outputs}/Figures/cookpad/`y'_`x'.png"					  *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Xinyu Ren
+   ** EDITTED BY:       Angela Rojas
+   ** Last date modified: Dec 13, 2023
+
+***********************************************
+* Merge cookpad data with cuisine and FLFP data
+***********************************************
 
 *import data
-use "${rawdata}/cookpad/Cookpad_032023.dta", clear
+use "${codedata}/cookpad/Cookpad_clean.dta", clear
 
 * keep useful variables
-keep COUNTRYNEW COUNTRY_ISO3 WGT YEAR_WAVE WP19967-WP19974 WP1219
-
-* rename variables
-rename (COUNTRYNEW COUNTRY_ISO3 WGT YEAR_WAVE WP19967 WP19960 WP19975 WP19968 WP1219) (country three_letter_country_code weight year numLunCook numLunEat numDinCook numDinEat gender)
-
-* replace missing values
-foreach var of varlist numLunCook numLunEat numDinCook numDinEat{
-	replace `var' = . if `var' == 98 | `var' == 99
-}
+keep country three_letter_country_code weight year numLunCook numLunEat numDinCook numDinEat gender
 
 * generate new variables
 egen numTotalCook = rowtotal(numLunCook numLunCook)
@@ -28,28 +41,30 @@ egen pctTotalCook = rowmean(pctLunCook pctDinCook)
 * collapse
 collapse numLunCook numDinCook numLunEat numDinEat numTotalCook numTotalEat, by(three_letter_country_code country)
 
-* save dataset
-save "${codedata}/cookpad/Cookpad_sum.dta", replace
-
 * generate summary statistics for each variable
 foreach var of varlist numLunCook numLunEat numDinCook numDinEat numTotalCook numTotalEat{
 	sum `var', de
 }
 
-* merge with recipe data
-merge 1:1 three_letter_country_code using "${codedata}/recipes/recipe_FLFP2019.dta"
+* merge with cuisine data
+rename three_letter_country_code adm0
+merge 1:1 adm0 using "${codedata}/recipes/cuisine_complexity_sum.dta" 
+keep if _merge == 3
+drop _merge
+
+* merge with FLFP data
+merge 1:1 country using "${codedata}/flfp/FLFPlong2019.dta"
 keep if _merge == 3
 drop _merge
 
 * reduced form
 ** generate variables
 encode continent_name, gen(continentFactor)
-rename mTime mtime
-gen logmtime = log(mtime)
+gen logtime_mean = log(time_mean)
 
 foreach var of varlist numLunCook numLunEat numDinCook numDinEat numTotalCook numTotalEat{
-	gen time_`var' = mtime*`var'
-	gen logtime_`var' = log(mtime*`var')
+	gen time_`var' = time_mean*`var'
+	gen logtime_`var' = log(time_mean*`var')
 }
 
 ** label variables
@@ -67,8 +82,8 @@ label var time_numLunEat "avg time*avg lunch eat"
 label var time_numDinEat "avg time*avg dinner eat"
 label var time_numTotalEat "avg time*avg total eat"
 
-label var mtime "avg cooking time"
-label var logmtime "log avg cooking time"
+label var time_mean "avg cooking time"
+label var logtime_mean "log avg cooking time"
 
 ** regressions
 /*
@@ -79,7 +94,7 @@ iv.	FLFP = log (average cooking time* number of meals)
 
 */
 foreach var of varlist time_numLunCook time_numDinCook time_numTotalCook time_numLunEat time_numDinEat time_numTotalEat{
-	reg FLFP mtime `var' [aweight=num_recipes], absorb(continentFactor)
+	reg FLFP time_mean `var' [aweight=num_recipes], absorb(continentFactor)
 	eststo r1`var'
 	sum	FLFP if e(sample)
 	local mean = r(mean)
@@ -93,7 +108,7 @@ foreach var of varlist time_numLunCook time_numDinCook time_numTotalCook time_nu
 	estadd scalar mean = `mean'
 	estadd local continent "\multicolumn{1}{c}{Yes}"
 	
-	reg FLFP logmtime log`var'[aweight=num_recipes], absorb(continentFactor)
+	reg FLFP logtime_mean log`var'[aweight=num_recipes], absorb(continentFactor)
 	eststo r3`var'
 	sum	FLFP if e(sample)
 	local mean = r(mean)
@@ -109,28 +124,28 @@ foreach var of varlist time_numLunCook time_numDinCook time_numTotalCook time_nu
 }
 
 
-esttab r1time_numLunCook r1time_numDinCook r1time_numTotalCook r1time_numLunEat r1time_numDinEat r1time_numTotalEat using "${outputs}/Tables/cookpad/orsr1.tex", ///
+esttab r1time_numLunCook r1time_numDinCook r1time_numTotalCook r1time_numLunEat r1time_numDinEat r1time_numTotalEat using "${outputs}/Tables/cookpad/olsr1.tex", ///
 se r2 star(* 0.1 ** 0.05 *** .01) label ///
 s( r2  mean N continent, ///
 labels( "\midrule R-squared" "Control Mean" "Number of obs." "Continent") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
 nobaselevels  prehead("\begin{tabular}{l*{7}{c}} \hline\hline") ///
 fragment postfoot("\hline" "\end{tabular}")replace
 
-esttab r2time_numLunCook r2time_numDinCook r2time_numTotalCook r2time_numLunEat r2time_numDinEat r2time_numTotalEat using "${outputs}/Tables/cookpad/orsr2.tex", ///
+esttab r2time_numLunCook r2time_numDinCook r2time_numTotalCook r2time_numLunEat r2time_numDinEat r2time_numTotalEat using "${outputs}/Tables/cookpad/olsr2.tex", ///
 se r2 star(* 0.1 ** 0.05 *** .01) label ///
 s( r2  mean N continent, ///
 labels( "\midrule R-squared" "Control Mean" "Number of obs." "Continent") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
 nobaselevels  prehead("\begin{tabular}{l*{7}{c}} \hline\hline") ///
 fragment postfoot("\hline" "\end{tabular}")replace
 
-esttab r3time_numLunCook r3time_numDinCook r3time_numTotalCook r3time_numLunEat r3time_numDinEat r3time_numTotalEat using "${outputs}/Tables/cookpad/orsr3.tex", ///
+esttab r3time_numLunCook r3time_numDinCook r3time_numTotalCook r3time_numLunEat r3time_numDinEat r3time_numTotalEat using "${outputs}/Tables/cookpad/olsr3.tex", ///
 se r2 star(* 0.1 ** 0.05 *** .01) label ///
 s( r2  mean N continent, ///
 labels( "\midrule R-squared" "Control Mean" "Number of obs." "Continent") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
 nobaselevels  prehead("\begin{tabular}{l*{7}{c}} \hline\hline") ///
 fragment postfoot("\hline" "\end{tabular}")replace
 
-esttab r4time_numLunCook r4time_numDinCook r4time_numTotalCook r4time_numLunEat r4time_numDinEat r4time_numTotalEat using "${outputs}/Tables/cookpad/orsr4.tex", ///
+esttab r4time_numLunCook r4time_numDinCook r4time_numTotalCook r4time_numLunEat r4time_numDinEat r4time_numTotalEat using "${outputs}/Tables/cookpad/olsr4.tex", ///
 se r2 star(* 0.1 ** 0.05 *** .01) label ///
 s( r2  mean N continent, ///
 labels( "\midrule R-squared" "Control Mean" "Number of obs." "Continent") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
@@ -138,7 +153,7 @@ nobaselevels  prehead("\begin{tabular}{l*{7}{c}} \hline\hline") ///
 fragment postfoot("\hline" "\end{tabular}")replace
 
 * scatter plot
-foreach y of varlist FLFP mtime mIng mSpice{
+foreach y of varlist FLFP time_mean ingredients_mean spices_mean{
 	foreach x of varlist numLunCook numDinCook numTotalCook numLunEat numDinEat numTotalEat{
 		qui reg `y' `x'
 		loc p = r(table)[4,1]

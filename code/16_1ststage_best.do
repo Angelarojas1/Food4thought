@@ -26,12 +26,11 @@
 
 local fval = -100
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
-	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{
+	foreach y in "g2weight" "g3simple" "g3weight"{ // "g2simple" 
 		foreach z in "p0" "p10" "p25" "p50" "p60" "p70"{
 
 		
 use "${codedata}/recipes/recipe_FLFP2019.dta", clear
-rename three_letter_country_code adm0
 
 ** merge with geographical data
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/geographical.dta"
@@ -43,9 +42,9 @@ drop _merge
 
 ** merge with numNative
 preserve
-use "${codedata}/iv_versatility/recipe_flfp_ciat.dta", clear
+use "${codedata}/iv_versatility/recipe_ciat.dta", clear
 quietly unique adm0
-assert `r(sum)' == 135
+assert `r(sum)' == 136
 keep adm0 numNative
 quietly duplicates drop
 tempfile numNative
@@ -53,6 +52,7 @@ save `numNative', replace
 restore
 
 quietly merge 1:1 adm0 using `numNative'
+drop if adm0 == "XXK" // Kosovo
 assert _merge == 3
 drop _merge
 
@@ -61,6 +61,7 @@ assert `r(sum)' == 135
 
 ** merge with native versatility
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"
+drop if adm0 == "XXK" // Kosovo
 assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
 drop _merge
@@ -71,6 +72,7 @@ assert !missing(nativeVersatility)
 
 ** merge with imported versatility
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/importbycountry_`z'.dta"
+drop if adm0 == "XXK" // Kosovo
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -81,7 +83,7 @@ assert !missing(importVersatility)
 
 ** create factor 
 encode continent_name, gen(continentFactor)
-gen logmtime = log(mTime)
+gen logtime_mean = log(time_mean)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
@@ -89,11 +91,11 @@ label var std_native "std of native versatility"
 label var nativeVersatility "native versatility"
 label var std_import "std of import versatility"
 label var importVersatility "import versatility"
-label var mIng "average number of ingredients"
-label var mSpice "average number of spices"
+label var ingredients_mean "average number of ingredients"
+label var spices_mean "average number of spices"
 
 	* 1st stage
-	quietly reghdfe logmtime std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
+	quietly reghdfe logtime_mean std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
 	
 	if `e(F)' > `fval'{
 		local fval = e(F)
@@ -114,7 +116,6 @@ foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 
 		
 use "${codedata}/recipes/recipe_FLFP2019.dta", clear
-rename three_letter_country_code adm0
 
 ** merge with geographical data
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/geographical.dta"
@@ -126,9 +127,9 @@ drop _merge
 
 ** merge with numNative
 preserve
-use "${codedata}/iv_versatility/recipe_flfp_ciat.dta", clear
+use "${codedata}/iv_versatility/recipe_ciat.dta", clear
 quietly unique adm0
-assert `r(sum)' == 135
+assert `r(sum)' == 136
 keep adm0 numNative
 quietly duplicates drop
 tempfile numNative
@@ -136,6 +137,7 @@ save `numNative', replace
 restore
 
 quietly merge 1:1 adm0 using `numNative'
+drop if adm0 == "XXK" // Kosovo
 assert _merge == 3
 drop _merge
 
@@ -144,6 +146,7 @@ assert `r(sum)' == 135
 
 ** merge with native versatility
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"
+drop if adm0 == "XXK" // Kosovo
 assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
 drop _merge
@@ -154,6 +157,7 @@ assert !missing(nativeVersatility)
 
 ** merge with imported versatility
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/importbycountry_`z'.dta"
+drop if adm0 == "XXK" // Kosovo
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -164,7 +168,7 @@ assert !missing(importVersatility)
 
 ** create factor 
 encode continent_name, gen(continentFactor)
-gen logmtime = log(mTime)
+gen logtime_mean = log(time_mean)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
@@ -172,11 +176,11 @@ label var std_native "std of native versatility"
 label var nativeVersatility "native versatility"
 label var std_import "std of import versatility"
 label var importVersatility "import versatility"
-label var mIng "average number of ingredients"
-label var mSpice "average number of spices"
+label var ingredients_mean "average number of ingredients"
+label var spices_mean "average number of spices"
 
 	* 1st stage
-	quietly reghdfe mIng std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
+	quietly reghdfe ingredients_mean std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
 	
 	if `e(F)' > `fval'{
 		local fval = e(F)
@@ -198,7 +202,6 @@ foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
 
 		
 use "${codedata}/recipes/recipe_FLFP2019.dta", clear
-rename three_letter_country_code adm0
 
 ** merge with geographical data
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/geographical.dta"
@@ -210,9 +213,9 @@ drop _merge
 
 ** merge with numNative
 preserve
-use "${codedata}/iv_versatility/recipe_flfp_ciat.dta", clear
+use "${codedata}/iv_versatility/recipe_ciat.dta", clear
 quietly unique adm0
-assert `r(sum)' == 135
+assert `r(sum)' == 136
 keep adm0 numNative
 quietly duplicates drop
 tempfile numNative
@@ -220,6 +223,7 @@ save `numNative', replace
 restore
 
 quietly merge 1:1 adm0 using `numNative'
+drop if adm0 == "XXK" // Kosovo
 assert _merge == 3
 drop _merge
 
@@ -228,6 +232,7 @@ assert `r(sum)' == 135
 
 ** merge with native versatility
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"
+drop if adm0 == "XXK" // Kosovo
 assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
 drop _merge
@@ -238,6 +243,7 @@ assert !missing(nativeVersatility)
 
 ** merge with imported versatility
 quietly merge 1:1 adm0 using "${codedata}/iv_versatility/importbycountry_`z'.dta"
+drop if adm0 == "XXK" // Kosovo
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -248,7 +254,7 @@ assert !missing(importVersatility)
 
 ** create factor 
 encode continent_name, gen(continentFactor)
-gen logmtime = log(mTime)
+gen logtime_mean = log(time_mean)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
@@ -256,11 +262,11 @@ label var std_native "std of native versatility"
 label var nativeVersatility "native versatility"
 label var std_import "std of import versatility"
 label var importVersatility "import versatility"
-label var mIng "average number of ingredients"
-label var mSpice "average number of spices"
+label var ingredients_mean "average number of ingredients"
+label var spices_mean "average number of spices"
 
 	* 1st stage
-	quietly reghdfe mSpice std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
+	quietly reghdfe spices_mean std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
 	
 	if `e(F)' > `fval'{
 		local fval = e(F)
