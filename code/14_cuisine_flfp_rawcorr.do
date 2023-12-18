@@ -3,8 +3,8 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *   This dofile shows raw correlations of FLFP and cuisine complexity  *
    *																	  *
-   * - Inputs: "${codedata}/flfp/FLFPlong2019.dta"						  *
-   *		   "${codedata}/recipes/cuisine_complexity_sum.dta"		      *
+   * - Inputs: "${flfp}/FLFPlong2019.dta"						  *
+   *		   "${recipes}/cuisine_complexity_sum.dta"		      *
    * - Output: "${outputs}/Figures/RecipeFLFPTime.png"				      *
    *		   "${outputs}/Figures/RecipeFLFPSpi.png"					  *
    *		   "${outputs}/Figures/RecipeFLFPIng.png"					  *
@@ -17,10 +17,10 @@
    ** Last date modified: Dec 13, 2023
 
 * import FLFP dataset
-use "${codedata}/flfp/FLFPlong2019.dta", clear
+use "${flfp}/FLFPlong2019.dta", clear
 
 * Merge cuisine data with FLFP data *
-merge 1:1 country using "${codedata}/recipes/cuisine_complexity_sum.dta"
+merge 1:1 country using "${recipes}/cuisine_complexity_sum.dta"
 tab _merge
 assert inlist(_merge, 1, 2, 3)
 

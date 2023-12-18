@@ -4,7 +4,7 @@
    *        This dofile merges recipe, region, country dataset      	  *
    *																	  *
    * - Inputs: "${rawdata}/CIAT/food_supplies_countries_regions_all_merge.csv"
-   *           "${codedata}/recipes/cuisine_complexity_sum.dta"		      *
+   *           "${recipes}/cuisine_complexity_sum.dta"		      *
    *		   "${rawdata}/CIAT/ingredients_category.xlsx"				  *
    *		   "${rawdata}/CIAT/region_ingredients.xlsx"				  *
    * - Output: "${versatility}/cuisine_ciat.dta"         	  			  *
@@ -47,7 +47,7 @@ duplicates drop
  replace country = "Vietnam" if country == "Viet Nam"
 
 preserve
-merge m:1 country using "${codedata}/recipes/cuisine_complexity_sum.dta"
+merge m:1 country using "${recipes}/cuisine_complexity_sum.dta"
 tab _merge
 assert inlist(_merge, 1, 2, 3)
 
@@ -91,7 +91,7 @@ replace country = "Tuvalu" if _n == _N
 replace region_nice = "Australia New Zealand" if _n == _N
 
 preserve
-merge m:1 country using "${codedata}/recipes/cuisine_complexity_sum.dta"
+merge m:1 country using "${recipes}/cuisine_complexity_sum.dta"
 tab _merge
 assert _merge != 2
 restore
@@ -160,7 +160,7 @@ import excel "${rawdata}/CIAT/region_ingredients.xlsx", sheet("Sheet1") firstrow
  drop _merge
  
 ** merge with recipe and limit to countries that we have recipes
- merge m:1 country using "${codedata}/recipes/cuisine_complexity_sum.dta"
+ merge m:1 country using "${recipes}/cuisine_complexity_sum.dta"
  tab _merge
  assert inlist(_merge, 1, 2, 3)
  

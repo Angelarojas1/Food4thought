@@ -3,9 +3,9 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *       This dofile organizes time, ingredients and spices variables	  *
    *																	  *
-   * - Inputs: "${codedata}/recipes/recipe_all_countries.dta"		      *
-   * - Output: "${codedata}/recipes/cuisine_complexity_all.dta"	          *
-   *		   "${codedata}/recipes/cuisine_complexity_sum.dta"			  *
+   * - Inputs: "${recipes}/recipe_all_countries.dta"		      		  *
+   * - Output: "${recipes}/cuisine_complexity_all.dta"	          		  *
+   *		   "${recipes}/cuisine_complexity_sum.dta"			  		  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -16,7 +16,7 @@
 
 * Check time, ingredients and spices variables
 * import data
-use "${codedata}/recipes/recipe_all_countries.dta", clear
+use "${recipes}/recipe_all_countries.dta", clear
 
 ** drop recipes that the total time are higher than 99%
 bys country: egen p99 = pctile(totaltime), p(99)
@@ -52,9 +52,9 @@ foreach var of varlist time* ing* spices*{
 }
 
 ** save dataset
-save "${codedata}/recipes/cuisine_complexity_all.dta", replace
+save "${recipes}/cuisine_complexity_all.dta", replace
 
 * Keep only mean and median measures
 keep time_mean time_median ingredients_mean ingredients_median spices_mean spices_median num_recipes continent_name two_letter_country_code adm0 country
 
-save "${codedata}/recipes/cuisine_complexity_sum.dta", replace
+save "${recipes}/cuisine_complexity_sum.dta", replace

@@ -3,9 +3,9 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    * This dofile calculate distance between any two countries in the world*
    *																	  *
-   * - Inputs: "${codedata}/recipes/cuisine_complexity_sum.dta"	          *
+   * - Inputs: "${recipes}/cuisine_complexity_sum.dta"	          *
    *           "${rawdata}/distance/geo_cepii.dta"				          *
-   * - Output: "${codedata}/iv_versatility/distance_capital.dta"          *
+   * - Output: "${versatility}/distance_capital.dta"          			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -21,7 +21,7 @@
 
 * calculate distance between any two countries in the world **********************
 
- use "${codedata}/recipes/cuisine_complexity_sum.dta", clear
+ use "${recipes}/cuisine_complexity_sum.dta", clear
 
  preserve
  keep adm0 country
@@ -113,4 +113,4 @@ rename country2 nativecountry
 rename adm0_2 nativeadm0
 rename capital_distance distance
 
-save "${codedata}/iv_versatility/distance_capital.dta", replace
+save "${versatility}/distance_capital.dta", replace

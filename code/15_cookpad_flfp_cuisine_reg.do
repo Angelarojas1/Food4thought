@@ -3,9 +3,9 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *This dofile runs regressions using Cookpad, FLFP and cuisine variables*
    *																	  *
-   * - Inputs: "${codedata}/cookpad/Cookpad_clean.dta"				      *
-   *		   "${codedata}/recipes/cuisine_complexity_sum.dta"			  *
-   *		   "${codedata}/flfp/FLFPlong2019.dta"						  *
+   * - Inputs: "${cookpad}/Cookpad_clean.dta"				      		  *
+   *		   "${recipes}/cuisine_complexity_sum.dta"					  *
+   *		   "${flfp}/FLFPlong2019.dta"						  		  *
    * - Output: "${outputs}/Tables/cookpad/olsr1.tex"				      *
    *		   "${outputs}/Tables/cookpad/olsr2.tex"					  *
    *		   "${outputs}/Tables/cookpad/olsr3.tex"					  *
@@ -24,7 +24,7 @@
 ***********************************************
 
 *import data
-use "${codedata}/cookpad/Cookpad_clean.dta", clear
+use "${cookpad}/Cookpad_clean.dta", clear
 
 * keep useful variables
 keep country three_letter_country_code weight year numLunCook numLunEat numDinCook numDinEat gender
@@ -48,12 +48,12 @@ foreach var of varlist numLunCook numLunEat numDinCook numDinEat numTotalCook nu
 
 * merge with cuisine data
 rename three_letter_country_code adm0
-merge 1:1 adm0 using "${codedata}/recipes/cuisine_complexity_sum.dta" 
+merge 1:1 adm0 using "${recipes}/cuisine_complexity_sum.dta" 
 keep if _merge == 3
 drop _merge
 
 * merge with FLFP data
-merge 1:1 country using "${codedata}/flfp/FLFPlong2019.dta"
+merge 1:1 adm0 using "${flfp}/FLFPlong2019.dta"
 keep if _merge == 3
 drop _merge
 

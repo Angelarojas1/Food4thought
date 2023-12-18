@@ -4,12 +4,15 @@
    *            This dofile gets regressions results to identify most     *
    *            accurate one 											  *
    *																	  *
-   * - Inputs: "${codedata}/recipes/recipe_FLFP2019.dta"	              *
-   *           "${codedata}/iv_versatility/geographical.dta"              *
-   *           "${codedata}/iv_versatility/recipe_flfp_ciat.dta"          *
-   *           "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"   *
-   *           "${codedata}/iv_versatility/importbycountry_`z'.dta"       *
-   * - Output:                                                            *
+   * - Inputs: "${recipes}/cuisine_complexity_sum.dta"		              *
+   *		   "${flfp}/FLFPlong2019.dta"								  *
+   *           "${versatility}/geographical.dta"              			  *
+   *           "${versatility}/cuisine_ciat.dta"         				  *
+   *           "${versatility}/native/nativebycountry_`x'_`y'.dta"  	  *
+   *           "${versatility}/imported/importbycountry_`z'.dta"       	  *
+   * - Output: "${outputs}/Tables/iv_best/best_time.tex"                  *
+   *		   "${outputs}/Tables/iv_best/best_ingredient.tex"			  *
+   *		   "${outputs}/Tables/iv_best/best_spices.tex"				  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -23,26 +26,35 @@
 ****************************************
 
 * Note: find the highest f statistics: p60, g3simple, p60
-
+eststo clear
 local fval = -100
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
-	foreach y in "g2weight" "g3simple" "g3weight"{ // "g2simple" 
+	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
 		foreach z in "p0" "p10" "p25" "p50" "p60" "p70"{
 
 		
-use "${codedata}/recipes/recipe_FLFP2019.dta", clear
+use "${recipes}/cuisine_complexity_sum.dta", clear
 
 ** merge with geographical data
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/geographical.dta"
+quietly merge 1:1 adm0 using "${versatility}/geographical.dta"
 assert _merge != 2
 quietly keep if _merge == 3
 quietly count
 assert `r(N)' == 135
 drop _merge
 
-** merge with numNative
+** organize FLFP data
 preserve
-use "${codedata}/iv_versatility/recipe_ciat.dta", clear
+use "${flfp}/FLFPlong2019.dta", clear
+quietly unique country
+keep country FLFP
+tempfile flfp
+save `flfp', replace
+restore
+
+** Organize native ingredients data
+preserve
+use "${versatility}/cuisine_ciat.dta", clear
 quietly unique adm0
 assert `r(sum)' == 136
 keep adm0 numNative
@@ -51,16 +63,23 @@ tempfile numNative
 save `numNative', replace
 restore
 
+** merge with numNative ingredients
 quietly merge 1:1 adm0 using `numNative'
+rename _merge _merge1
+
+** merge with FLFP
+quietly merge 1:1 country using `flfp'
+drop if _merge == 2
 drop if adm0 == "XXK" // Kosovo
 assert _merge == 3
-drop _merge
+assert _merge1 == 3
+drop _merge*
 
 quietly unique adm0
 assert `r(sum)' == 135
 
 ** merge with native versatility
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"
+quietly merge 1:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
 drop if adm0 == "XXK" // Kosovo
 assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
@@ -71,7 +90,7 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/importbycountry_`z'.dta"
+quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_`z'.dta"
 drop if adm0 == "XXK" // Kosovo
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
@@ -83,51 +102,72 @@ assert !missing(importVersatility)
 
 ** create factor 
 encode continent_name, gen(continentFactor)
-gen logtime_mean = log(time_mean)
+gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
-label var std_native "std of native versatility"
-label var nativeVersatility "native versatility"
-label var std_import "std of import versatility"
-label var importVersatility "import versatility"
-label var ingredients_mean "average number of ingredients"
-label var spices_mean "average number of spices"
+rename (logtime_median ingredients_median spices_median) (lt_md ing_md sp_md)
 
-	* 1st stage
-	quietly reghdfe logtime_mean std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
+	* 1st stage		
+	quietly reghdfe lt_md std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor)  
 	
 	if `e(F)' > `fval'{
 		local fval = e(F)
-		dis `fval'
-		dis "`x'"
-		dis "`y'"
-		dis "`z'"
+*		dis `fval'
+*		dis "`x'"
+*		dis "`y'"
+*		dis "`z'"
+
+		eststo t`x'`y'`z'
+		sum lt_md if e(sample)
+		local mean = r(mean)
+		estadd scalar mean = `mean'
 	}
 	
-		}
-		}
-		}
-
+	}
+	}
+	}
+	
+		esttab t* using "${outputs}/Tables/iv_best/best_time.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(std_native std_import) label ///
+		mtitle ///
+		s( r2  mean N, ///
+		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
+		nobaselevels  prehead("\begin{tabular}{l*{12}{c}} \hline\hline") ///
+		fragment postfoot("Continent & Yes & & & \\"  ///
+		"Geographical & Yes & & & \\" ///
+		"\hline" "\end{tabular}") replace
+eststo clear
+		
+** Ingredients
 local fval = -100
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
-	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{
+	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
 		foreach z in "p0" "p10" "p25" "p50" "p60" "p70"{
 
 		
-use "${codedata}/recipes/recipe_FLFP2019.dta", clear
+use "${recipes}/cuisine_complexity_sum.dta", clear
 
 ** merge with geographical data
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/geographical.dta"
+quietly merge 1:1 adm0 using "${versatility}/geographical.dta"
 assert _merge != 2
 quietly keep if _merge == 3
 quietly count
 assert `r(N)' == 135
 drop _merge
 
-** merge with numNative
+** organize FLFP data
 preserve
-use "${codedata}/iv_versatility/recipe_ciat.dta", clear
+use "${flfp}/FLFPlong2019.dta", clear
+quietly unique country
+keep country FLFP
+tempfile flfp
+save `flfp', replace
+restore
+
+** Organize native ingredients data
+preserve
+use "${versatility}/cuisine_ciat.dta", clear
 quietly unique adm0
 assert `r(sum)' == 136
 keep adm0 numNative
@@ -136,16 +176,23 @@ tempfile numNative
 save `numNative', replace
 restore
 
+** merge with numNative ingredients
 quietly merge 1:1 adm0 using `numNative'
+rename _merge _merge1
+
+** merge with FLFP
+quietly merge 1:1 country using `flfp'
+drop if _merge == 2
 drop if adm0 == "XXK" // Kosovo
 assert _merge == 3
-drop _merge
+assert _merge1 == 3
+drop _merge*
 
 quietly unique adm0
 assert `r(sum)' == 135
 
 ** merge with native versatility
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"
+quietly merge 1:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
 drop if adm0 == "XXK" // Kosovo
 assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
@@ -156,7 +203,7 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/importbycountry_`z'.dta"
+quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_`z'.dta"
 drop if adm0 == "XXK" // Kosovo
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
@@ -168,52 +215,74 @@ assert !missing(importVersatility)
 
 ** create factor 
 encode continent_name, gen(continentFactor)
-gen logtime_mean = log(time_mean)
+gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
-label var std_native "std of native versatility"
-label var nativeVersatility "native versatility"
-label var std_import "std of import versatility"
-label var importVersatility "import versatility"
-label var ingredients_mean "average number of ingredients"
-label var spices_mean "average number of spices"
+rename (logtime_median ingredients_median spices_median) (lt_md ing_md sp_md)
 
-	* 1st stage
-	quietly reghdfe ingredients_mean std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
+	* 1st stage		
+	quietly reghdfe ing_md std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor)  
 	
 	if `e(F)' > `fval'{
 		local fval = e(F)
-		dis `fval'
-		dis "`x'"
-		dis "`y'"
-		dis "`z'"
+*		dis `fval'
+*		dis "`x'"
+*		dis "`y'"
+*		dis "`z'"
+
+		eststo i`x'`y'`z'
+		sum ing_md if e(sample)
+		local mean = r(mean)
+		estadd scalar mean = `mean'
 	}
 	
-		}
-		}
-		}
-		
-		
+	}
+	}
+	}
+	
+lab var ing_md "ing_md"
+	
+		esttab i* using "${outputs}/Tables/iv_best/best_ingredient.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(std_native std_import)label ///
+				mtitle ///
+		s( r2  mean N, ///
+		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
+		nobaselevels  prehead("\begin{tabular}{l*{5}{c}} \hline\hline") ///
+		fragment postfoot("Continent & Yes & & & \\"  ///
+		"Geographical & Yes & & & \\" ///
+		"\hline" "\end{tabular}") replace
+eststo clear
+
+** Spices
 local fval = -100
 foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
-	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{
+	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
 		foreach z in "p0" "p10" "p25" "p50" "p60" "p70"{
 
 		
-use "${codedata}/recipes/recipe_FLFP2019.dta", clear
+use "${recipes}/cuisine_complexity_sum.dta", clear
 
 ** merge with geographical data
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/geographical.dta"
+quietly merge 1:1 adm0 using "${versatility}/geographical.dta"
 assert _merge != 2
 quietly keep if _merge == 3
 quietly count
 assert `r(N)' == 135
 drop _merge
 
-** merge with numNative
+** organize FLFP data
 preserve
-use "${codedata}/iv_versatility/recipe_ciat.dta", clear
+use "${flfp}/FLFPlong2019.dta", clear
+quietly unique country
+keep country FLFP
+tempfile flfp
+save `flfp', replace
+restore
+
+** Organize native ingredients data
+preserve
+use "${versatility}/cuisine_ciat.dta", clear
 quietly unique adm0
 assert `r(sum)' == 136
 keep adm0 numNative
@@ -222,16 +291,23 @@ tempfile numNative
 save `numNative', replace
 restore
 
+** merge with numNative ingredients
 quietly merge 1:1 adm0 using `numNative'
+rename _merge _merge1
+
+** merge with FLFP
+quietly merge 1:1 country using `flfp'
+drop if _merge == 2
 drop if adm0 == "XXK" // Kosovo
 assert _merge == 3
-drop _merge
+assert _merge1 == 3
+drop _merge*
 
 quietly unique adm0
 assert `r(sum)' == 135
 
 ** merge with native versatility
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/nativebycountry_`x'_`y'.dta"
+quietly merge 1:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
 drop if adm0 == "XXK" // Kosovo
 assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
@@ -242,7 +318,7 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${codedata}/iv_versatility/importbycountry_`z'.dta"
+quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_`z'.dta"
 drop if adm0 == "XXK" // Kosovo
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
@@ -254,28 +330,43 @@ assert !missing(importVersatility)
 
 ** create factor 
 encode continent_name, gen(continentFactor)
-gen logtime_mean = log(time_mean)
+gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
-label var std_native "std of native versatility"
-label var nativeVersatility "native versatility"
-label var std_import "std of import versatility"
-label var importVersatility "import versatility"
-label var ingredients_mean "average number of ingredients"
-label var spices_mean "average number of spices"
+rename (logtime_median ingredients_median spices_median) (lt_md ing_md sp_md)
 
-	* 1st stage
-	quietly reghdfe spices_mean std_native std_import numNative al_mn [aweight=num_recipes] , absorb(continentFactor)  
+	* 1st stage		
+	quietly reghdfe sp_md std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor)  
 	
 	if `e(F)' > `fval'{
 		local fval = e(F)
-		dis `fval'
-		dis "`x'"
-		dis "`y'"
-		dis "`z'"
+*		dis `fval'
+*		dis "`x'"
+*		dis "`y'"
+*		dis "`z'"
+
+		eststo s`x'`y'`z'
+		sum sp_md if e(sample)
+		local mean = r(mean)
+		estadd scalar mean = `mean'
 	}
 	
-		}
-		}
-		}
+	}
+	}
+	}
+	
+lab var sp_md "sp_md"
+
+		esttab s* using "${outputs}/Tables/iv_best/best_spices.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(std_native std_import)label ///
+		mtitle ///
+		s( r2  mean N, ///
+		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
+		nobaselevels  prehead("\begin{tabular}{l*{14}{c}} \hline\hline") ///
+		fragment postfoot("Continent & Yes & & & \\"  ///
+		"Geographical & Yes & & & \\" ///
+		"\hline" "\end{tabular}") replace
+
+
+		

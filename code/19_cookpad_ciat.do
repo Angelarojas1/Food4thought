@@ -5,7 +5,7 @@
    * relaciona la complejidad de la cocina con variables del mercado      *
    *             laboral teniendo en cuenta la pandemia de 2020.          *
    *																	  *
-   * - Inputs: "${rawdata}/cookpad/Cookpad_032023.dta"	                  *
+   * - Inputs: "${cookpad}/Cookpad_clean.dta"			                  *
    *           "${codedata}/merge/p50.dta"                                *
    * - Output: "${outputs}/Tables/ivreg_`val'_`var'.tex"     			  *
    * ******************************************************************** *
@@ -18,25 +18,10 @@
 
    
 	* Import data
-	use "${rawdata}/cookpad/Cookpad_032023.dta", clear
-	rename *, lower
-
-	* Organize gender variable
-	recode wp1219 (1=0) (2=1), gen(fem)
-
-	* Study Completion Date
-	gen y=yofd(field_date)
-	gen ym=mofd(field_date)
-	gen month=month(field_date)
-	
-	* Organize country variable
-	rename countrynew country
-
-	replace country="Bosnia And Herzegovina" if country=="Bosnia Herzegovina"
-	replace country="Cote D'Ivoire" if country=="Ivory Coast"
+	use "${cookpad}/Cookpad_clean.dta", clear
 	
 	* Three letter country code
-	rename country_iso3 adm0
+	rename three_letter_country_code adm0
 	encode adm0, gen(niso)
 	
 	* Covid variable	
@@ -59,27 +44,7 @@
 	
 	* Keep relevant variables
 	keep wp5889 country adm0 working emp_ftemp_pop emp_lfpr emp_work_hours niso ym fem hhsize covid cov_fem
-
-	* Add recipes vbs (time, ingredients, spices)
-	merge m:1 country using "${codedata}/recipes/recipe_sum_all.dta"
-	*merge m:1 country using "${codedata}/merge/p50.dta"
-	
-	tab country if _merge==1
-	levelsof country if _merge == 3
-	display "`r(r)'" ingredients_mean
-	* merge == 1 -> 36
-	* merge == 2 -> 21
-	* merge == 3 -> 114
-	
-	* Create interaction between gender and IV variable
-	*gen fem_nat = fem*std_native
-	*gen fem_imp = fem*std_import
-	
-	* Create log time 
-	foreach v of varlist time* {
-		gen l`v'=log(`v')
-	}
-	
+		
 	* Label variables
 	la var working 			"Employed"
 	la var emp_ftemp_pop 	"Full time for employer"
@@ -87,15 +52,27 @@
 	la var emp_work_hours 	"Hours worked per week"
 	la var fem 				"Women"
 	la var cov_fem 			"Covid x Women"
-	*la var fem_nat 		"Women x Native versatility"
-	*la var fem_imp 		"Women x Imported versatility"
+	
+
+	preserve
+	* Merge with cuisine database that has multiple percentils information for time, ingredients and spices to get excel file
+	merge m:1 country using "${recipes}/cuisine_complexity_all.dta"
+	
+	levelsof country if _merge == 3
+	display "`r(r)'"
+	* merge == 3 -> 118
+	
+	* Create log time 
+	foreach v of varlist time* {
+		gen l`v'=log(`v')
+	}
 	
 	local time "Time recipes"
 	local ingredients "Num ingredients"
 	local spices "Num spices"
 	
 	foreach v in time ingredients spices {
-		foreach k in mean median p10 p25 p75 p90 {
+	foreach k in mean median p10 p25 p75 p90 {
 			la var `v'_`k' "``v'' `k'"	
 		}
 	}
@@ -103,20 +80,18 @@
 	foreach k in mean median p10 p25 p75 p90 {
  		la var ltime_`k' "Log time `k'"	
 	}
+	
+	* Pre covid
 
-*------------------------------------------------------------------------------*
-	* Regressions
-	
-	* Using database without versatility variables
-	
-		*pre covid
 		foreach w of varlist ltime* ingredients* spices* {
-    
+			
+			* Create complexity variables
 			gen femx = fem*`w'
 			la var femx "Women x Complexity"
 	
 			local lb: variable label `w'
-	
+			
+			* Run regressions with employment variables
 			foreach v of varlist working emp_ftemp_pop emp_lfpr emp_work_hours {
 	
 			reghdfe `v' fem femx hhsize if covid==0, absorb(niso ym) cluster(niso)
@@ -129,22 +104,39 @@
 drop femx
 }
 erase "${outputs}\Tables\reg_summary_pre.txt"
+	
+	restore
+	
+	
+	* Merge with database that contains cuisine, versatility, geographical variables
+	merge m:1 country using "${versatility}/reg_variables.dta"
+	
+	levelsof country if _merge == 3
+	display "`r(r)'"
+	* merge == 3 -> 118
+	
+	* Create interaction between gender and IV variable
+	gen fem_nat = fem*std_native
+	gen fem_imp = fem*std_import
 
-/*
-	* Pre-covid
-	foreach w of varlist logmtime mIng mSpice {
+	la var fem_nat 		"Women x Native versatility"
+	la var fem_imp 		"Women x Imported versatility"
+	
+
+	* Regressions - Pre-covid
+	foreach w of varlist time_median ingredients_median spices_median {
 	
 		gen comp = fem*`w'	
     
 		local lb: variable label `w'
 		
+		* First Stage. Should I add controls?
+		reghdfe comp fem fem_nat fem_imp hhsize, absorb(niso ym) cluster(niso)
+		reghdfe comp fem fem_nat fem_imp hhsize al_mn cl_md pt_mn, absorb(niso ym) cluster(niso)
+
 		* OLS		
 		reghdfe working fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
 		
-		* First Stage. Should I add controls?
-		* reghdfe comp fem fem_nat fem_imp hhsize, absorb(niso ym) cluster(niso)
-		*reghdfe comp fem fem_nat fem_imp hhsize, absorb(continentFactor ym) cluster(niso) 
-
 		drop comp
 	*		sum `w' if e(sample)
 	*		local m `r(mean)'

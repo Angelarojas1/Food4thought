@@ -4,7 +4,7 @@
    *              This dofile merges country's recipes databases		  *
    *																	  *
    * - Inputs: "${precodedata}/recipes/final/`country'.csv"			      *
-   * - Output: "${codedata}/recipes/recipe_all_countries.dta"	          *
+   * - Output: "${recipes}/recipe_all_countries.dta"	          		  *
    * ******************************************************************** *
 
    ** IDS VAR:               // Uniquely identifies countries 
@@ -65,4 +65,4 @@ unique country
 
 replace country = proper(country)
 
-save "${codedata}/recipes/recipe_all_countries.dta", replace
+save "${recipes}/recipe_all_countries.dta", replace

@@ -39,7 +39,13 @@
 	global precodedata			"$projectfolder/data/precoded"
 	global rawdata				"$projectfolder/data/raw"
 	global codedata				"$projectfolder/data/coded"
+	
+	global recipes              "$codedata/recipes"
+	global flfp             	"$codedata/FLFP"
 	global versatility          "$codedata/iv_versatility"
+	global cookpad              "$codedata/cookpad"
+	global fao_suit             "$codedata/FAO_suitability"
+
 	
 	* Output sub-folder globals
 	global outputs				"$projectfolder/outputs"
@@ -213,14 +219,15 @@
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
-	*		- Find the best performance 1st stage
+	*		- Find the best performance 1st stage regressions
+	*		- Best: p60, g3simple
 
 		do "$code/16_1ststage_best.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
-	*		- Merge the different databases created to procede with analysis
+	*		- Merge the different databases created to run regressions
 
 		do "$code/17_merge_reg.do"
 

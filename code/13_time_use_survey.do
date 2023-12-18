@@ -5,7 +5,7 @@
    *																	  *
    * - Inputs: "${rawdata}/time use/Multinational Time Use Study/         *
    *			ALL_HAF_external.dta"									  *
-   *			"${codedata}/recipes/cuisine_complexity_sum.dta"		  *
+   *			"${recipes}/cuisine_complexity_sum.dta"		  			  *
    * - Output: "${outputs}/Figures/survey_recipe.png"			          *
    * ******************************************************************** *
 
@@ -39,7 +39,7 @@ collapse (mean)survey_avgtime, by(country isocountry)
 rename isocountry two_letter_country_code
 
 * merge with recipe data
-merge 1:1 two_letter_country_code using "${codedata}/recipes/cuisine_complexity_sum.dta", force
+merge 1:1 two_letter_country_code using "${recipes}/cuisine_complexity_sum.dta", force
 assert inlist(_merge, 1, 2, 3)
 keep if _merge == 3
 drop _merge

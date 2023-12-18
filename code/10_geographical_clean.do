@@ -4,11 +4,11 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *             This  dofile cleans greographical control data           *
    *																	  *
-   * - Inputs: "${codedata}/iv_versatility/recipe_ciat.dta"	      *
+   * - Inputs: "${recipes}/cuisine_complexity_sum.dta"  				  *
    *           "${precodedata}/suitability/spices_suitability.dta"        *
    *           "${precodedata}/suitability/crop_suitability.dta"          *
    *           "${precodedata}/suitability/country-vars-9nov23.csv"       *
-   * - Output: "${codedata}/iv_versatility/geographical.dta"              *
+   * - Output: "${versatility}/geographical.dta"              			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -21,7 +21,7 @@
 * Data cleaning for geographical control data
 ****************************************
 
-use "${codedata}/recipes/cuisine_complexity_sum.dta", clear
+use "${recipes}/cuisine_complexity_sum.dta", clear
 
  preserve
  keep adm0 country
@@ -73,4 +73,4 @@ label var pt_mn "Total precipitation in 1999 (mm)" // 137 countries (Tonga)
 label var ph_mn "Average pH" // 124 countries
 label var cl_md "Most common climate zone (KG2)" // 138 countries
 
-save "${codedata}/iv_versatility/geographical.dta", replace
+save "${versatility}/geographical.dta", replace

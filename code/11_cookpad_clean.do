@@ -4,7 +4,7 @@
    * 				 This dofile cleans cookpad database				  *
    *																	  *
    * - Inputs: "${rawdata}/cookpad/Cookpad_032023.dta"				      *
-   * - Output: "${codedata}/cookpad/Cookpad_clean.dta"				      *
+   * - Output: "${cookpad}/Cookpad_clean.dta"						      *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -46,5 +46,5 @@
 	}
 
 * save dataset
-save "${codedata}/cookpad/Cookpad_clean.dta", replace
+save "${cookpad}/Cookpad_clean.dta", replace
 

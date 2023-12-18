@@ -4,7 +4,7 @@
    *              	  This dofile cleans FLFP database 				      *
    *																	  *
    * - Inputs: "${rawdata}/flfp/FLFP.csv"							      *
-   * - Output: "${codedata}/flfp/FLFPlong2019.dta"				          *
+   * - Output: "${flfp}/FLFPlong2019.dta"				          *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -40,6 +40,7 @@ reshape long year, i(countryname continent_name continent_code two_letter_countr
 rename year FLFP
 rename y year
 rename countryname country
+rename three_letter_country_code adm0
 
 ** drop variables
 drop id flag
@@ -67,6 +68,6 @@ unique country
 note: There are `r(sum)' countries in FLFP data.
 
 ** save dataset
-save "${codedata}/flfp/FLFPlong2019.dta", replace
+save "${flfp}/FLFPlong2019.dta", replace
 note
 
