@@ -6,7 +6,8 @@
    *             laboral teniendo en cuenta la pandemia de 2020.          *
    *																	  *
    * - Inputs: "${cookpad}/Cookpad_clean.dta"			                  *
-   *           "${codedata}/merge/p50.dta"                                *
+   *           "${recipes}/cuisine_complexity_all.dta"                    *
+   *           "${versatility}/reg_variables.dta"	                      *
    * - Output: "${outputs}/Tables/ivreg_`val'_`var'.tex"     			  *
    * ******************************************************************** *
 
@@ -54,9 +55,8 @@
 	la var cov_fem 			"Covid x Women"
 	
 
-	preserve
-	* Merge with cuisine database that has multiple percentils information for time, ingredients and spices to get excel file
-	merge m:1 country using "${recipes}/cuisine_complexity_all.dta"
+	* Merge with cuisine database that contains time, ingredients, versatility, geographical variables
+	merge m:1 country using "${versatility}/reg_variables.dta"
 	
 	levelsof country if _merge == 3
 	display "`r(r)'"
@@ -66,6 +66,14 @@
 	foreach v of varlist time* {
 		gen l`v'=log(`v')
 	}
+	
+	* Create interaction between gender and IV variable
+	gen fem_nat = fem*std_native
+	gen fem_imp = fem*std_import
+
+	* Label variables
+	la var fem_nat 		"Women x Native versatility"
+	la var fem_imp 		"Women x Imported versatility"
 	
 	local time "Time recipes"
 	local ingredients "Num ingredients"
@@ -81,7 +89,11 @@
  		la var ltime_`k' "Log time `k'"	
 	}
 	
-	* Pre covid
+	
+	* Create excel file with regression results:
+			* Y = Employment variables
+			* X = Complexity variables (interaction between time/ingredients/spices and fem)
+			* Precovid period
 
 		foreach w of varlist ltime* ingredients* spices* {
 			
@@ -99,57 +111,61 @@
 			sum `v' if e(sample)
 			local m `r(mean)'
 
-			outreg2 using "${outputs}\Tables\reg_summary_pre.xls", lab dec(4) excel par(se) stats(coef se) keep(fem femx) addstat(mean.dep.var, `m') addtext(Complexity, "`lb'", period, "pre covid") nocons
-}
-drop femx
-}
-erase "${outputs}\Tables\reg_summary_pre.txt"
-	
-	restore
-	
-	
-	* Merge with database that contains cuisine, versatility, geographical variables
-	merge m:1 country using "${versatility}/reg_variables.dta"
-	
-	levelsof country if _merge == 3
-	display "`r(r)'"
-	* merge == 3 -> 118
-	
-	* Create interaction between gender and IV variable
-	gen fem_nat = fem*std_native
-	gen fem_imp = fem*std_import
+			outreg2 using "${outputs}\Tables\reg_summary_pre.xls", lab dec(4) excel /// 	
+			par(se) stats(coef se) keep(fem femx) addstat(mean.dep.var, `m') ///
+			addtext(Complexity, "`lb'", period, "pre covid") nocons
+			}
+		drop femx
+		}
+		erase "${outputs}\Tables\reg_summary_pre.txt"	
 
-	la var fem_nat 		"Women x Native versatility"
-	la var fem_imp 		"Women x Imported versatility"
 	
+	** Create regressions 
 
 	* Regressions - Pre-covid
+	
 	foreach w of varlist time_median ingredients_median spices_median {
 	
 		gen comp = fem*`w'	
     
 		local lb: variable label `w'
 		
-		* First Stage. Should I add controls?
-		reghdfe comp fem fem_nat fem_imp hhsize, absorb(niso ym) cluster(niso)
-		reghdfe comp fem fem_nat fem_imp hhsize al_mn cl_md pt_mn, absorb(niso ym) cluster(niso)
-
-		* OLS		
-		reghdfe working fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
+		* First Stage (una tabla)
+		reghdfe comp fem fem_nat fem_imp hhsize , absorb(niso ym) cluster(niso)
+		eststo reg1
+		sum `w' if e(sample)
+		local m `r(mean)'
+		estadd scalar mean = `mean'
 		
-		drop comp
-	*		sum `w' if e(sample)
-	*		local m `r(mean)'
+		* OLS (comparar con los de Paola, una tabla) poner loop para variables de empleo
+		reghdfe working fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
+		eststo reg2
+		sum work if e(sample)
+		local m `r(mean)'
+		estadd scalar mean = `mean'
+		
+		* IV (otra tabla) poner loop para variables de empleo
+		ivreghdfe working fem (comp = fem_nat fem_imp) hhsize if covid==0, absorb(niso ym) cluster(niso)
 
-*	outreg2 using "${outputs}\Tables\reg-fem-pre-vers.xls", lab dec(4) excel par(se) stats(coef se) keep(fem fem_nat fem_imp) addstat(mean.dep.var, `m') addtext(Complexity, "`lb'", period, "2018-2023") nocons
+		esttab reg1 reg2 using "${outputs}/Tables/cookpad_reg_`w'.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(fem_nat fem_imp comp)label ///
+		mtitles("First stage" "IV")  ///
+		s( r2  mean N, ///
+		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
+		nobaselevels  prehead("\begin{tabular}{l*{3}{c}} \hline\hline") ///
+		fragment postfoot("Continent & Yes & & & \\"  ///
+		"Geographical & Yes & & & \\" ///
+		"\hline" "\end{tabular}") replace
+
+drop comp
 }
 
 
-*estadisticas descriptivas
+	*Descriptive statistics
 
-glo yv "working emp_ftemp_pop emp_lfpr emp_work_hours"
-glo yc "time* ingredients* spices* fem hhsize"
+	glo yv "working emp_ftemp_pop emp_lfpr emp_work_hours"
+	glo yc "time* ingredients* spices* fem hhsize"
 
-eststo clear
-eststo a: estpost sum $yv $yc
-*esttab a using "tab-descriptives.rtf", cells("count(fmt(%9.0fc)) mean(fmt(2)) sd(fmt(%9.2fc)) min(fmt(%9.2fc)) max(fmt(%9.0fc))") collabels("Count" "Mean" "S.D." "Min." "Max.") title("Descriptive statistics") noobs label nonumbers nogaps compress replace
+	eststo clear
+	eststo a: estpost sum $yv $yc
+	esttab a using "${outputs}\Tables\tab-descriptives.rtf", cells("count(fmt(%9.0fc)) mean(fmt(2)) sd(fmt(%9.2fc)) min(fmt(%9.2fc)) max(fmt(%9.0fc))") collabels("Count" "Mean" "S.D." "Min." "Max.") title("Descriptive statistics") noobs label nonumbers nogaps compress replace

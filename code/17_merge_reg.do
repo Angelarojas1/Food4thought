@@ -4,7 +4,7 @@
    *        Cuisine Complexity and Female Labor Force Participation	      *
    *            This dofile merges all databases for analysis             *
    *																	  *
-   * - Inputs: "${recipes}/cuisine_complexity_sum.dta"		              *
+   * - Inputs: "${recipes}/cuisine_complexity_all.dta"		              *
    *		   "${flfp}/FLFPlong2019.dta"								  *
    *           "${versatility}/geographical.dta"              			  *
    *           "${versatility}/cuisine_ciat.dta"         				  *
@@ -23,7 +23,7 @@
 * Get data ready for regressions
 ****************************************
 
-use "${recipes}/cuisine_complexity_sum.dta", clear
+use "${recipes}/cuisine_complexity_all.dta", clear
 
 ** merge with geographical data
 merge 1:1 adm0 using "${versatility}/geographical.dta"
