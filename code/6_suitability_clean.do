@@ -16,14 +16,14 @@
    ** IDS VAR:          adm0        // Uniquely identifies countries 
    ** NOTES:
    ** WRITTEN BY:       Xinyu Ren
-   ** EDITTED BY:       
+   ** EDITTED BY:       Angela Rojas
    ** Last date modified: Nov 28, 2023
 
 ****************************************
 * Data cleaning for suitability data
 ****************************************
 
-* Create suitability data for all ingredients  *******************
+***** Create suitability data for all ingredients  *****
 
 ** import staple suitability data
 use "${precodedata}/suitability/staple_suitability.dta", clear
@@ -78,6 +78,7 @@ tab ingredient
  replace ingredient = "cowpeas" if ingredient == "cowpea"
  replace ingredient = "faba beans" if ingredient == "faba_beans"
  replace ingredient = "lentils" if ingredient == "lentiles"
+ replace ingredient = "macadamia nut" if ingredient == "macadamia_nut"
  replace ingredient = "mustard seed" if ingredient == "mustard_seed"
  replace ingredient = "nutmeg and mace" if ingredient == "nutmeg_mace"
  replace ingredient = "oats" if ingredient == "oat"
@@ -97,11 +98,13 @@ tab ingredient
  replace ingredient = "millets" if ingredient == "foxtail millet"
  replace ingredient = "millets" if ingredient == "pearl millet"
  replace ingredient = "potatoes" if ingredient == "white potato"
- 
+
+ * Join repeated information
  bysort adm0 ingredient (suitability): keep if _n == 1
  keep adm0 country ingredient suitability
  isid adm0 ingredient, missok
 
+ * Fill country information
  bys adm0 (country ingredient): replace country = country[_N]
  cap noisily assert !missing(country)
  tab adm0 if missing(country)
@@ -117,21 +120,20 @@ tab ingredient
  save `rest', replace
  restore
  
+ * Merge with cuisine database 
  merge 1:1 adm0 ingredient using "${versatility}/cuisine_ciat.dta"
- tab _merge
  assert inlist(_merge, 1, 2, 3)
  drop if _merge == 1
  rename _merge _merge1
  
  ** if missing suitability, use the suitability from the rest of the world
  merge m:1 ingredient using `rest'
- tab _merge
  assert inlist(_merge, 1, 2, 3)
- drop if _merge == 2
+ drop if _merge == 2 
  tab _merge1 _merge
  assert !missing(suitability_rest) if _merge1 == 2 & _merge == 3
- assert missing(suitability_rest) if _merge1 == 2 & _merge == 1
- replace suitability = suitability_rest if _merge1 == 2 & _merge == 3
+ assert missing(suitability_rest) if _merge1 == 2 & _merge == 1 //For these ing we definetly don't have information
+ replace suitability = suitability_rest if _merge1 == 2 & _merge == 3 
  drop _merge1 _merge suitability_rest
  
  sort adm0 ingredient
@@ -139,6 +141,7 @@ tab ingredient
  
  cap noisily assert !missing(country)
  bys adm0 (country ingredient): replace country = country[_N]
+ replace country = "Tuvalu" if adm0 == "TUV"
  assert !missing(country)
  
  unique adm0
@@ -148,25 +151,28 @@ tab ingredient
  gen flag = 0
  bys ingredient(suitability adm0): replace flag = 1 if suitability[1] == suitability[_N] & suitability[1] == .
  assert missing(suitability) if flag == 1
- tab ingredient if flag == 1
+ tab ingredient if flag == 1 //identify ingredients without suitability information
  drop if flag == 1
  drop flag
  
  sort adm0 ingredient
  
  unique adm0
- assert `r(sum)' == 132
+ assert `r(sum)' == 136 // we have 136 countries with suitability information
  
  save "${versatility}/cuisine_ciat_suit.dta", replace
 
-* Find median of suitability for native ingredients  *******************
+*** Find median of suitability for native ingredients  ***
  collapse (p10) p10 = suitability (p25) p25 = suitability (median) p50 = suitability (p60) p60 = suitability (p70) p70 = suitability, by(ingredient)
- isid ingredient
+ isid ingredient // there's information for 64 ingredients
  save "${versatility}/median_suitability.dta", replace
   
-* limit to suitability data of all ingredients that are from CIAT map  *******************
+  
+  **NO ENTIENDO ESTA PARTE PARA QUÉ ES
+*** limit to suitability data of all ingredients that are from CIAT map  ***
  use "${versatility}/cuisine_ciat.dta", clear
 
+ * Keep country names information
  preserve
  keep adm0 country
  duplicates drop 
@@ -175,6 +181,7 @@ tab ingredient
  save `adm0', replace
  restore
  
+ * Keep only ingredients in recipe data
  preserve
  keep ingredient
  duplicates drop
@@ -185,8 +192,7 @@ tab ingredient
  
  use `rest', clear
  merge 1:1 ingredient using `ing'
- tab _merge
- keep if _merge == 3
+ keep if _merge == 3 // 34 ingredients
  drop _merge
  rename suitability_rest suitability
  tempfile rest_suit
@@ -194,13 +200,11 @@ tab ingredient
  
  use `suit', clear
  merge m:1 adm0 using `adm0'
- tab _merge
  assert inlist(_merge, 1, 2, 3)
  drop if _merge == 1
  rename _merge _merge1
  
  merge m:1 ingredient using `ing'
- tab _merge
  assert inlist(_merge, 1, 2, 3)
  drop if _merge1 == 3 & _merge == 1
  list if _merge == 2
