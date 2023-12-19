@@ -130,34 +130,63 @@
     
 		local lb: variable label `w'
 		
-		* First Stage (una tabla)
+		* First Stage
 		reghdfe comp fem fem_nat fem_imp hhsize , absorb(niso ym) cluster(niso)
 		eststo reg1
 		sum `w' if e(sample)
 		local m `r(mean)'
 		estadd scalar mean = `mean'
 		
-		* OLS (comparar con los de Paola, una tabla) poner loop para variables de empleo
-		reghdfe working fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
-		eststo reg2
+		foreach v of varlist working emp_ftemp_pop emp_lfpr emp_work_hours {
+		
+		* OLS
+		reghdfe `v' fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
+		
+		eststo regh`v'
 		sum work if e(sample)
 		local m `r(mean)'
 		estadd scalar mean = `mean'
 		
-		* IV (otra tabla) poner loop para variables de empleo
-		ivreghdfe working fem (comp = fem_nat fem_imp) hhsize if covid==0, absorb(niso ym) cluster(niso)
+		* IV 
+		ivreghdfe `v' fem (comp = fem_nat fem_imp) hhsize if covid==0, absorb(niso ym) cluster(niso)
+		
+		eststo iv`v'
+		sum work if e(sample)
+		local m `r(mean)'
+		estadd scalar mean = `mean'
 
-		esttab reg1 reg2 using "${outputs}/Tables/cookpad_reg_`w'.tex", ///
-		se r2 star(* 0.1 ** 0.05 *** .01) keep(fem_nat fem_imp comp)label ///
-		mtitles("First stage" "IV")  ///
+		
+		** Create tables
+		
+		* For First stage regressions (Y is cuisine variable)
+		esttab reg1 using "${outputs}/Tables/cookpad_reg_`w'.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(fem_nat fem_imp)label ///
+		mtitles("First stage")  ///
 		s( r2  mean N, ///
 		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
 		nobaselevels  prehead("\begin{tabular}{l*{3}{c}} \hline\hline") ///
-		fragment postfoot("Continent & Yes & & & \\"  ///
-		"Geographical & Yes & & & \\" ///
-		"\hline" "\end{tabular}") replace
-
-drop comp
+		fragment postfoot("\hline" "\end{tabular}") replace
+		
+		* For OLS regressions (Y is cuisine variable)
+		esttab regh* using "${outputs}/Tables/cookpad_reg_ols_`w'.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(fem_nat fem_imp comp)label ///
+		mtitles("working" "emp_ftemp_pop" "emp_lfpr" "emp_work_hour")  ///
+		s( r2  mean N, ///
+		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
+		nobaselevels  prehead("\begin{tabular}{l*{3}{c}} \hline\hline") ///
+		fragment postfoot("\hline" "\end{tabular}") replace
+		
+		* For OLS regressions (Y is cuisine variable)
+		esttab iv* using "${outputs}/Tables/cookpad_reg_ols_`w'.tex", ///
+		se r2 star(* 0.1 ** 0.05 *** .01) keep(fem_nat fem_imp comp)label ///
+		mtitles("working" "emp_ftemp_pop" "emp_lfpr" "emp_work_hour")  ///
+		s( r2  mean N, ///
+		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
+		nobaselevels  prehead("\begin{tabular}{l*{3}{c}} \hline\hline") ///
+		fragment postfoot("\hline" "\end{tabular}") replace
+	}
+	
+	drop comp
 }
 
 
