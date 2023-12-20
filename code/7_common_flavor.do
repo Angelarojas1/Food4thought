@@ -4,6 +4,7 @@
    *              This dofile creates common flavor files 	        	  *
    *																	  *
    * - Inputs: "${versatility}/cuisine_ciat_suit.dta"	  	 			  *
+   *		   "${precodedata}/flavor_profile/CIAT/{}.json"
    * - Output: "${versatility}/common_flavor.dta"             			  *
    *		   "${versatility}/common_flavor_3ing.csv"		  			  *
    * ******************************************************************** *

@@ -8,8 +8,6 @@
    *		   "${versatility}/cuisine_suit.dta"			  			  *
    * - Output: "${versatility}/native/native_clean_`var'.dta"			  *
    *		   "${versatility}/imported/imported_`var'.dta"	  			  *
-   *		   "${versatility}/common_flavor.dta"             			  *
-   *		   "${versatility}/common_flavor_3ing.csv"		  			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
