@@ -55,6 +55,7 @@
 	** Install packages (run once)
 	
 	* ssc install aaplot
+	* ssc install ivreghdfe
 	
 	* ***************************************************** *
 	*                Recipe Data Coding                     *
