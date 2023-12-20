@@ -28,9 +28,9 @@
 * Note: find the highest f statistics: p60, g3simple, p60
 eststo clear
 *local fval = -100
-foreach x in "p0" "p10" { // "p25" "p50" "p60" "p70"
+foreach x in "p0" "p10" "p25" "p50" "p60" "p70" {
 	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
-		foreach z in "p50" { // "p0" "p10" "p25" "p60" "p70"
+		foreach z in "p0" "p10" "p25" "p50" "p60" "p70" { 
 
 		
 use "${recipes}/cuisine_complexity_sum.dta", clear
@@ -103,28 +103,37 @@ gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
-rename (logtime_median ingredients_median spices_median) (lt_md ing_md sp_md)
+rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
+	foreach var of varlist ltime ing spice {
+	
 	* 1st stage		
-	quietly reghdfe lt_md std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor)  
+	quietly reghdfe `var' std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor)  
 
 *	if `e(F)' > `fval'{
-*		local fval = e(F)
+		local fval = e(F)
 *		dis `fval'
 *		dis "`x'"
 *		dis "`y'"
 *		dis "`z'"
 		
-		eststo `x'`y'
-		sum lt_md if e(sample)
+*		eststo `x'`y'
+		sum `var' if e(sample)
 		local mean = r(mean)
-		estadd scalar mean = `mean'
+*		estadd scalar mean = `mean'
 	*}
 	
+	outreg2 using "${outputs}/Tables/iv_best/best_`var'.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(mean.dep.var , `mean', f-value, `fval') addtext(native_import, "`x'`y'_`z'") nocons title("Log Time")
 	}
 	}
 	}
-
+	}
+	
+	erase "${outputs}/Tables/iv_best/best_ltime.txt"
+	erase "${outputs}/Tables/iv_best/best_ing.txt"
+	erase "${outputs}/Tables/iv_best/best_spice.txt"
+	
+	/*
 		esttab using "${outputs}/Tables/iv_best/best_time.tex", ///
 		se r2 star(* 0.1 ** 0.05 *** .01) keep(std_native std_import) label ///
 		mtitle ///
