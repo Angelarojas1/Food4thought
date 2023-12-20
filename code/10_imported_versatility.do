@@ -5,7 +5,7 @@
    *																	  *
    * - Inputs: "${versatility}/imported/imported_`x'.csv"              	  *
    *           "${versatility}/common_flavor_clean.dta"      			  *
-   *           "${versatility}/native_clean_`x'.dta"         			  *
+   *           "${versatility}/native/native_clean_`x'.dta"         			  *
    *           "${versatility}/distance_capital.dta"         			  *
    * - Output: "${versatility}/imported/importbycountry_`x'.dta"      	  *
    * ******************************************************************** *
@@ -91,7 +91,7 @@ replace weight = 1 if ifnative2 == 1
 
 ** calculate the distance between the country and origin of the ingredient2
 rename (ingredient ingredient2) (ingredientrow ingredient)
-joinby ingredient using "${versatility}/native_clean_`x'.dta"
+joinby ingredient using "${versatility}/native/native_clean_`x'.dta"
 joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 count 
@@ -123,7 +123,7 @@ keep if ifnative == 0
 drop ifnative
 
 * calculate the distance between the country and origin of the ingredient
-joinby ingredient using "${versatility}/native_clean_`x'.dta"
+joinby ingredient using "${versatility}/native/native_clean_`x'.dta"
 joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 * calculate imported versatility
@@ -197,7 +197,7 @@ foreach l of local level{
 
 	** calculate the distance between the country and origin of the ingredient2
 	rename (ingredient ingredient2) (ingredientrow ingredient)
-	joinby ingredient using "${versatility}/native_clean_`x'.dta"
+	joinby ingredient using "${versatility}/native/native_clean_`x'.dta"
 	joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
 	count 
@@ -234,7 +234,7 @@ foreach l of local level{
 	drop ifnative
 
 	* calculate the distance between the country and origin of the ingredient
-	joinby ingredient using "${versatility}/native_clean_`x'.dta"
+	joinby ingredient using "${versatility}/native/native_clean_`x'.dta"
 	dis "`l'"
 	joinby adm0 nativeadm0 using "${versatility}/distance_capital.dta"
 
