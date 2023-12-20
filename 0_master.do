@@ -30,7 +30,7 @@
 	** Project folder globals
 	
 	* Dofile sub-folder globals
-	global code					"$github/analysis23/code"
+	global code					"$github/code"
 	
 	global precode				"$projectfolder/precode"
 	global recipes              "$precode/recipes"	
@@ -122,34 +122,40 @@
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
-	*		-  Clean data from suitability databases
-	*		- 132 countries with suitability data
-	*       - For the other 3 countries we create the suitability data
+	*		- Clean data from suitability databases
+	*		- 136 countries with suitability data
+	*       - For the other 5 countries we create the suitability data
 
 		do "$code/6_suitability_clean.do"
 
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
-	*		- Clean data for calculating versatility.
-	*       - Creates native versatility and imported versatility and 
 	*       - Creates common flavor (between 2 and 3 ingredients) files.
 
-		do "$code/7_versatility_clean.do" 
+		do "$code/7_common_flavor.do"
+
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	*		- Clean data for calculating versatility.
+	*       - Creates native versatility and imported versatility and 
+
+		do "$code/8_versatility_clean.do" 
 
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		- Generate native versatility by country
 
-		do "$code/8_native_versatility.do"
+		do "$code/9_native_versatility.do"
 
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		- Generate imported versatility by country
 
-		do "$code/9_imported_versatility.do"
+		do "$code/10_imported_versatility.do"
 		
 		
 	* ***************************************************** *
@@ -160,7 +166,7 @@
 	*		- Generate geographical controls for all countries
 	*		- Info for 138 countries (Kosovo pending)
 
-		do "$code/10_geographical_clean.do"
+		do "$code/11_geographical_clean.do"
 		
 		
 	* ***************************************************** *
@@ -170,7 +176,7 @@
 	* 	The purpose of this dofile is:
 	*		- Clean cookpad data
 
-		do "$code/11_cookpad_clean.do"
+		do "$code/12_cookpad_clean.do"
 		
 	* ***************************************************** *
 	*             FAO suitability Data Coding               *
@@ -181,7 +187,7 @@
 	*		- Creates suitability variable
 	*  		- Don't run this part. Treat the suitability data as raw
 	
-	*	do "$code/12_FAO_suitability.do"
+	*	do "$code/13_FAO_suitability.do"
 	
 	* ***************************************************** *
 	*              Time Use Survey Data Validation          *
@@ -191,7 +197,7 @@
 	*		- Compare time variable from survey data vs 
 	*		  recipe data
 
-		do "$code/13_time_use_survey.do"
+		do "$code/14_time_use_survey.do"
 	
 	* ***************************************************** *
 	*          		 FLFP raw correlations     	 	        *
@@ -201,7 +207,7 @@
 	* 		- Raw correlations of FLFP and cuisine complexity
 	*		- 134 countries with FLFP information
 		
-		do "$code/14_cuisine_flfp_rawcorr.do"
+		do "$code/15_cuisine_flfp_rawcorr.do"
 				
 		
 	* ***************************************************** *
@@ -214,7 +220,7 @@
 	* 		- Creates scatter plots:
 	*		  	Complexity variables vs avg meals cooked
 		
-		do "$code/15_cookpad_flfp_cuisine_reg.do"
+		do "$code/16_cookpad_flfp_cuisine_reg.do"
 
 	* ***************************************************** *
 		
@@ -222,21 +228,21 @@
 	*		- Find the best performance 1st stage regressions
 	*		- Best: p60, g3simple
 
-		do "$code/16_1ststage_best.do"
+		do "$code/17_1ststage_best.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
 	*		- Merge the different databases created to run regressions
 
-		do "$code/17_merge_reg.do"
+		do "$code/18_merge_reg.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
 	*		- Run IV regressions
 
-		do "$code/18_IV_reg.do"
+		do "$code/19_IV_reg.do"
 		
 	* ***************************************************** *
 		
@@ -244,7 +250,7 @@
 	*		- Merge cookpad and CIAT databases
 	*		- Run regressions
 
-		do "$code/19_cookpad_ciat.do"
+		do "$code/20_cookpad_ciat.do"
 		
 
 	
