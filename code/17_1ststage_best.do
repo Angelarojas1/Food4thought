@@ -28,9 +28,9 @@
 * Note: find the highest f statistics: p60, g3simple, p60
 eststo clear
 *local fval = -100
-foreach x in "p0" "p10" "p25" "p50" "p60" "p70" {
+foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" {
 	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
-		foreach z in "p0" "p10" "p25" "p50" "p60" "p70" { 
+		foreach z in "p0" "p10" "p33" "p25" "p50" "p60" "p66" "p70" { 
 
 		
 use "${recipes}/cuisine_complexity_sum.dta", clear
@@ -119,11 +119,11 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 		
 *		eststo `x'`y'
 		sum `var' if e(sample)
-		local mean = r(mean)
+*		local mean = r(mean)
 *		estadd scalar mean = `mean'
 	*}
-	
-	outreg2 using "${outputs}/Tables/iv_best/best_`var'.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(mean.dep.var , `mean', f-value, `fval') addtext(native_import, "`x'`y'_`z'") nocons title("Log Time")
+
+	outreg2 using "${outputs}/Tables/iv_best/best_`var'.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	}
 	}
 	}

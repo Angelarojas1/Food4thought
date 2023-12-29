@@ -13,14 +13,11 @@
    ** NOTES:
    ** WRITTEN BY:       Paola Poveda
    ** EDITTED BY:       Angela Rojas
-   ** Last date modified: Dec 12, 2023
-
+   ** Last date modified: Dec 29, 2023
    
 	* Import data
 	use "${versatility}/reg_vbs_cookpad.dta", clear
 
-	
-/*	
 	* Create excel file with regression results:
 		* Y = Employment variables
 		* X = Complexity variables (interaction between time/ingredients/spices and fem)
@@ -50,8 +47,7 @@
 		drop femx
 		}
 		erase "${outputs}\Tables\reg_summary_pre.txt"	
-*/
-	
+
 	** Create regressions 
 
 	* Regressions - Pre-covid
@@ -72,7 +68,7 @@ eststo clear
 		estadd scalar mean_r = `m_r'
 		
 		foreach v of varlist working emp_ftemp_pop emp_lfpr emp_work_hours {
-/*		
+	
 		* OLS
 		quietly reghdfe `v' fem comp hhsize if covid==0, absorb(niso ym) cluster(niso)
 		
@@ -80,8 +76,8 @@ eststo clear
 		sum `v' if e(sample)
 		local m_ols `r(mean)'
 		estadd scalar mean_ols = `m_ols'
-*/		
-		* IV (LE DEBO AGREGAR YM??)
+	
+		* IV 
 		quietly ivreghdfe `v' fem  hhsize (comp = fem_nat fem_imp) if covid==0, absorb(niso ym)
 		
 		eststo iv`v'
@@ -90,7 +86,7 @@ eststo clear
 		estadd scalar mean_iv = `m_iv'
 		
 		** Create tables
-/*		
+		
 		* For OLS regressions (Y is cuisine variable)
 		esttab regh* using "${outputs}/Tables/cookpad_reg_ols_`w'.tex", ///
 		b(3) se(3) r2 star(* 0.1 ** 0.05 *** .01) keep(fem comp) label ///
@@ -98,7 +94,7 @@ eststo clear
 		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
 		nobaselevels  prehead("\begin{tabular}{l*{5}{c}} \hline\hline") ///
 		fragment postfoot("\hline" "\end{tabular}") replace
-*/		
+		
 		* For IV regressions (Y is cuisine variable)
 		esttab iv* using "${outputs}/Tables/cookpad_reg_iv_`w'.tex", ///
 		b(3) se(3) r2 star(* 0.1 ** 0.05 *** .01) keep(fem comp) label ///
@@ -109,7 +105,7 @@ eststo clear
 	} 
 	
 		** Create table
-/*		
+		
 		* For First stage regressions (Y is cuisine variable)
 		esttab reg1* using "${outputs}/Tables/cookpad_reg_1st.tex", ///
 		b(3) se(3) r2 star(* 0.1 ** 0.05 *** .01) keep(fem fem_nat fem_imp) label ///
@@ -118,12 +114,11 @@ eststo clear
 		labels( "\midrule R-squared" "Control Mean" "Number of obs.") fmt( %9.3f %9.3f %9.0g))  style(tex)  ///
 		nobaselevels  prehead("\begin{tabular}{l*{4}{c}} \hline\hline") ///
 		fragment postfoot("\hline" "\end{tabular}") replace
-*/	
+
 	drop comp
 }
 
 
-/*
 	*Descriptive statistics
 
 	glo yv "working emp_ftemp_pop emp_lfpr emp_work_hours"
