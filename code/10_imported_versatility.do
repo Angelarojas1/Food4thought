@@ -22,7 +22,7 @@
 
 clear 
 
-foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
+foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66"  "p70"{ 
 	
 * imported data
 import delimited "${versatility}/imported/imported_`x'.csv", clear 

@@ -30,7 +30,7 @@
  drop _merge
  
  gen p0 = 0
- foreach var of varlist p0 p10 p25 p50 p60 p70{
+ foreach var of varlist p0 p10 p25 p33 p50 p60 p66 p70 {
  	
 	preserve
  	gen aboveCutoff = (suitability > `var') & (!missing(suitability))
@@ -66,7 +66,7 @@
  drop _merge
  
  gen p0 = 0
- foreach var of varlist p0 p10 p25 p50 p60 p70{
+ foreach var of varlist p0 p10 p25 p33 p50 p60 p66 p70{
  
  preserve
  gen aboveCutoff = (suitability > `var') & (!missing(suitability))

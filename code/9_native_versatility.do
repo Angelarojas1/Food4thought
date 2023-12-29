@@ -24,7 +24,7 @@
 * 2 ingredients as a group, simple average 
 *********************************************
 
-foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
+foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" { 
 	
 * import data
 import delimited "${versatility}/native/native_`x'.csv", clear 
@@ -117,7 +117,7 @@ save "${versatility}/native/nativebycountry_`x'_g2simple.dta", replace
 * 2 ingredients as a group, weighted with suitability
 ******************************************************
 
-foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
+foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" { 
 	
 * import data
 import delimited "${versatility}/native/native_`x'.csv", clear 
@@ -241,7 +241,7 @@ save "${versatility}/native/nativebycountry_`x'_g2weight.dta", replace
 * 3 ingredients as a group, simple average
 ********************************************
 
-foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
+foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" { 
 	
 * import data
 import delimited "${versatility}/native/native_`x'.csv", clear 
@@ -336,7 +336,7 @@ save "${versatility}/native/nativebycountry_`x'_g3simple.dta", replace
 * 3 ingredients as a group, weighted average
 ********************************************
 
-foreach x in "p0" "p10" "p25" "p50" "p60" "p70"{
+foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" {    
 * import data
 import delimited "${versatility}/native/native_`x'.csv", clear 
 
