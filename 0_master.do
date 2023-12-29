@@ -227,6 +227,7 @@
 		
 	* 	The purpose of this dofile is:
 	*		- Find the best performance 1st stage regressions
+	* 		- Regressions country level
 	*		- Best: p60, g3simple
 
 		do "$code/17_1ststage_best.do"
@@ -245,6 +246,24 @@
 
 		do "$code/19_IV_reg.do"
 		
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
+	*		- Find the best performance 1st stage regressions
+	*		  using cookpad variables
+	*		- Regressions individual level
+	*		- Best: 
+
+		do "$code/20_1ststage_best_cookpad.do"
+		
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
+	*		- Merge the different databases created to run regressions
+	*       - Only use the best native and imported measure
+
+		do "$code/21_merge_reg_cookpad.do"
+
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
