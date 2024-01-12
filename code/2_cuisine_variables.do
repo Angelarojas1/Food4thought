@@ -18,6 +18,10 @@
 * import data
 use "${recipes}/recipe_all_countries.dta", clear
 
+* Drop recipes with information as zero in time and number of ingredients
+drop if totaltime==0 // 6,155 observations deleted
+drop if numberofingredients==0 // 590 observations deleted
+
 ** drop recipes that the total time are higher than 99%
 bys country: egen p99 = pctile(totaltime), p(99)
 drop if totaltime > p99
