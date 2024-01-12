@@ -80,7 +80,6 @@ tab ingredient
  replace ingredient = "lentils" if ingredient == "lentiles"
  replace ingredient = "macadamia nut" if ingredient == "macadamia_nut"
  replace ingredient = "mustard seed" if ingredient == "mustard_seed"
- replace ingredient = "peppermint" if ingredient == "mint" // 62 more observations merge after adding this. We added this because peppermint doesn't exist in suitability data, but it does in recipe database (AR: Dec 20,2023).
  replace ingredient = "nutmeg and mace" if ingredient == "nutmeg_mace"
  replace ingredient = "oats" if ingredient == "oat"
  replace ingredient = "palm oil" if ingredient == "oil palm"

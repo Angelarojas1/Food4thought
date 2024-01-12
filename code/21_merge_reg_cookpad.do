@@ -65,6 +65,13 @@ drop _merge*
 quietly unique adm0
 assert `r(sum)' == 139
 
+foreach x in "p0" "p50" {
+	foreach y in "g2simple" "g3simple"{ 
+		foreach z in "p0" "p50" { 
+		
+		if `x' == `y' {
+preserve
+
 ** merge with native versatility
 quietly merge m:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
 assert _merge != 2
@@ -114,4 +121,10 @@ egen std_import = std(importVersatility)
 	}
 	
 * Save database
-save "${versatility}/reg_vbs_cookpad.dta", replace
+save "${versatility}/reg_cp_`x'`y'.dta", replace
+
+restore
+}
+}
+}
+}
