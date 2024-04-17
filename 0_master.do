@@ -19,7 +19,7 @@
 
 	if "`c(username)'" == "stell" {
 	global projectfolder "/Users/stell/Dropbox/food4thought/analysis23"
-	global github "/Users/stell/OneDrive/Escritorio/Documentos/GitHub/Food4thought"
+	global github "C:\Users\stell\OneDrive - Universidad de los andes\Documentos\GitHub\Food4thought"
 	}
 	
 	if "`c(username)'" == "[xx's Username]" {
@@ -32,8 +32,9 @@
 	* Dofile sub-folder globals
 	global code					"$github/code"
 	
-	global precode				"$projectfolder/precode"
-	global recipes              "$precode/recipes"	
+	* Python codes folder
+	global precode				"$github/precode" 
+	global recipe_code          "$precode/recipes"	
 	
 	* Dataset sub-folder globals
 	global precodedata			"$projectfolder/data/precoded"
@@ -80,6 +81,7 @@
 	*	do "$code/1_merge_recipes.do" 	
 
 	* 	The purpose of this dofile is:
+	*		- Clean recipes dataset
 	* 		- Create time, ingredients and spices variables for 
 	*         different percentiles (cuisine complexity variables)
 	*		- Country level databases
@@ -167,7 +169,7 @@
 	*		- Generate geographical controls for all countries
 	*		- Info for 138 countries (Kosovo pending)
 
-		do "$code/11_geographical_clean.do"
+	*	do "$code/11_geographical_clean.do"
 		
 		
 	* ***************************************************** *
@@ -177,7 +179,7 @@
 	* 	The purpose of this dofile is:
 	*		- Clean cookpad data
 
-		do "$code/12_cookpad_clean.do"
+	*	do "$code/12_cookpad_clean.do"
 		
 	* ***************************************************** *
 	*             FAO suitability Data Coding               *
@@ -198,7 +200,7 @@
 	*		- Compare time variable from survey data vs 
 	*		  recipe data
 
-		do "$code/14_time_use_survey.do"
+	*	do "$code/14_time_use_survey.do"
 	
 	* ***************************************************** *
 	*          		 FLFP raw correlations     	 	        *
@@ -208,7 +210,7 @@
 	* 		- Raw correlations of FLFP and cuisine complexity
 	*		- 134 countries with FLFP information
 		
-		do "$code/15_cuisine_flfp_rawcorr.do"
+	*	do "$code/15_cuisine_flfp_rawcorr.do"
 				
 		
 	* ***************************************************** *
@@ -221,7 +223,7 @@
 	* 		- Creates scatter plots:
 	*		  	Complexity variables vs avg meals cooked
 		
-		do "$code/16_cookpad_flfp_cuisine_reg.do"
+	*	do "$code/16_cookpad_flfp_cuisine_reg.do"
 
 	* ***************************************************** *
 		
@@ -230,21 +232,21 @@
 	* 		- Regressions country level
 	*		- Best: p60, g3simple
 
-		do "$code/17_1ststage_best.do"
+*		do "$code/17_1ststage_best.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
 	*		- Merge the different databases created to run regressions
 
-		do "$code/18_merge_reg.do"
+*		do "$code/18_merge_reg.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
 	*		- Run IV regressions
 
-		do "$code/19_IV_reg.do"
+*		do "$code/19_IV_reg.do"
 		
 	* ***************************************************** *
 		
@@ -254,7 +256,7 @@
 	*		- Regressions individual level
 	*		- Best: 
 
-		do "$code/20_1ststage_best_cookpad.do"
+		do "$code/20_1stage_best_cookpad.do"
 		
 	* ***************************************************** *
 		
@@ -262,15 +264,14 @@
 	*		- Merge the different databases created to run regressions
 	*       - Only use the best native and imported measure
 
-		do "$code/21_merge_reg_cookpad.do"
+*		do "$code/21_merge_reg_cookpad.do"
 
 	* ***************************************************** *
 		
 	* 	The purpose of this dofile is:
-	*		- Merge cookpad and CIAT databases
-	*		- Run regressions
+	*		- Run regressions (using best IV)
 
-		do "$code/20_cookpad_ciat.do"
+*		do "$code/22_cookpad_reg.do"
 		
 
 	
