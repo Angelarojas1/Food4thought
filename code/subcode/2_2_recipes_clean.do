@@ -11,10 +11,10 @@
    ** NOTES:
    ** WRITTEN BY:       Angela Rojas
    ** EDITTED BY:       
-   ** Last date modified: Ene 12, 2024
+   ** Last date modified: April 19, 2024
 
 * import data
-use "${recipes}/recipe_all_countries.dta", clear
+* use "${recipes}/recipe_all_countries.dta", clear
 
 * Fix number of ingredients variable
 destring numberofingredients_raw, replace
@@ -27,8 +27,24 @@ gen n_ing = (length(listofingredients) - length(subinstr(listofingredients, ",",
 
 replace numberofingredients = n_ing + 1 if numberofingredients == 1 & inlist(country, "Jordan", "Latvia")
 drop n_ing
+drop if numberofingredients >= 47 & country == "Iraq" // The code is counting wrong the ingredients, I drop 13 observations
+
+* Drop recipes with information as zero in time and number of ingredients
+drop if totaltime==0 // 6,078 observations deleted
+drop if numberofingredients==0 // 79 observations deleted
+
+* Remove duplicates
+duplicates drop nameoftherecipe totaltime listofingredients listofinstructions numberofservings preptime cooktime numberofingredients_raw numberofingredients country, force
+
+*MIRAR QUE HACER CON MALAYSIA , TIENE UNAS CUANTAS RECETAS CON INGREDIENTES MUY GRANDES
+*sum totaltime if country=="Poland", de
+*tab country if id>90 & id<120, sum(totaltime) 
 
 * Organize time variable
+/*
+Armenia, Kosovo, Luxembourg, Poland: Has one recipe that takes days due to fermetation process
+Iceland: Has one recipe that takes days to soften the meat
+*/
 replace totaltime = 4320 if cooktime == "~ 3-4 days"
 replace totaltime = 1440 if cooktime == "~ 1 day"
 replace totaltime = 255 if strpos(cooktime,"4 hrs 15")>0
@@ -57,16 +73,10 @@ replace totaltime = 30 if preptime == "PT30M" & cooktime == ""
 replace totaltime = 20 if preptime == "PT20M" & cooktime == "" 
 replace totaltime = 10 if preptime == "PT10M" & cooktime == "" 
 
-* Drop recipes with information as zero in time and number of ingredients
-drop if totaltime==0 // 6,078 observations deleted
-drop if numberofingredients==0 // 79 observations deleted
-
 ** drop recipes that the total time are higher than 99%
 bys country: egen p99 = pctile(totaltime), p(99)
 drop if totaltime > p99
 note: `r(N_drop)' recipes are dropped because of higher than 99%.
-
-sum totaltime
 
 *replace listofingredients = ",'" if strpos(listofingredients,", '")>0
 *replace listofingredients = subinstr(listofingredients, ", '", ",'", .)

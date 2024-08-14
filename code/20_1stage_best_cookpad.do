@@ -28,36 +28,12 @@
 		
 use "${recipes}/cuisine_complexity_all.dta", clear
 
-** merge with geographical data
-quietly merge 1:1 adm0 using "${versatility}/geographical.dta"
-assert _merge != 2
-assert inlist(adm0, "XXK") if _merge == 1 //Kosovo
-quietly count
-assert `r(N)' == 139
-drop _merge
-
-** Organize native ingredients data
-preserve
-use "${versatility}/cuisine_ciat.dta", clear
-keep adm0 numNative
-quietly duplicates drop
-quietly count
-assert `r(N)' == 136
-tempfile numNative
-save `numNative', replace
-restore
-
 ** organize cookpad data
 preserve
 do "${code}/subcode/cookpad_reg.do"
 tempfile cookpad
 save `cookpad', replace
 restore
-
-** merge with numNative ingredients
-quietly merge 1:1 adm0 using `numNative'
-assert inlist(country, "Comoros", "Madagascar", "Mauritius") if _merge == 1
-drop _merge
 
 ** merge with cookpad
 quietly merge 1:m country using `cookpad'
@@ -120,6 +96,8 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	
 	* 1st stage		
 	quietly reghdfe comp fem fem_nat fem_imp hhsize if covid==0, absorb(niso ym) cluster(niso)
+	
+	* La otra first stage es como la del código 17, serían solo 118 observaciones que son las que también están en cookpad
 
 		local fval = e(F)
 

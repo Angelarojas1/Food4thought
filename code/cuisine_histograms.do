@@ -18,11 +18,6 @@
 * import data
 use "${recipes}/recipe_all_countries.dta", clear
 
-** drop recipes that the total time are higher than 99%
-bys country: egen p99 = pctile(totaltime), p(99)
-drop if totaltime > p99
-note: `r(N_drop)' recipes are dropped because of higher than 99%.
-
 * Organize country and continent codes
 kountry country, from(other) stuck marker
 rename _ISO3N_ iso3
