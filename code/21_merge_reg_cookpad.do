@@ -73,5 +73,5 @@ label var importVersatility "import versatility"
 
 	
 * Save database
-save "${versatility}/reg_variables_cp.dta" , replace
+save "${versatility}/reg_variables_cookpad.dta" , replace
 

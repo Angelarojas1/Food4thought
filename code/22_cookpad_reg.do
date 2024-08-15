@@ -5,8 +5,8 @@
    * relaciona la complejidad de la cocina con variables del mercado      *
    *             laboral teniendo en cuenta la pandemia de 2020.          *
    *																	  *
-   * - Inputs: "${versatility}/reg_vbs_cookpad.dta"			              *
-   * - Output: "${outputs}/Tables/ivreg_`val'_`var'.tex"     			  *
+   * - Inputs: ""			              *
+   * - Output: ""     			  *
    * ******************************************************************** *
 
    ** IDS VAR:     wp5889    // Uniquely identifies people

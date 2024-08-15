@@ -25,7 +25,7 @@ clear
 foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66"  "p70"{ 
 	
 * imported data
-import delimited "${versatility}/imported/imported_`x'.csv", clear 
+import delimited "${versatility}/imported/imported_`x'.csv", clear // we need to have also native ingredients, fix this in code 8
 
 * keep variables
 keep adm0 ingredient suitability country ifnative

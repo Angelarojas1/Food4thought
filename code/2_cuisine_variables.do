@@ -18,10 +18,6 @@
 * import data
 use "${recipes}/recipe_all_countries.dta", clear
 
-bysort nameoftherecipe country: gen numrecipe = _n
-tabstat numrecipe if totaltime != 0, by(country) stats(count) 
-tabstat numrecipe, by(country) stats(count) 
-
 ** Clean recipes information
 do "$code/subcode/2_2_recipes_clean.do"
 

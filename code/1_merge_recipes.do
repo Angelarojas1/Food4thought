@@ -54,7 +54,7 @@ describe, full
 drop v1 unnamed01
 
 * convert string to numeric
-destring totaltime numberofingredients numberofspices, replace 
+destring totaltime* numberofingredients numberofspices, replace 
 
 * generate country
 split src, parse(".")
