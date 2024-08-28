@@ -81,7 +81,7 @@ eststo clear
 		local m_ols `r(mean)'
 		estadd scalar mean_ols = `m_ols'
 */		
-		* IV (LE DEBO AGREGAR YM??)
+		* IV 
 		quietly ivreghdfe `v' fem  hhsize (comp = fem_nat fem_imp) if covid==0, absorb(niso ym)
 		
 		eststo iv`v'

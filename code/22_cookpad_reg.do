@@ -5,8 +5,8 @@
    * relaciona la complejidad de la cocina con variables del mercado      *
    *             laboral teniendo en cuenta la pandemia de 2020.          *
    *																	  *
-   * - Inputs: "${versatility}/reg_vbs_cookpad.dta""		              *
-   * - Output: "${outputs}/Tables/ivreg_`val'_`var'.tex"     			  *
+   * - Inputs: ""			              *
+   * - Output: ""     			  *
    * ******************************************************************** *
 
    ** IDS VAR:     wp5889    // Uniquely identifies people
@@ -15,13 +15,49 @@
    ** EDITTED BY:       Angela Rojas
    ** Last date modified: Dec 29, 2023
    
-	* Import data
-	use "${versatility}/reg_vbs_cookpad.dta", clear
+   
+   use "${recipes}/cuisine_complexity_all.dta",clear
+   * use "${versatility}/reg_variables_cp.dta", clear
+
+	** organize cookpad data
+	preserve
+	do "${code}/subcode/cookpad_reg.do"
+	tempfile cookpad
+	save `cookpad', replace
+	restore
+	
+	** merge with cookpad
+	quietly merge 1:m country using `cookpad'
+	drop if _merge == 2
+	* merge == 1 -> 21
+	* drop _merge*
+
+	quietly unique adm0
+	assert `r(sum)' == 139
 
 	* Create excel file with regression results:
 		* Y = Employment variables
 		* X = Complexity variables (interaction between time/ingredients/spices and fem)
 		* Precovid period
+
+	foreach v of varlist time* {
+		gen l`v'=log(`v')
+	}
+	
+	local time "Time recipes"
+	local ingredients "Num ingredients"
+	local spices "Num spices"
+
+	foreach v in time ingredients spices {
+		foreach k in mean median p10 p25 p75 p90 {
+			la var `v'_`k' "``v'' `k'"	
+		}
+	}
+
+	foreach k in mean median p10 p25 p75 p90 {
+ 		la var ltime_`k' "Log time `k'"	
+	}
+
 
 		foreach w of varlist ltime* ingredients* spices* {
 			
@@ -39,15 +75,16 @@
 			sum `v' if e(sample)
 			local m `r(mean)'
 
-			outreg2 using "${outputs}\Tables\cookpad\reg_summary_pre.xls", lab dec(4) excel /// 	
+			outreg2 using "${outputs}\Tables\cookpad\reg_summary_pre_2024.xls", lab dec(4) excel /// 	
 			par(se) stats(coef se) keep(fem femx) addstat(mean.dep.var, `m') ///
 			addtext(Complexity, "`lb'", period, "pre covid") nocons
 			}
 		
 		drop femx
 		}
-		erase "${outputs}\Tables\reg_summary_pre.txt"	
+		erase "${outputs}\Tables\cookpad\reg_summary_pre_2024.txt"	
 
+		/*
 	** Create regressions 
 
 	* Regressions - Pre-covid

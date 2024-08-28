@@ -168,7 +168,6 @@ tab ingredient
  save "${versatility}/median_suitability.dta", replace
   
   
-  **NO ENTIENDO ESTA PARTE PARA QUÉ ES
 *** limit to suitability data of all ingredients that are from CIAT map  ***
  use "${versatility}/cuisine_ciat.dta", clear
 

@@ -26,7 +26,7 @@
 **************************************
 
 * Date global
-* local today : display %tdCYND date(c(current_date), "DMY")
+*local today : display %tdCYND date(c(current_date), "DMY")
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
@@ -66,7 +66,7 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge m:1 adm0 using "${versatility}/imported/importbycountry_`z'.dta"
+quietly merge m:1 adm0 using "${versatility}/imported/importbycountry_v4_`x'.dta"
 assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -107,7 +107,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'.xls", lab dec(4) excel par(se) stats(coef se) keep(fem_nat fem_imp) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'_v4.xls", lab dec(4) excel par(se) stats(coef se) keep(fem_nat fem_imp) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
 	drop comp
 	}
@@ -117,6 +117,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/ltime.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/ing.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/spice.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/ltime_v4.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/ing_v4.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/spice_v4.txt"

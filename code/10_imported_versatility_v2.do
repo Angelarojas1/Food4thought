@@ -5,7 +5,7 @@
    *																	  *
    * - Inputs: "${versatility}/imported/imported_`x'.csv"              	  *
    *           "${versatility}/common_flavor_clean.dta"      			  *
-   *           "${versatility}/native/native_clean_`x'.dta"         	  *
+   *           "${versatility}/native/native_clean_`x'.dta"         			  *
    *           "${versatility}/distance_capital.dta"         			  *
    * - Output: "${versatility}/imported/importbycountry_`x'.dta"      	  *
    * ******************************************************************** *
@@ -25,7 +25,7 @@ clear
 foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66"  "p70"{ 
 	
 * imported data
-import delimited "${versatility}/imported/imported_`x'.csv", clear 
+import delimited "${versatility}/imported/imported_`x'_v2.csv", clear 
 
 * keep variables
 keep adm0 ingredient suitability country ifnative
@@ -74,6 +74,9 @@ foreach i of local ing{
 	replace ifnative2 = `s' if ingredient2 == "`i'"
 }
 
+* Drop pairs where both ingredients are native 
+drop if ifnative==1 & ifnative2 ==1
+
 * get common flavors 
 merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 count if _merge == 3
@@ -119,8 +122,8 @@ drop common
 rename (weightcommon ingredientrow ingredient) (common ingredient ingredient2)
 
 collapse (first)adm0 (first)country (mean)common (mean)ifnative, by(ingredient)
-keep if ifnative == 0
-drop ifnative
+*keep if ifnative == 0
+*drop ifnative
 
 * calculate the distance between the country and origin of the ingredient
 joinby ingredient using "${versatility}/native/native_clean_`x'.dta"
@@ -133,7 +136,8 @@ bysort ingredient: gen num = _n
 keep if num == 1
 drop num
 
-gen commondistance = 1/distance * common
+gen commondistance = 1/distance * common if ifnative != 1
+replace commondistance = common if ifnative==1
 collapse (first)adm0 (first)country (mean)commondistance
 rename commondistance importVersatility
 
@@ -182,6 +186,9 @@ foreach l of local level{
 	local s = r(mean)
 	replace ifnative2 = `s' if ingredient2 == "`i'"
 	}
+	
+	* Drop pairs where both ingredients are native 
+	drop if ifnative==1 & ifnative2 ==1
 
 	merge 1:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
 	count if _merge == 3
@@ -230,8 +237,8 @@ foreach l of local level{
 	if r(N) == 0{
 		continue
 	}
-	keep if ifnative == 0
-	drop ifnative
+	*keep if ifnative == 0
+	*drop ifnative
 
 	* calculate the distance between the country and origin of the ingredient
 	joinby ingredient using "${versatility}/native/native_clean_`x'.dta"
@@ -245,7 +252,8 @@ foreach l of local level{
 	keep if num == 1
 	drop num
 
-	gen commondistance = 1/distance * common
+	gen commondistance = 1/distance * common if ifnative != 1
+	replace commondistance = common if ifnative==1
 	collapse (first)adm0 (first)country (mean)commondistance
 	rename commondistance importVersatility
 	
@@ -258,6 +266,6 @@ foreach l of local level{
 * drop duplicates
 duplicates drop
 
-save "${versatility}/imported/importbycountry_`x'.dta", replace
+save "${versatility}/imported/importbycountry_v2_`x'.dta", replace
 
 }

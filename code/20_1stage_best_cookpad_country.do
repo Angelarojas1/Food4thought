@@ -81,25 +81,19 @@ gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
-* Create interaction between gender and IV variable
-	gen fem_nat = fem*std_native
-	gen fem_imp = fem*std_import
 	
-* Label variables
+/* Label variables
 	la var fem_nat 		"Women x Native versatility"
 	la var fem_imp 		"Women x Imported versatility"
-
+*/
 rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
 	foreach var of varlist ltime ing spice {
-	
-		gen comp = fem*`var'	
-		la var comp "Women x Complexity"
     
 		local lb: variable label `var'
 	
 	* 1st stage		
-	quietly reghdfe comp fem fem_nat fem_imp hhsize if covid==0, absorb(niso ym) cluster(niso)
+	quietly reghdfe `var' std_native std_import if covid==0, absorb(continentFactor ym) cluster(continentFactor)
 	
 		local fval = e(F)
 
@@ -107,7 +101,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'.xls", lab dec(4) excel par(se) stats(coef se) keep(fem_nat fem_imp) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'_country.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
 	drop comp
 	}
@@ -117,6 +111,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/ltime.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/ing.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/spice.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/ltime_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/ing_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/spice_country.txt"

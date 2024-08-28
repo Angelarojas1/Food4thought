@@ -142,7 +142,7 @@
 	
 	* 	The purpose of this dofile is:
 	*		- Clean data for calculating versatility.
-	*       - Creates native versatility and imported versatility and 
+	*       - Creates native versatility and imported versatility files
 
 		do "$code/8_versatility_clean.do" 
 
