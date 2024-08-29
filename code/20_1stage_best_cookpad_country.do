@@ -35,6 +35,8 @@ use "${recipes}/cuisine_complexity_all.dta", clear
 ** organize cookpad data
 preserve
 do "${code}/subcode/cookpad_reg.do"
+keep country adm0 
+duplicates drop
 tempfile cookpad
 save `cookpad', replace
 restore
@@ -92,8 +94,8 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
     
 		local lb: variable label `var'
 	
-	* 1st stage		
-	quietly reghdfe `var' std_native std_import if covid==0, absorb(continentFactor ym) cluster(continentFactor)
+	* 1st stage	
+	quietly reghdfe `var' std_native std_import , absorb(continentFactor)
 	
 		local fval = e(F)
 
@@ -103,7 +105,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
 	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'_country.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
-	drop comp
 	}
 	
 	restore
