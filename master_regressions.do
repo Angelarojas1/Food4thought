@@ -113,7 +113,15 @@
 		do "$code/20_1stage_best_cookpad_v3.do"
 		do "$code/20_1stage_best_cookpad_v4.do"
 		
-
+	* 	The purpose of this dofile is:
+	*	- THIS DOFILE DOESN'T INCLUDE NATIVE VERSATILITY IN THE REGRESSION
+		do "$code/20_1stage_best_cookpad_1.do"
+		do "$code/20_1stage_best_cookpad_v2_1.do"
+		do "$code/20_1stage_best_cookpad_v3_1.do"
+		do "$code/20_1stage_best_cookpad_v4_1.do"
 		
-
-	
+	*	This dofiles run the regression at country level
+		do "$code/20_1stage_best_cookpad_country.do"
+		do "$code/20_1stage_best_cookpad_country_v2.do"
+		do "$code/20_1stage_best_cookpad_country_v3.do"
+		do "$code/20_1stage_best_cookpad_country_v4.do"
