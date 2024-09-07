@@ -25,9 +25,6 @@
 * Find the best 1st stage regression
 **************************************
 
-* Date global
-*local today : display %tdCYND date(c(current_date), "DMY")
-
 * Note: find the highest f statistics: p60, g3simple, p60
 		
 use "${recipes}/cuisine_complexity_all.dta", clear
@@ -57,7 +54,7 @@ foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" {
 	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
 		foreach z in "p0" "p10" "p33" "p25" "p50" "p60" "p66" "p70" { 
 preserve
-
+/*
 ** merge with native versatility
 quietly merge 1:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
 *assert _merge != 2
@@ -67,7 +64,7 @@ drop _merge
 *** set missing native versatility as 0
 quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
-
+*/
 ** merge with imported versatility
 quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_v4_`z'.dta"
 *assert _merge !=2
@@ -81,7 +78,7 @@ assert !missing(importVersatility)
 ** create factor 
 encode continent_name, gen(continentFactor)
 gen logtime_median = log(time_median)
-egen std_native = std(nativeVersatility)
+*egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 	
 

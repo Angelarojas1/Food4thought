@@ -100,7 +100,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'_country_v3.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country_v3.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
 	}
 	
@@ -109,6 +109,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/ltime_country_v3.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/ing_country_v3.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/spice_country_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country_v3.txt"

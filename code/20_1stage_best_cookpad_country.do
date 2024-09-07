@@ -26,7 +26,8 @@
 **************************************
 
 * Date global
-* local today : display %tdCYND date(c(current_date), "DMY")
+global today : display %tdCYND date(c(current_date), "DMY")
+mkdir "${outputs}/Tables/iv_best/cookpad/$today"
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
@@ -100,7 +101,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'_country.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
 	}
 	
@@ -109,6 +110,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/ltime_country.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/ing_country.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/spice_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country.txt"
