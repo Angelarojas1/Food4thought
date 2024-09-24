@@ -125,3 +125,9 @@
 		do "$code/20_1stage_best_cookpad_country_v2.do"
 		do "$code/20_1stage_best_cookpad_country_v3.do"
 		do "$code/20_1stage_best_cookpad_country_v4.do"
+		
+	*	This dofiles run the regression at country level
+		do "$code/20_1stage_best_cookpad_country_1.do"
+		do "$code/20_1stage_best_cookpad_country_v2_1.do"
+		do "$code/20_1stage_best_cookpad_country_v3_1.do"
+		do "$code/20_1stage_best_cookpad_country_v4_1.do"
