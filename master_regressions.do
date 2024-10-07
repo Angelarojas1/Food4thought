@@ -19,7 +19,7 @@
 
 	if "`c(username)'" == "stell" {
 	global projectfolder "/Users/stell/Dropbox/food4thought/analysis23"
-	global github "C:\Users\stell\OneDrive - Universidad de los andes\Documentos\GitHub\Food4thought"
+	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
 	}
 	
 	if "`c(username)'" == "[xx's Username]" {
