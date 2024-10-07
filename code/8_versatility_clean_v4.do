@@ -15,6 +15,7 @@
    ** WRITTEN BY:       Xinyu Ren
    ** EDITTED BY:       Angela Rojas
    ** Last date modified: Nov 28, 2023
+   ** Description: This dofile considers all the imported ingredients, no matter the ingredient suitability and also considers native ingredients.
 
 ****************************************
 * Data cleaning for versatility data

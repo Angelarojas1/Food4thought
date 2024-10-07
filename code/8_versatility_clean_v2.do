@@ -6,15 +6,16 @@
    * - Inputs: "${versatility}/cuisine_ciat_suit.dta"	  	 			  *
    *           "${versatility}/median_suitability.dta"        			  *
    *		   "${versatility}/cuisine_suit.dta"			  			  *
-   * - Output: "${versatility}/native/native_clean_`var'.dta"			  *
-   *		   "${versatility}/imported/imported_`var'.dta"	  			  *
+   * - Output: "${versatility}/imported/imported_`var'_v2.dta"	  			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
    ** NOTES:
    ** WRITTEN BY:       Xinyu Ren
    ** EDITTED BY:       Angela Rojas
-   ** Last date modified: Nov 28, 2023
+   ** Last date modified: Oct 2, 2024
+   ** Description : This code changes the imported versatility database, we don't drop 
+   *  native ingredients, so later we are going to have common compound betweeen native and imported ingredients. 
 
 ****************************************
 * Data cleaning for versatility data

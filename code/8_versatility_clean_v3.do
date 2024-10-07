@@ -6,8 +6,8 @@
    * - Inputs: "${versatility}/cuisine_ciat_suit.dta"	  	 			  *
    *           "${versatility}/median_suitability.dta"        			  *
    *		   "${versatility}/cuisine_suit.dta"			  			  *
-   * - Output: "${versatility}/native/native_clean_`var'.dta"			  *
-   *		   "${versatility}/imported/imported_`var'.dta"	  			  *
+   * - Output: "${versatility}/native/native_clean_`var'_v3.dta"			  *
+   *		   "${versatility}/imported/imported_`var'_v3.dta"	  			  *
    * ******************************************************************** *
 
    ** IDS VAR:          adm0        // Uniquely identifies countries 
@@ -15,6 +15,7 @@
    ** WRITTEN BY:       Xinyu Ren
    ** EDITTED BY:       Angela Rojas
    ** Last date modified: Nov 28, 2023
+   ** Description: This dofile considers all the imported ingredients, no matter the ingredient suitability. 
 
 ****************************************
 * Data cleaning for versatility data
