@@ -37,8 +37,8 @@ use "${recipes}/cuisine_complexity_sum.dta", clear
 
 ** merge with geographical data
 quietly merge 1:1 adm0 using "${versatility}/geographical.dta"
-assert _merge != 2
 assert inlist(adm0, "XXK") if _merge == 1 //Kosovo
+assert inlist(adm0, "MDG") if _merge == 2 //Madagascar
 quietly count
 assert `r(N)' == 139
 drop _merge

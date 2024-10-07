@@ -69,7 +69,7 @@
  foreach var of varlist p0 p10 p25 p33 p50 p60 p66 p70{
  
  preserve
- gen aboveCutoff = (suitability > `var') & (!missing(suitability))  // CHECK THIS
+ gen aboveCutoff = (suitability > `var') & (!missing(suitability)) 
  joinby adm0 using `native'
  
  keep if aboveCutoff == 1
