@@ -30,7 +30,31 @@
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
-use "${recipes}/cuisine_complexity_all.dta", clear
+use "${recipes}/cuisine_complexity_sum.dta", clear
+
+** merge with geographical data
+quietly merge 1:1 adm0 using "${versatility}/geographical.dta"
+assert inlist(adm0, "XXK") if _merge == 1 //Kosovo
+assert inlist(adm0, "MDG") if _merge == 2 //Madagascar
+quietly count
+assert `r(N)' == 139
+drop _merge
+
+** Organize native ingredients data
+preserve
+use "${versatility}/cuisine_ciat.dta", clear
+keep adm0 numNative
+quietly duplicates drop
+quietly count
+assert `r(N)' == 136
+tempfile numNative
+save `numNative', replace
+restore
+
+** merge with numNative ingredients
+quietly merge 1:1 adm0 using `numNative'
+assert inlist(country, "Comoros", "Madagascar", "Mauritius") if _merge == 1
+drop _merge
 
 ** organize cookpad data
 preserve
@@ -49,7 +73,7 @@ keep if _merge == 3
 drop _merge*
 
 quietly unique adm0
-assert `r(sum)' == 117
+assert `r(sum)' == 118
 
 eststo clear
 
@@ -93,7 +117,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 		local lb: variable label `var'
 	
 	* 1st stage		
-	quietly reghdfe `var' std_native std_import , absorb(continentFactor) 
+	quietly reghdfe `var' std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor) 
 	
 		local fval = e(F)
 
