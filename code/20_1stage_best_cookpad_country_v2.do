@@ -26,8 +26,7 @@
 **************************************
 
 * Date global
-*global today : display %tdCYND date(c(current_date), "DMY")
-*mkdir "${outputs}/Tables/iv_best/cookpad/$today"
+* local today : display %tdCYND date(c(current_date), "DMY")
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
@@ -94,7 +93,7 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_`z'.dta"
+quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_v2_`z'.dta"
 *assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -109,6 +108,7 @@ gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
+
 rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
 	foreach var of varlist ltime ing spice {
@@ -117,7 +117,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 		local lb: variable label `var'
 	
 	* 1st stage		
-	quietly reghdfe `var' std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor)
+	quietly reghdfe `var' std_native std_import numNative al_mn pt_mn cl_md [aweight=num_recipes] , absorb(continentFactor) 
 	
 		local fval = e(F)
 
@@ -125,7 +125,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country_v2.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
 	}
 	
@@ -134,6 +134,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country_v2.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country_v2.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country_v2.txt"
