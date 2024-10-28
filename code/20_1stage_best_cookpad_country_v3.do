@@ -26,7 +26,7 @@
 **************************************
 
 * Date global
-* local today : display %tdCYND date(c(current_date), "DMY")
+*local today : display %tdCYND date(c(current_date), "DMY")
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
@@ -36,7 +36,7 @@ use "${recipes}/cuisine_complexity_all.dta", clear
 preserve
 do "${code}/subcode/cookpad_reg.do"
 keep country 
-duplicates drop
+duplicates drop 
 tempfile cookpad
 save `cookpad', replace
 restore
@@ -69,7 +69,7 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_v2_`z'.dta"
+quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_v3_`z'.dta"
 *assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -88,7 +88,6 @@ egen std_import = std(importVersatility)
 rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
 	foreach var of varlist ltime ing spice {
-
     
 		local lb: variable label `var'
 	
@@ -101,7 +100,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country_v2.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country_v3.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
 	}
 	
@@ -110,6 +109,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country_v2.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country_v2.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country_v2.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country_v3.txt"

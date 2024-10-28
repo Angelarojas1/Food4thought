@@ -5,7 +5,7 @@
    *																	  *
    * - Inputs: "${versatility}/imported/imported_`x'.csv"              	  *
    *           "${versatility}/common_flavor_clean.dta"      			  *
-   *           "${versatility}/native/native_clean_`x'.dta"         	  *
+   *           "${versatility}/native/native_clean_`x'.dta"         			  *
    *           "${versatility}/distance_capital.dta"         			  *
    * - Output: "${versatility}/imported/importbycountry_`x'.dta"      	  *
    * ******************************************************************** *
@@ -25,7 +25,7 @@ clear
 foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66"  "p70"{ 
 	
 * imported data
-import delimited "${versatility}/imported/imported_`x'.csv", clear // we need to have also native ingredients, fix this in code 8
+import delimited "${versatility}/imported/imported_v3.csv", clear 
 
 * keep variables
 keep adm0 ingredient suitability country ifnative
@@ -137,7 +137,7 @@ gen commondistance = 1/distance * common
 collapse (first)adm0 (first)country (mean)commondistance
 rename commondistance importVersatility
 
-save "${versatility}/imported/importbycountry_`x'.dta", replace
+save "${versatility}/imported/importbycountry_v3_`x'.dta", replace
 restore
 
 * loop through rest of countries
@@ -250,14 +250,14 @@ foreach l of local level{
 	rename commondistance importVersatility
 	
 	* append to original data 
-	append using "${versatility}/imported/importbycountry_`x'.dta" 
-	save "${versatility}/imported/importbycountry_`x'.dta", replace
+	append using "${versatility}/imported/importbycountry_v3_`x'.dta" 
+	save "${versatility}/imported/importbycountry_v3_`x'.dta", replace
 }
 
 
 * drop duplicates
 duplicates drop
 
-save "${versatility}/imported/importbycountry_`x'.dta", replace
+save "${versatility}/imported/importbycountry_v3_`x'.dta", replace
 
 }

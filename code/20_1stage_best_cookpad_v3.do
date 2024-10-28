@@ -26,7 +26,7 @@
 **************************************
 
 * Date global
-* local today : display %tdCYND date(c(current_date), "DMY")
+*local today : display %tdCYND date(c(current_date), "DMY")
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
@@ -35,21 +35,18 @@ use "${recipes}/cuisine_complexity_all.dta", clear
 ** organize cookpad data
 preserve
 do "${code}/subcode/cookpad_reg.do"
-keep country 
-duplicates drop
 tempfile cookpad
 save `cookpad', replace
 restore
 
 ** merge with cookpad
-quietly merge 1:1 country using `cookpad'
-keep if _merge == 3
-*drop if _merge == 2
+quietly merge 1:m country using `cookpad'
+drop if _merge == 2
 * merge == 1 -> 21
 drop _merge*
 
 quietly unique adm0
-assert `r(sum)' == 117
+assert `r(sum)' == 138
 
 eststo clear
 
@@ -59,8 +56,8 @@ foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" {
 preserve
 
 ** merge with native versatility
-quietly merge 1:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
-*assert _merge != 2
+quietly merge m:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
+assert _merge != 2
 assert missing(nativeVersatility) if _merge == 1
 drop _merge
 
@@ -69,8 +66,8 @@ quietly replace nativeVersatility = 0 if missing(nativeVersatility)
 assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_v2_`z'.dta"
-*assert _merge !=2
+quietly merge m:1 adm0 using "${versatility}/imported/importbycountry_v3_`z'.dta"
+assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
 
@@ -84,16 +81,25 @@ gen logtime_median = log(time_median)
 egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
 
+* Create interaction between gender and IV variable
+	gen fem_nat = fem*std_native
+	gen fem_imp = fem*std_import
+	
+* Label variables
+	la var fem_nat 		"Women x Native versatility"
+	la var fem_imp 		"Women x Imported versatility"
 
 rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
 	foreach var of varlist ltime ing spice {
-
+	
+		gen comp = fem*`var'	
+		la var comp "Women x Complexity"
     
 		local lb: variable label `var'
 	
 	* 1st stage		
-	quietly reghdfe `var' std_native std_import , absorb(continentFactor) 
+	quietly reghdfe comp fem fem_nat fem_imp hhsize if covid==0, absorb(niso ym) cluster(niso)
 	
 		local fval = e(F)
 
@@ -101,8 +107,9 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country_v2.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/`var'_v3.xls", lab dec(4) excel par(se) stats(coef se) keep(fem_nat fem_imp) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
 	
+	drop comp
 	}
 	
 	restore
@@ -110,6 +117,6 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	}
 	
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country_v2.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country_v2.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country_v2.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/ltime_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/ing_v3.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/spice_v3.txt"
