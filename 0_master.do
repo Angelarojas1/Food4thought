@@ -47,6 +47,7 @@
 	global cookpad              "$codedata/cookpad"
 	global fao_suit             "$codedata/FAO_suitability"
 	global pop 					"$codedata/population"
+	global wvs					"$codedata/wvs"
 
 	
 	* Output sub-folder globals
