@@ -274,6 +274,27 @@
 	*		- Run regressions (using best IV)
 
 *		do "$code/22_cookpad_reg.do"
+
+	* ***************************************************** *
+	*          			  Data check       				    *
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	*		- Create summary statistics for the following variables
+	*		  Log time, Time, Population, Imported Versatility
+	
+		do "$code/checking_data.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Create scatter plots of Time vs Imported versatility
+	
+		do "$code/scatter_ver_time_pop.do"
+		
+	* The purpose of this dofile is :
+	*		- Check regressions
+	
+		do "$code/1stage_verification"
+	
 		
 
 	

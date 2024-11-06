@@ -15,7 +15,7 @@
 
  * Remove duplicates
 duplicates drop nameoftherecipe totaltime listofingredients listofinstructions numberofservings preptime cooktime numberofingredients_raw numberofingredients country, force // Drop 9249 observations
-
+sort country
  bysort nameoftherecipe country: gen numrecipe = _n
  
 /*
@@ -103,6 +103,10 @@ duplicates drop nameoftherecipe totaltime listofingredients listofinstructions n
 
 *- Mexico
 	*keep if country == "Mexico" | country == "Brazil" | country == "Bangladesh"
+	gen n = 1
+	collapse (sum) n, by(country)
+	sum totaltime if country == "Bangladesh", de
+	
 	gsort country -totaltime
 	replace totaltime = 120 if nameoftherecipe == "Kol de pavo de monte" & country == "Mexico"
 	replace totaltime = 60 if nameoftherecipe == "Dulce de calabaza" & country == "Mexico"
