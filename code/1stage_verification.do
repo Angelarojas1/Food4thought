@@ -69,3 +69,8 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 	}
 	restore
 }
+
+erase "${outputs}/data_check/regressions/ltime.txt"	
+erase "${outputs}/data_check/regressions/ing.txt"	
+erase "${outputs}/data_check/regressions/spice.txt"	
+
