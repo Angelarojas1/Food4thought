@@ -38,6 +38,7 @@ replace two_letter_country_code = "XK" if country == "Kosovo"
 replace adm0 = "CPV" if country == "Cabo Verde"
 replace adm0 = "XXK" if country == "Kosovo"
 
+
 ** collapse to country level, multiple percentiles
 gen cnt = 1
 collapse (p10)time_p10 = totaltime (p25)time_p25 = totaltime (median)time_median = totaltime (p75)time_p75 = totaltime  (p90)time_p90 = totaltime  (mean)time_mean = totaltime  ///

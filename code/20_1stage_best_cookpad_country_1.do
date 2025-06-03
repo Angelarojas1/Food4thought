@@ -26,7 +26,8 @@
 **************************************
 
 * Date global
-* local today : display %tdCYND date(c(current_date), "DMY")
+global today : display %tdCYND date(c(current_date), "DMY")
+mkdir "${outputs}/Tables/iv_best/cookpad/$today"
 
 * Note: find the highest f statistics: p60, g3simple, p60
 		
@@ -53,23 +54,12 @@ assert `r(sum)' == 117
 
 eststo clear
 
-foreach x in "p0" "p10" "p25" "p33" "p50" "p60" "p66" "p70" {
-	foreach y in "g2simple" "g2weight" "g3simple" "g3weight"{ 
-		foreach z in "p0" "p10" "p33" "p25" "p50" "p60" "p66" "p70" { 
+foreach z in "p0" "p10" "p33" "p25" "p50" "p60" "p66" "p70" { 
 preserve
 
-** merge with native versatility
-quietly merge 1:1 adm0 using "${versatility}/native/nativebycountry_`x'_`y'.dta"
-*assert _merge != 2
-assert missing(nativeVersatility) if _merge == 1
-drop _merge
-
-*** set missing native versatility as 0
-quietly replace nativeVersatility = 0 if missing(nativeVersatility)
-assert !missing(nativeVersatility)
 
 ** merge with imported versatility
-quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_v2_`z'.dta"
+quietly merge 1:1 adm0 using "${versatility}/imported/importbycountry_`z'.dta"
 *assert _merge !=2
 assert missing(importVersatility) if _merge == 1
 drop _merge
@@ -81,9 +71,7 @@ assert !missing(importVersatility)
 ** create factor 
 encode continent_name, gen(continentFactor)
 gen logtime_median = log(time_median)
-egen std_native = std(nativeVersatility)
 egen std_import = std(importVersatility)
-
 
 rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 
@@ -93,7 +81,7 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 		local lb: variable label `var'
 	
 	* 1st stage		
-	quietly reghdfe `var' std_native std_import , absorb(continentFactor) 
+	quietly reghdfe `var' std_import , absorb(continentFactor) 
 	
 		local fval = e(F)
 
@@ -101,15 +89,14 @@ rename (logtime_median ingredients_median spices_median) (ltime ing spice)
 *		local mean = r(mean)
 *		estadd scalar mean = `mean'
 
-	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country_v2.xls", lab dec(4) excel par(se) stats(coef se) keep(std_native std_import) addstat(f-value, `fval') ctitle("`x'`y'_`z'") nocons title("`var'")
+	outreg2 using "${outputs}/Tables/iv_best/cookpad/$today/`var'_country.xls", lab dec(4) excel par(se) stats(coef se) keep(std_import) addstat(f-value, `fval') ctitle("`z'") nocons title("`var'")
 	
 	}
 	
 	restore
 	}
-	}
-	}
+
 	
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country_v2.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country_v2.txt"
-	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country_v2.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ltime_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/ing_country.txt"
+	erase "${outputs}/Tables/iv_best/cookpad/$today/spice_country.txt"
