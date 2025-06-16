@@ -1,15 +1,12 @@
-
 * **************************************************************************** *
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
-*                Authors: Girija Borker and Margarita Gáfaro          		   *
-*						  	Master Analysis do-file  							   	   *
+*               Author: Varun C
+* 				Last date modified: June 16, 2025 						   	   *
+*				Cookpad Data Exploration
 * **************************************************************************** *
 	
-	* Written by: Varun
-	* Last date modified: June 16, 2025
-
-
+	
 	clear all
 	set more off
 	global run = 1
@@ -57,21 +54,36 @@
 	* Output sub-folder globals
 	global outputs				"$files/Outputs"
 	global tables				"$projectfolder\outputs\Tables"
-	global figures				"$projectfolder\outputs\Figures"
 	
 	* ***************************************************** *
 	
-	*********************************************************
-	*					Versatility Analysis
-	*********************************************************
+	use "$cookpad\Cookpad_clean.dta", replace
 	
-	do "$code/38_FirstStage_versatility_analysis.do"
+	drop if year == 2020
 	
-	*********************************************************
-	*					Cookpad Analysis
-	*********************************************************
+	* keep useful variables
+	* keep country three_letter_country_code weight year numLunCook numLunEat numDinCook numDinEat gender
+	gen covid=(ym>=722)
 	
-	do "$code/36_cookpad_analysis.do"
+	* merge with cuisine data
+	rename three_letter_country_code adm0
+	merge m:1 country using "$outputs/complexity_recipe.dta" 
+	keep if _merge == 3
+	drop _merge
+
+	save "$outputs/cookpad_adm0.dta", replace
 	
 	
+	*=========================================================
+	* Adding cookpad indicator to versatility
+	*=========================================================
 	
+	keep adm0
+	duplicates drop
+	
+	merge 1:1 adm0 using "$outputs/all_versatility.dta", gen(cookpad_merge)
+	
+	drop if cookpad_merge == 1
+	gen cookpad = (cookpad_merge == 3)
+	
+	save "$outputs/final_versatility.dta", replace

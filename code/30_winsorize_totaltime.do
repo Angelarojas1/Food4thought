@@ -1,9 +1,9 @@
-
 * **************************************************************************** *
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
 *               Author: Varun C
-* 				Last date modified: April 14, 2025  							   	   *
+* 				Last date modified: June 16, 2025 						   	   *
+*				Winsorizing totaltime from recipe data
 * **************************************************************************** *
 	
 	
@@ -23,15 +23,15 @@
 	
 	if "`c(username)'" == "wb641362" { // Varun
 	global projectfolder "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global github "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global files "C:\Users\wb641362\OneDrive - WBG\Documents\Food4Thought"
+	global github "C:\Users\wb641362\OneDrive - WBG\Documents\GitHub\Food4thought"
+	}
 	
-	* Creating the World Map Shape File
-	* cd "C:\Users\wb641362\OneDrive - WBG\Documents\WB_countries_Admin0_10m"
-	* spshape2dta WB_countries_Admin0_10m, replace saving(world)
+	if "c(username)" == "mgafargo" { // Margarita
+	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
 	}
 
 	** Project folder globals
+	global files "$projectfolder\data\coded"
 	
 	* Dofile sub-folder globals
 	global code					"$github/code"
@@ -53,7 +53,9 @@
 
 	
 	* Output sub-folder globals
-	global outputs				"$projectfolder/outputs"
+	global outputs				"$files/Outputs"
+	global tables				"$projectfolder\outputs\Tables"
+	global figures				"$projectfolder/outputs/Figures"
 	
 	* ***************************************************** *
 
@@ -62,7 +64,7 @@
 	*				Looking into recipes
 	* ***************************************************** *	
 	
-	use "$projectfolder\data\coded\recipes\recipe_all_countries.dta", replace
+	use "$recipes\recipe_all_countries.dta", replace
 	encode country, gen(Country)
 	*hist Country, addl lw(0)
 	* Codes: Kosovo = 70; Armenia = 5; Belarus = 12
@@ -99,9 +101,9 @@
 	preserve
 	keep  w_numberofspices w_mean_totaltime w_mean_spices Country country mean_ingredients median_spices median_ingredients median_totaltime
 	duplicates drop Country, force
-	save "$files/Outputs/complexity_recipe.dta", replace
+	save "$outputs/complexity_recipe.dta", replace
 	restore
-	x
+	
 	* Plots
 	if $run == 1 {
 	preserve
@@ -111,7 +113,7 @@
 			scatter w_mean_totaltime mean_ingredients if outlier == 1, mlabel(country) mlabs(tiny) mfc(dkgreen) mlw(none)  legend(label(2 "Outliers")) ///
 	title("Mean Ingredients by Winsorized Mean Time") ytitle("Winsorized Average Time") ///
 	xtitle("Average Number of Ingredients")
-	graph export "$files/Outputs/WinTime_Ingredients.png", replace
+	graph export "$figures/WinTime_Ingredients.png", replace
 	
 	destring numberofingredients_raw, replace
 	replace numberofingredients = numberofingredients_raw if country == "Armenia"
@@ -121,12 +123,12 @@
 			scatter w_mean_totaltime mean_ingredients if outlier == 1, mlabel(country) mlabs(tiny) mfc(dkgreen) mlw(none)  legend(label(2 "Outliers")) ///
 	title("Mean Ingredients by Winsorized Mean Time") ytitle("Winsorized Average Time") ///
 	xtitle("Average Number of Ingredients - Armenia Raw")
-	graph export "$files/Outputs/WinTime_Ingredients_ARRaw.png", replace
+	graph export "$figures/WinTime_Ingredients_ARRaw.png", replace
 	
 	twoway scatter w_mean_totaltime w_mean_spices if outlier == 0, mlabel(country) mlabs(tiny) mlw(none) || ///
 		scatter w_mean_totaltime w_mean_spices if outlier == 1, mlabel(country) mlabs(tiny) mfc(dkgreen) mlw(none)  legend(label(2 "Outliers")) ///
 	ytitle("Average Time") xtitle("Average Number of spices - Armenia Raw") title("Winzorised Mean Time by Winsorized Mean Spices")
-	graph export "$files\Outputs\WinTime_NOS_ARRaw.png", replace
+	graph export "$figures\WinTime_NOS_ARRaw.png", replace
 	restore
 	}
 	
@@ -142,30 +144,30 @@
 	
 	preserve 
 	keep if nativeVersatility == 0
-	export delim country using "$files/Outputs/no_native.csv", replace
+	export delim country using "$outputs/no_native.csv", replace
 	restore
 	
 	preserve 
 	keep if importVersatility == 0
-	export delim country using "$files/Outputs/no_import.csv", replace
+	export delim country using "$outputs/no_import.csv", replace
 	restore
 	
 	preserve 
 	keep if nativeVersatility == 0 & importVersatility == 0
-	export delim country using "$files/Outputs/no_versatility.csv", replace
+	export delim country using "$outputs/no_versatility.csv", replace
 	restore
 	
 	twoway scatter time_mean nativeVersatility if nativeVersatility != 0, mlabel(country) mlabs(tiny) mlw(none) legend(label(1 "Non-Zero")) || ///
 		scatter time_mean nativeVersatility if nativeVersatility == 0, mlabel(country) mlabs(tiny) mfc(dkgreen) mlw(none) legend(label(2 "Zero Native")) || ///
 		scatter time_mean nativeVersatility if nativeVersatility == 0 & importVersatility == 0,  mlabel(country) mlabs(tiny) mfc(blue) mlw(none)  legend(label(3 "Zero Native & Import")) ///
 	ytitle("Average Time") xtitle("Native Versatility") title("Native Versatility by Mean Time")
-	graph export "$files\Outputs\Time_NoNative.png", replace
+	graph export "$figures\Time_NoNative.png", replace
 	
 	if $run == 0 {
 	twoway scatter time_mean ingredients_mean, mlabel(country) mlabs(tiny) || ///
 		scatter time_mean spices_mean, mlabel(country) mlabs(tiny)
 	ytitle("Average Time") xtitle("Average Number of ingredients")
-	graph export "$files\Outputs\Time_NOI.png", replace
+	graph export "$figures\Time_NOI.png", replace
 	
 	twoway scatter time_mean spices_mean, mlabel(country) mlabs(tiny) ///
 	ytitle("Average Time") xtitle("Average Number of spices")
@@ -173,11 +175,11 @@
 	
 	twoway scatter time_mean importVersatility, mlabel(country) mlabs(tiny) ///
 	ytitle("Average Time") xtitle("Imported Versatility")
-	graph export "$files\Outputs\Time_Imported.png", replace
+	graph export "$figures\Time_Imported.png", replace
 	
 	twoway scatter time_mean nativeVersatility, mlabel(country) mlabs(tiny) ///
 	ytitle("Average Time") xtitle("Native Versatility")
-	graph export "$files\Outputs\Time_Native.png", replace
+	graph export "$figures\Time_Native.png", replace
 	}
 	}
 	
@@ -189,24 +191,13 @@
 	keep if country == "Mexico" | country == "Colombia"
 	twoway scatter FLFP importVersatility, mlabel(country) mlabs(tiny) ///
 	ytitle("FLFP") xtitle("Imported Versatility")
-	graph export "$files\Outputs\MC_FLFP_Imported.png", replace
+	graph export "$figures\MC_FLFP_Imported.png", replace
 	
 	twoway scatter FLFP nativeVersatility, mlabel(country) mlabs(tiny) ///
 	ytitle("FLFP") xtitle("Native Versatility")
-	graph export "$files\Outputs\MC_FLFP_Native.png", replace
+	graph export "$figures\MC_FLFP_Native.png", replace
 	
 	}
-	
-	
-	* ***************************************************** *
-	*				World Maps - Not Imp
-	* ***************************************************** *	
-	if $run == 0 {
-	use "${versatility}/reg_variables.dta", replace
-	ren country FORMAL_EN
-	merge 1:m FORMAL_EN using "$files\WB_countries_Admin0_10m\world.dta"
-	spmap nativeVersatility using "$files\WB_countries_Admin0_10m\world_shp.dta", id(_ID) fcolor(Blues)
-	
 	}
 	
 	

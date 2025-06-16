@@ -1,33 +1,37 @@
-
 * **************************************************************************** *
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
-*                Authors: Girija Borker and Margarita Gáfaro          		   *
-*						  	Master do-file  							   	   *
+*               Author: Varun C
+* 				Last date modified: June 16, 2025 						   	   *
+*				Master dataset generation file
 * **************************************************************************** *
 	
-	* Written by: Xinyu Ren and Angela Rojas
-	* Last date modified: Dec 4, 2023
+	
 
 	clear all
 	set more off
-	pause on
+	global run = 1
 
 	* ***************************************************** *
 	
 	** Root folder globals 
 
 	if "`c(username)'" == "stell" {
-	global projectfolder "/Users/stell/Dropbox/food4thought/analysis23"
-	global github "C:/Users/stell/OneDrive/Escritorio/Documentos/GitHub/Food4thought"
+	global projectfolder "C:/Users/stell/Dropbox/food4thought/analysis23"
+	global github "C:\Users\stell\Dropbox\food4thought\analysis23"
 	}
 	
-	if "`c(username)'" == "[xx's Username]" {
-	global projectfolder "[insert ss's root directory for Dropbox]"
-	global github "[insert ss's root directory for Github]"
+	if "`c(username)'" == "wb641362" { // Varun
+	global projectfolder "C:\Users\wb641362\Dropbox\food4thought\analysis23"
+	global github "C:\Users\wb641362\OneDrive - WBG\Documents\GitHub\Food4thought"
+	}
+	
+	if "c(username)" == "mgafargo" { // Margarita
+	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
 	}
 
 	** Project folder globals
+	global files "$projectfolder\data\coded"
 	
 	* Dofile sub-folder globals
 	global code					"$github/code"
@@ -46,12 +50,11 @@
 	global versatility          "$codedata/iv_versatility"
 	global cookpad              "$codedata/cookpad"
 	global fao_suit             "$codedata/FAO_suitability"
-	global pop 					"$codedata/population"
-	global wvs					"$codedata/wvs"
 
 	
 	* Output sub-folder globals
-	global outputs				"$projectfolder/outputs"
+	global outputs				"$files/Outputs"
+	global tables				"$projectfolder\outputs\Tables"
 	
 	* ***************************************************** *
 
@@ -143,35 +146,9 @@
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
-	*		- Clean data for calculating versatility.
-	*       - Creates native versatility and imported versatility files
+	*		- Generate versatility by country
 
-		do "$code/8_versatility_clean.do" 
-
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	*		- Generate native versatility by country
-
-		do "$code/9_native_versatility.do"
-
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	*		- Generate imported versatility by country
-
-		do "$code/10_imported_versatility.do"
-		
-		
-	* ***************************************************** *
-	*              Geographical Data Coding                 *
-	* ***************************************************** *	
-	
-	* 	The purpose of this dofile is:
-	*		- Generate geographical controls for all countries
-	*		- Info for 138 countries (Kosovo pending)
-
-	*	do "$code/11_geographical_clean.do"
+		do "$code/34_new_versatility_including_native.do"
 		
 		
 	* ***************************************************** *
@@ -181,120 +158,18 @@
 	* 	The purpose of this dofile is:
 	*		- Clean cookpad data
 
-	*	do "$code/12_cookpad_clean.do"
+		do "$code/35_cookpad_data.do"
 		
 	* ***************************************************** *
-	*             FAO suitability Data Coding               *
+	*            First Stage IV Dataset Creation            *
 	* ***************************************************** *
 
 	* 	The purpose of this dofile is:
-	*		- Read in crop suitability data from FAO
-	*		- Creates suitability variable
-	*  		- Don't run this part. Treat the suitability data as raw
+	*		- Add a cookpad indicator to versatility dataset
 	
-	*	do "$code/13_FAO_suitability.do"
-	
-	* ***************************************************** *
-	*              Time Use Survey Data Validation          *
-	* ***************************************************** *
-
-	* 	The purpose of this dofile is:
-	*		- Compare time variable from survey data vs 
-	*		  recipe data
-
-	*	do "$code/14_time_use_survey.do"
-	
-	* ***************************************************** *
-	*          		 FLFP raw correlations     	 	        *
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	* 		- Raw correlations of FLFP and cuisine complexity
-	*		- 134 countries with FLFP information
+		do "$code/37_FirstStage_versatility_dataset.do"
 		
-	*	do "$code/15_cuisine_flfp_rawcorr.do"
-				
-		
-	* ***************************************************** *
-	*              	 	 Regressions                	    *
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	*		- Runs regressions ussing cookpad, FLFP and cuisine 
-	*			complexity variables
-	* 		- Creates scatter plots:
-	*		  	Complexity variables vs avg meals cooked
-		
-	*	do "$code/16_cookpad_flfp_cuisine_reg.do"
-
-	* ***************************************************** *
-		
-	* 	The purpose of this dofile is:
-	*		- Find the best performance 1st stage regressions
-	* 		- Regressions country level
-	*		- Best: p60, g3simple
-
-*		do "$code/17_1ststage_best.do"
-
-	* ***************************************************** *
-		
-	* 	The purpose of this dofile is:
-	*		- Merge the different databases created to run regressions
-
-*		do "$code/18_merge_reg.do"
-
-	* ***************************************************** *
-		
-	* 	The purpose of this dofile is:
-	*		- Run IV regressions
-
-*		do "$code/19_IV_reg.do"
-		
-	* ***************************************************** *
-		
-	* 	The purpose of this dofile is:
-	*		- Find the best performance 1st stage regressions
-	*		  using cookpad variables
-	*		- Regressions individual level
-	*		- Best: 
-
-		do "$code/20_1stage_best_cookpad.do"
-		
-	* ***************************************************** *
-		
-	* 	The purpose of this dofile is:
-	*		- Merge the different databases created to run regressions
-	*       - Only use the best native and imported measure
-
-*		do "$code/21_merge_reg_cookpad.do"
-
-	* ***************************************************** *
-		
-	* 	The purpose of this dofile is:
-	*		- Run regressions (using best IV)
-
-*		do "$code/22_cookpad_reg.do"
-
-	* ***************************************************** *
-	*          			  Data check       				    *
-	* ***************************************************** *
-	
-	* 	The purpose of this dofile is:
-	*		- Create summary statistics for the following variables
-	*		  Log time, Time, Population, Imported Versatility
-	
-		do "$code/checking_data.do"
-		
-	* 	The purpose of this dofile is:
-	*		- Create scatter plots of Time vs Imported versatility
-	
-		do "$code/scatter_ver_time_pop.do"
-		
-	* The purpose of this dofile is :
-	*		- Check regressions
-	
-		do "$code/1stage_verification"
-	
-		
-
+	*=======================================================*
+	*	Please proceed to master_regressions for analysis
+	*=======================================================*
 	

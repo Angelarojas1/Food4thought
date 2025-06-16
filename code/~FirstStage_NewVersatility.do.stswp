@@ -2,11 +2,13 @@
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
 *               Author: Varun C
-* 				Last date modified: 5 May, 2025 						   	   *
-*				First stage results
+* 				Last date modified: June 16, 2025 						   	   *
+*				First Stage Review
 * **************************************************************************** *
+	
+	
 
-clear all
+	clear all
 	set more off
 	global run = 1
 
@@ -21,15 +23,15 @@ clear all
 	
 	if "`c(username)'" == "wb641362" { // Varun
 	global projectfolder "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global github "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global files "C:\Users\wb641362\OneDrive - WBG\Documents\Food4Thought"
+	global github "C:\Users\wb641362\OneDrive - WBG\Documents\GitHub\Food4thought"
+	}
 	
-	* Creating the World Map Shape File
-	* cd "C:\Users\wb641362\OneDrive - WBG\Documents\WB_countries_Admin0_10m"
-	* spshape2dta WB_countries_Admin0_10m, replace saving(world)
+	if "c(username)" == "mgafargo" { // Margarita
+	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
 	}
 
 	** Project folder globals
+	global files "$projectfolder\data\coded"
 	
 	* Dofile sub-folder globals
 	global code					"$github/code"
@@ -52,6 +54,10 @@ clear all
 	
 	* Output sub-folder globals
 	global outputs				"$files/Outputs"
+	global tables				"$projectfolder\outputs\Tables"
+	global figures				"$projectfolder\outputs\Figures"
+	
+	* ***************************************************** *
 	
 	/* ***************************************************** *
 		* File Details
@@ -71,6 +77,7 @@ clear all
 	keep if flfp_merge == 3
 	encode continent_name, gen(continent)
 	
+	/****************** Old versions of versatility calculation********************
 	merge 1:1 adm0 using "$outputs\composite_versatility_mindist.dta", gen(mindist_merge)
 	lab var Versatility_mindist "Composite - Min Distance"
 	merge 1:1 adm0 using "$outputs\composite_versatility.dta", gen(composite_merge)
@@ -79,15 +86,36 @@ clear all
 	lab var Versatility_weighted "Composite - Suitability Weighted"
 	merge 1:1 adm0 using "$outputs\clean_versatility.dta",gen(clean_versatility_merge)
 	
-	*twoway scatter w_mean_totaltime FLFP, mlabel(country) mlabs(tiny) mlw(none) legend(label(1 "FLFP"))
-	*graph export "$files/Outputs/flfp_country.png", replace
+	merge 1:1 adm0 using "$outputs/all_versatility.dta",gen(all_versatility_merge)
 	
-	**********************************************************
+	*twoway scatter w_mean_totaltime FLFP, mlabel(country) mlabs(tiny) mlw(none) legend(label(1 "FLFP"))
+	*graph export "$figures/flfp_country.png", replace
+	
+	**********************************************************/
 	*			First Stage
 	**********************************************************
 	
 	local outcome median_spices median_totaltime median_ingredients w_mean_totaltime
 	
+	
+	est clear
+	foreach o of local outcome {
+		*********************************************
+		* All Versatility
+		*********************************************
+	eststo c1_`o': reg `o' versatility
+	eststo c1_`o': reghdfe `o' versatility i.continent
+	eststo c1_`o': ivregress 2sls FLFP ( `o' = versatility)
+	
+	eststo c2_`o': reg `o'  suit_versatility
+	eststo c2_`o': reghdfe `o'  suit_versatility i.continent
+	eststo c2_`o': ivregress 2sls FLFP (`o' = suit_versatility)
+	}
+	
+	
+	esttab c1* c2* using "$tables/FirstStage_all_versatility.csv", replace star(* 0.1 ** 0.05 *** 0.01) r2 ar2 p label
+	
+	if $run == 0{
 	est clear
 	foreach o of local outcome {
 		*********************************************
@@ -101,12 +129,12 @@ clear all
 	}
 	
 	
-	esttab c1* c2* using "$outputs/FirstStage_clean_versatility.csv", replace star(* 0.1 ** 0.05 *** 0.01) r2 ar2 p label
+	esttab c1* c2* using "$tables/FirstStage_clean_versatility.csv", replace star(* 0.1 ** 0.05 *** 0.01) r2 ar2 p label
 	
 	
 	
 	
-	if $run == 0{
+	
 		est clear
 	foreach o of local outcome {
 		*********************************************
@@ -120,7 +148,7 @@ clear all
 	}
 	
 	
-	esttab s1* s2* using "$outputs/FirstStage_nativeVersatility.csv", replace
+	esttab s1* s2* using "$tables/FirstStage_nativeVersatility.csv", replace
 	
 	
 	
@@ -138,7 +166,7 @@ clear all
 	}
 	
 	
-	esttab s1* s2* using "$outputs/FirstStage_importVersatility.csv", replace
+	esttab s1* s2* using "$tables/FirstStage_importVersatility.csv", replace
 	
 		est clear
 	foreach o of local outcome {
@@ -154,7 +182,7 @@ clear all
 		*********************************************
 	}
 	
-	esttab s1* s2* using "$outputs/FirstStage_versatility_mindist.csv", replace
+	esttab s1* s2* using "$tables/FirstStage_versatility_mindist.csv", replace
 	
 		est clear
 	foreach o of local outcome {
@@ -170,7 +198,7 @@ clear all
 		*********************************************
 	}
 	
-	esttab s1* s2* using "$outputs/FirstStage_versatility.csv", replace
+	esttab s1* s2* using "$tables/FirstStage_versatility.csv", replace
 	
 		est clear
 	foreach o of local outcome {
@@ -186,7 +214,7 @@ clear all
 		*********************************************
 	}
 	
-	esttab s1* s2* using "$outputs/FirstStage_versatility_weighted.csv", replace
+	esttab s1* s2* using "$tables/FirstStage_versatility_weighted.csv", replace
 	
 	}
 	
