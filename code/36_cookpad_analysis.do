@@ -64,6 +64,7 @@
 	
 	use "$outputs/cookpad_adm0.dta", replace
 	
+	
 	*** regressions
 	/*
 	i.	FLFP = average cooking time + average cooking time*number of meals
@@ -71,7 +72,7 @@
 	iii.FLFP = log (average cooking time) + log (average cooking time*number of meals)
 	iv.	FLFP = log (average cooking time* number of meals)
 
-	*/
+	
 	
 	local outcomes FLFP emp_lfpr emp_work_hours
 	est clear
@@ -82,7 +83,7 @@
 	
 	
 	
-	/*
+	
 	Cookpad regression at the individual/ household level
 	Male/Female*lfp
 	Likelihood that a person works depending on the food complexity of the country
