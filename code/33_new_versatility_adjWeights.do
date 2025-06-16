@@ -2,7 +2,7 @@
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
 *               Author: Varun C
-* 				Last date modified: April 14, 2025 						   	   *
+* 				Last date modified: June 16, 2025 						   	   *
 *				New Versatility Calculation
 * **************************************************************************** *
 	
@@ -23,15 +23,15 @@
 	
 	if "`c(username)'" == "wb641362" { // Varun
 	global projectfolder "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global github "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global files "C:\Users\wb641362\OneDrive - WBG\Documents\Food4Thought"
+	global github "C:\Users\wb641362\OneDrive - WBG\Documents\GitHub\Food4thought"
+	}
 	
-	* Creating the World Map Shape File
-	* cd "C:\Users\wb641362\OneDrive - WBG\Documents\WB_countries_Admin0_10m"
-	* spshape2dta WB_countries_Admin0_10m, replace saving(world)
+	if "c(username)" == "mgafargo" { // Margarita
+	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
 	}
 
 	** Project folder globals
+	global files "$projectfolder\data\coded"
 	
 	* Dofile sub-folder globals
 	global code					"$github/code"
@@ -54,6 +54,7 @@
 	
 	* Output sub-folder globals
 	global outputs				"$files/Outputs"
+	global tables				"$projectfolder\outputs\Tables"
 	
 	* ***************************************************** *
 	

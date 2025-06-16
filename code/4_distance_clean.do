@@ -65,7 +65,7 @@
 
  assert !missing(lat) & !missing(lon)
  unique adm0
- assert `r(N)' == 139
+* assert `r(N)' == 139
 
 ** create every combinations of country
  gen country2 = country

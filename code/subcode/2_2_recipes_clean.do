@@ -104,8 +104,8 @@ sort country
 *- Mexico
 	*keep if country == "Mexico" | country == "Brazil" | country == "Bangladesh"
 	gen n = 1
-	collapse (sum) n, by(country)
-	sum totaltime if country == "Bangladesh", de
+	*collapse (sum) n, by(country)
+	*sum totaltime if country == "Bangladesh", de
 	
 	gsort country -totaltime
 	replace totaltime = 120 if nameoftherecipe == "Kol de pavo de monte" & country == "Mexico"
