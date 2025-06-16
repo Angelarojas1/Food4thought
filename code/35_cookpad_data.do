@@ -70,6 +70,10 @@
 	merge m:1 country using "$outputs/complexity_recipe.dta" 
 	keep if _merge == 3
 	drop _merge
+	
+	merge m:1 adm0 using "$flfp/FLFPlong2019.dta", gen(flfp_merge)
+	keep if flfp_merge == 3
+	drop flfp_merge
 
 	save "$outputs/cookpad_adm0.dta", replace
 	

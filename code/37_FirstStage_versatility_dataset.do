@@ -72,8 +72,9 @@
 	
 	*drop if importVersatility == . & nativeVersatility == . // 25 obs deleted
 	
-	merge 1:1 adm0 using "$flfp\FLFPlong2019.dta", gen(flfp_merge)
-	keep if flfp_merge == 3
+	merge 1:1 country using "$flfp\FLFPlong2019.dta", gen(flfp_merge)
+	
+	keep if flfp_merge != 2
 	encode continent_name, gen(continent)
 	
 	/****************** Old versions of versatility calculation********************

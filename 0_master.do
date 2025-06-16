@@ -28,6 +28,7 @@
 	
 	if "c(username)" == "mgafargo" { // Margarita
 	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
+	global github "C:\Users\mgafargo\Dropbox\food4thought"
 	}
 
 	** Project folder globals
