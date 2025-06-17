@@ -2,7 +2,8 @@
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
 *               Author: Varun C
-* 				Last date modified: June 16, 2025 						   	   *
+* 				Last date modified: June 17, 2025 						   	   *
+*				Modified by: Ángela Rojas
 *				Master dataset generation file
 * **************************************************************************** *
 	
@@ -18,7 +19,7 @@
 
 	if "`c(username)'" == "stell" {
 	global projectfolder "C:/Users/stell/Dropbox/food4thought/analysis23"
-	global github "C:\Users\stell\Dropbox\food4thought\analysis23"
+	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
 	}
 	
 	if "`c(username)'" == "wb641362" { // Varun
@@ -30,9 +31,6 @@
 	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
 	global github "C:\Users\mgafargo\Dropbox\food4thought"
 	}
-
-	** Project folder globals
-	global files "$projectfolder\data\coded"
 	
 	* Dofile sub-folder globals
 	global code					"$github/code"
@@ -54,8 +52,9 @@
 
 	
 	* Output sub-folder globals
-	global outputs				"$files/Outputs"
-	global tables				"$projectfolder\outputs\Tables"
+	global outputs				"$projectfolder/outputs"
+	global tables				"$outputs/Tables"
+	global figures				"$outputs/Figures"
 	
 	* ***************************************************** *
 
@@ -147,6 +146,57 @@
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
+	*		- Clean data for calculating versatility.
+	*       - Creates native versatility and imported versatility files
+
+		do "$code/8_versatility_clean_v2.do" 
+		
+	* ***************************************************** *
+	*              Geographical Data Coding                 *
+	* ***************************************************** *	
+	
+	* 	The purpose of this dofile is:
+	*		- Generate geographical controls for all countries
+	*		- Info for 138 countries (Kosovo pending)
+
+		do "$code/11_geographical_clean.do"
+		
+	* ***************************************************** *
+	*                 Cookpad Data Coding                   *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean cookpad data
+
+		do "$code/12_cookpad_clean.do"
+
+	* ***************************************************** *
+	*             FAO suitability Data Coding               *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Read in crop suitability data from FAO
+	*		- Creates suitability variable
+	*  		- Don't run this part. Treat the suitability data as raw
+	
+		do "$code/13_FAO_suitability.do"
+	
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
+	*		- Merge the different databases created to run regressions
+
+	*		do "$code/18_merge_reg.do"
+
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Create recipes database: complexity_recipe.dta
+	*		- Creates plots: winsorized variables, outliers, mexico vs Colombia
+	
+		do "$code/30_winsorize_totaltime.do"
+	
+	* 	The purpose of this dofile is:
 	*		- Generate versatility by country
 
 		do "$code/34_new_versatility_including_native.do"
@@ -170,7 +220,15 @@
 	
 		do "$code/37_FirstStage_versatility_dataset.do"
 		
-	*=======================================================*
-	*	Please proceed to master_regressions for analysis
-	*=======================================================*
+	*********************************************************
+	*					Versatility Analysis
+	*********************************************************
+	
+		do "$code/38_FirstStage_versatility_analysis.do"
+	
+	*********************************************************
+	*					Cookpad Analysis
+	*********************************************************
+	
+		do "$code/36_cookpad_analysis.do"
 	
