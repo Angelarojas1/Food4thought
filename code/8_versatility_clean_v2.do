@@ -23,6 +23,34 @@
 
 // Limit ingredients to only suitable ingredients: = 1 if >= p0/p10/p25/... of suitability for region that's native for the ingredient
 
+***** Prep for native versatility *****
+
+ use  "${versatility}/cuisine_ciat_suit.dta", clear
+ merge m:1 ingredient using "${versatility}/median_suitability.dta"
+ assert _merge == 3
+ drop _merge
+ 
+ gen p0 = 0
+ foreach var of varlist p0 p10 p25 p33 p50 p60 p66 p70 {
+ 	
+	preserve
+ 	gen aboveCutoff = (suitability > `var') & (!missing(suitability))
+	keep if aboveCutoff == 1
+	
+	** save to csv file
+	outsheet using "${versatility}/native/native_`var'.csv", replace
+	
+	* Save native ingredients files based on cutoff
+	keep adm0 country ingredient
+	rename adm0 nativeadm0
+	rename country nativecountry
+	
+	save "${versatility}/native/native_clean_`var'.dta", replace
+	
+	restore
+ 	
+ }
+
 ***** prep for imported versatility *****
 
  use "${versatility}/cuisine_ciat_suit.dta", clear
