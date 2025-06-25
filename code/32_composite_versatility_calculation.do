@@ -79,7 +79,7 @@
 	tempfile all
 	save `all'
 	
-	if $run == 0 {
+	if $run == 1 {
 	preserve
 	keep if country == "zzz"
 	tempfile bycountry
@@ -102,10 +102,10 @@
 	restore
 	}
 	use `bycountry', replace
-	save "$outputs/2ingredient.dta", replace
+	save "$recipes/2ingredient.dta", replace
 	}
 	
-	use "$outputs/2ingredient.dta",replace
+	use "$recipes/2ingredient.dta",replace
 	duplicates drop adm0 country ingredient ingredient2, force
 	drop country suitability
 	merge m:1 adm0 ingredient using `all', gen(suit1_merge)
@@ -191,7 +191,7 @@
 	* drop duplicates
 	duplicates drop adm0 Versatility_mindist, force
 	
-	save "$outputs/composite_versatility_mindist.dta", replace
+	save "$versatility/composite_versatility_mindist.dta", replace
 	restore
 	****************************************************************************
 	
@@ -237,7 +237,7 @@
 	* drop duplicates
 	duplicates drop adm0 Versatility, force
 	
-	save "$outputs/composite_versatility.dta", replace
+	save "$versatility/composite_versatility.dta", replace
 	restore
 	****************************************************************************
 
@@ -286,6 +286,6 @@
 	* drop duplicates
 	duplicates drop adm0 Versatility_weighted, force
 	
-	save "$outputs/composite_versatility_weighted.dta", replace
+	save "$versatility/composite_versatility_weighted.dta", replace
 	restore
 	****************************************************************************

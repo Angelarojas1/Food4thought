@@ -79,7 +79,7 @@
 	tempfile all
 	save `all'
 	
-	use "$outputs/2ingredient.dta",replace
+	use "$recipes/2ingredient.dta",replace
 	duplicates drop adm0 country ingredient ingredient2, force
 	drop country suitability
 	merge m:1 adm0 ingredient using `all', gen(suit1_merge)
@@ -139,6 +139,6 @@
 	bys adm0: egen versatility = mean(ingredient_versatility)
 	keep adm0 versatility
 	duplicates drop
-	save "$outputs/clean_versatility.dta", replace
+	save "$versatility/clean_versatility.dta", replace
 	
 	
