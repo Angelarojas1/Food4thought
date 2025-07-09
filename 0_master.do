@@ -7,8 +7,6 @@
 *				Master dataset generation file
 * **************************************************************************** *
 	
-	
-
 	clear all
 	set more off
 	global run = 1
@@ -62,6 +60,7 @@
 	
 	* ssc install aaplot
 	* ssc install ivreghdfe
+	* ssc install winsor4
 	
 	* ***************************************************** *
 	*                Recipe Data Coding                     *
@@ -195,6 +194,8 @@
 	*		- Creates plots: winsorized variables, outliers, mexico vs Colombia
 	
 		do "$code/30_winsorize_totaltime.do"
+		
+		do "$code/32_composite_versatility_calculation.do"
 	
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country

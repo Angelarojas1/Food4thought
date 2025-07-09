@@ -1,9 +1,9 @@
-use "$outputs/cookpad_adm0.dta", replace
+use "$cookpad/cookpad_adm0.dta", replace
 merge m:1 adm0 using "$rawdata\suitability\spices\20250616-spices-suitability"
 // BEN MLT and SGP not in spices data 
 drop _merge 
 
-merge m:1 adm0 using "$outputs/first_stage_dataset.dta"
+merge m:1 adm0 using "$versatility/first_stage_dataset.dta"
 
 
 ren (median_ingredients median_spices median_totaltime) (ingredients spices time)
