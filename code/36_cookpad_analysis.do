@@ -21,25 +21,6 @@
 	iii.FLFP = log (average cooking time) + log (average cooking time*number of meals)
 	iv.	FLFP = log (average cooking time* number of meals)
 
-	
-	
-	local outcomes FLFP emp_lfpr emp_work_hours
-	est clear
-	foreach o of local outcomes {
-	eststo r1_`o': reg `o' time_median  income_2 pctTotalCook i.continentFactor
-	}
-	esttab r1_* using "$tables/cookpad_reg.csv", replace
-	
-	
-	
-	
-	Cookpad regression at the individual/ household level
-	Male/Female*lfp
-	Likelihood that a person works depending on the food complexity of the country
-	Recipes data
-	Interact with dummy for M/F
-	First Stage
-	Repeat the analysis
 	*/
 	 
 	ren (median_ingredients median_spices median_totaltime) (ingredients spices time)

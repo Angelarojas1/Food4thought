@@ -195,7 +195,7 @@
 	
 		do "$code/30_winsorize_totaltime.do"
 		
-		do "$code/32_composite_versatility_calculation.do"
+		*do "$code/32_composite_versatility_calculation.do"
 	
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country
@@ -232,6 +232,6 @@
 	*********************************************************
 	
 		do "$code/38_FirstStage_versatility_analysis.do"
-	
+
 	
 	
