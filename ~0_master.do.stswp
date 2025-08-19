@@ -227,8 +227,6 @@
 	*********************************************************
 	
 		do "$code/38_FirstStage_versatility_analysis.do"
-		
-		do "$code/es-cookpad-mg.do"
 
 	
 	
