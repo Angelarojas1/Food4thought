@@ -61,6 +61,11 @@
 	* ssc install aaplot
 	* ssc install ivreghdfe
 	* ssc install winsor4
+	* ssc install dataex
+	* ssc install geoinpoly
+	
+	** Section to create all the folders I need in data/coded folder
+	* mkdir
 	
 	* ***************************************************** *
 	*                Recipe Data Coding                     *
@@ -126,6 +131,11 @@
 	
 		do "$code/5_ciat_clean.do"  
 
+	* 	The purpose of this dofile is:
+	*		-  Clean data from Millan data 
+	
+		do "$code/crop_origin_clean.do"
+		
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
@@ -179,23 +189,13 @@
 	*  		- Don't run this part. Treat the suitability data as raw
 	
 		do "$code/13_FAO_suitability.do"
-	
+		
 	* ***************************************************** *
 		
-	* 	The purpose of this dofile is:
-	*		- Merge the different databases created to run regressions
-
-	*		do "$code/18_merge_reg.do"
-
-	* ***************************************************** *
-	
 	*	The purpose of this dofile is:
-	*		- Create recipes database: complexity_recipe.dta
-	*		- Creates plots: winsorized variables, outliers, mexico vs Colombia
-	
-		do "$code/30_winsorize_totaltime.do"
+	*		- Create every combination between 2 ingredients
 		
-		*do "$code/32_composite_versatility_calculation.do"
+	    do "$code/32_2ingredient_combination.do"
 	
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country
@@ -233,5 +233,21 @@
 	
 		do "$code/38_FirstStage_versatility_analysis.do"
 
+	** other regressions
+	
+		do "$code/es-cookpad-mg.do"
+		
+	* ***************************************************** *
+	*                        Graphs                         *
+	* ***************************************************** *
+	
+		do "$code/cuisine_histograms.do"
+		
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Creates plots: winsorized variables, outliers, mexico vs Colombia
+	
+		* do "$code/30_time_outliers.do"
 	
 	
