@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# #### Ingredient Tagger of Greece
-# 
+# #### Ingredient Tagger of Belarus
 
 # In[1]:
 
@@ -30,7 +29,7 @@ from word2number import w2n
 
 
 # import dataset
-data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
+data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Belarus.csv")
 data.drop(['Unnamed: 0'],axis=1,inplace=True)
 data.head()
 
@@ -42,6 +41,13 @@ data.shape
 
 
 # ### Translate ingredients to English
+
+# In[7]:
+
+
+# convert string repretention of list to a list
+data['List of ingredients'] = data['List of ingredients'].apply(lambda x:ast.literal_eval(x))
+
 
 # In[ ]:
 
@@ -382,7 +388,7 @@ data['Ingredient list tagger'] = data["List of ingredients_Eng"].apply(lambda x:
 
 # ### Get the amount of sugar
 
-# In[9]:
+# In[12]:
 
 
 def unitInLst(unitTagger):
@@ -439,7 +445,7 @@ def sugarAmount(ingredientLstTagger):
 data["sugarAmount in tsp(ingredient tagger)"] = data['Ingredient list tagger'].apply(lambda x: sugarAmount(x))
 
 
-# In[10]:
+# In[13]:
 
 
 data['sugarAmount in tsp(ingredient tagger)'].describe()
@@ -447,14 +453,8 @@ data['sugarAmount in tsp(ingredient tagger)'].describe()
 
 # ### Save the data
 
-# In[11]:
+# In[14]:
 
 
-data.to_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
-
-
-# In[ ]:
-
-
-
+data.to_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Belarus.csv")
 

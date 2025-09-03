@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# #### Ingredient Tagger of Greece
-# 
+# #### Ingredient Tagger of Austria
 
 # In[1]:
 
@@ -30,7 +29,7 @@ from word2number import w2n
 
 
 # import dataset
-data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
+data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Austria.csv")
 data.drop(['Unnamed: 0'],axis=1,inplace=True)
 data.head()
 
@@ -42,6 +41,13 @@ data.shape
 
 
 # ### Translate ingredients to English
+
+# In[7]:
+
+
+# convert string repretention of list to a list
+data['List of ingredients'] = data['List of ingredients'].apply(lambda x:ast.literal_eval(x))
+
 
 # In[ ]:
 
@@ -63,14 +69,14 @@ data.head()
 
 # ### Ingredient tagger
 
-# In[4]:
+# In[3]:
 
 
 # convert string repretention of list to a list
 data['List of ingredients_Eng'] = data['List of ingredients_Eng'].apply(lambda x:ast.literal_eval(x))
 
 
-# In[5]:
+# In[142]:
 
 
 def num_there(s):
@@ -136,7 +142,7 @@ def fractionToFloat(fraction):
     return num * mult
 
 
-# In[6]:
+# In[143]:
 
 
 def ifUnit(ingredientStr):
@@ -185,7 +191,7 @@ def ifUnit(ingredientStr):
     
 
 
-# In[7]:
+# In[144]:
 
 
 def EuropeanIngredientTagger(ingredientStr):
@@ -350,7 +356,7 @@ def EuropeanIngredientTagger(ingredientStr):
     return result      
 
 
-# In[8]:
+# In[145]:
 
 
 def ingredientLstTagger(ingredientLst):
@@ -382,7 +388,7 @@ data['Ingredient list tagger'] = data["List of ingredients_Eng"].apply(lambda x:
 
 # ### Get the amount of sugar
 
-# In[9]:
+# In[146]:
 
 
 def unitInLst(unitTagger):
@@ -439,7 +445,7 @@ def sugarAmount(ingredientLstTagger):
 data["sugarAmount in tsp(ingredient tagger)"] = data['Ingredient list tagger'].apply(lambda x: sugarAmount(x))
 
 
-# In[10]:
+# In[147]:
 
 
 data['sugarAmount in tsp(ingredient tagger)'].describe()
@@ -447,14 +453,8 @@ data['sugarAmount in tsp(ingredient tagger)'].describe()
 
 # ### Save the data
 
-# In[11]:
+# In[149]:
 
 
-data.to_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
-
-
-# In[ ]:
-
-
-
+data.to_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Austria.csv")
 

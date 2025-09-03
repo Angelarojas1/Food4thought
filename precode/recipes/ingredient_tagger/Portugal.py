@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# #### Ingredient Tagger of Greece
+# #### Ingredient Tagger of Portugal
 # 
 
 # In[1]:
@@ -30,7 +30,7 @@ from word2number import w2n
 
 
 # import dataset
-data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
+data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Portugal.csv")
 data.drop(['Unnamed: 0'],axis=1,inplace=True)
 data.head()
 
@@ -450,7 +450,7 @@ data['sugarAmount in tsp(ingredient tagger)'].describe()
 # In[11]:
 
 
-data.to_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
+data.to_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Portugal.csv")
 
 
 # In[ ]:
