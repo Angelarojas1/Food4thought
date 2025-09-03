@@ -7,7 +7,6 @@
    * ******************************************************************** *
 	clear 
 	
-	preserve
    *- Import dataset
 	import delimited using "${rawdata}\Crop_Origins_Phylo-master\Crop_Origins_Phylo_v_live\crop_origins_v_live\crop_origins_live_db.csv", clear
 	
@@ -26,7 +25,23 @@
 	rename common_name_crop ingredient
 	replace ingredient = lower(ingredient)
 	replace ingredient = subinstr(ingredient, "_", " ", .)
-	keep ingredient 
+	keep ingredient mode_ecoreg_name mode_ecoreg_centroid_lon mode_ecoreg_centroid_lat mode_ecoreg_code biogeografic_realm sd_longitude sd_latitude
+	
+	** Get native countries using lat and lon information
+	
+	*net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
+	
+	replace mode_ecoreg_centroid_lon = "" if mode_ecoreg_centroid_lon == "NA"
+	
+	replace mode_ecoreg_centroid_lat = "" if mode_ecoreg_centroid_lat == "NA"
+	
+	destring mode_ecoreg_centroid_lat mode_ecoreg_centroid_lon, replace dpcomma
+	
+	geoinpoly mode_ecoreg_centroid_lat mode_ecoreg_centroid_lon using "geo2xy_world_coor.dta"
+	
+	merge m:1 _ID using "geo2xy_world_data.dta", ///
+    keep(master match) keepusing(geounit) nogen
+
 	gsort ingredient
 	
 	* Rename ingredients so they match suitability dataset
@@ -100,94 +115,3 @@
 	
 	duplicates drop
 
-	* Change ingredients names to be able to merge it with CIAT data
-	
-// 	replace ingredients = "almonds" if ingredients == "almond"
-// 	replace ingredients = "anise" if ingredients == "anise seeds"
-// 	replace ingredients = "apples" if ingredients == "apple"
-// 	replace ingredients = "apricots" if ingredients == "apricot"
-// 	replace ingredients = "avocados" if ingredients == "avocado"
-// 	replace ingredients = "bananas" if ingredients == "banana"
-// 	replace ingredients = "blueberries" if ingredients == "blueberry"
-// 	replace ingredients = "cabbages" if ingredients == "cabbage"
-// 	replace ingredients = "carrots" if ingredients == "carrot"
-// 	replace ingredients = "chickpeas" if ingredients == "chickpea gram pea"
-// 	replace ingredients = "chicory roots" if ingredients == "chicory"
-// 	replace ingredients = "chillies&peppers" if ingredients == "chilly"
-// 	replace ingredients = "cocoa beans" if ingredients == "cocoa cacao"
-// 	replace ingredients = "coconuts" if ingredients == "coconut"
-// 	replace ingredients = "cowpeas" if ingredients == "cowpea"
-	
-	gen Milla = 1
-	
-	tempfile origin
-	save `origin'
-	
-	restore
-	
-// 	preserve
-//		
-// 	*- CIAT dataset
-// 	import excel "${rawdata}/CIAT/ingredients_category.xlsx", sheet("Sheet1") firstrow case(lower) clear
-//	
-// 	gen CIAT = 1
-// 	keep ingredients
-//	
-// 	tempfile CIAT
-// 	save `CIAT'
-//	
-// 	restore
-//	
-// 	*- Merge to compare ingredients in data
-// 	merge m:1 ingredients using `CIAT'
-	
-	*- FAO suitability dataset
-	use "${fao_suit}/suitability_FAO.dta", clear
-	
-	keep ingredient
-	duplicates drop
-	replace ingredient = lower(ingredient)
-	
-	preserve
-	use "${precodedata}/suitability/crop_suitability.dta", clear
-	drop al_mn pt_mn ph_mn cl_md
-	keep if _n == 1
-	
-	xpose, varname clear
-	keep _varname 
-	drop if _n == 1
-	
-	replace _varname = subinstr(_varname, "ap_", "", .)
-	rename _varname ingredient
-	
-	tempfile crop
-	save `crop'
-	restore
-	
-	preserve
-	use "${precodedata}/suitability/spices_suitability.dta", clear
-	drop al_mn pt_mn ph_mn cl_md
-	keep if _n == 1
-	
-	xpose, varname clear
-	keep _varname 
-	drop if _n == 1
-	
-	replace _varname = subinstr(_varname, "ap_", "", .)
-	rename _varname ingredient
-	
-	tempfile spices
-	save `spices'
-	restore
-	
-	append using `crop'
-	append using `spices'
-
-	duplicates drop
-	
-	
-	* Merge suitability information with Millan data
-	
-	merge 1:m  ingredient using `origin'
-	
-	gsort ingredient

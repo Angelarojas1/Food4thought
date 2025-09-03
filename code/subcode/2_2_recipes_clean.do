@@ -14,8 +14,8 @@
    ** Last date modified: April 19, 2024
 
  * Remove duplicates
-duplicates drop nameoftherecipe totaltime listofingredients listofinstructions numberofservings preptime cooktime numberofingredients_raw numberofingredients country, force // Drop 9249 observations
-sort country
+ duplicates drop nameoftherecipe totaltime listofingredients listofinstructions numberofservings preptime cooktime numberofingredients_raw numberofingredients country, force // Drop 9249 observations
+ sort country
  bysort nameoftherecipe country: gen numrecipe = _n
  
 /*
@@ -69,6 +69,10 @@ sort country
 	destring cook , replace
 
 	replace totaltime = prep + cook if totaltime == 0 | totaltime == .
+	
+	* dealing with Kosovo outliers: totaltime 21605 27289001
+	drop if country == "Kosovo" & totaltime == 21605
+	drop if country == "Kosovo" & totaltime == 27289001
 
 * Organize time variable
 	replace totaltime = 4320 if cooktime == "~ 3-4 days"
