@@ -7,20 +7,22 @@
 * **************************************************************************** *
 	
 	* ***************************************************** *
+	*				Milla database							*
+	* ***************************************************** *
 	
-	import delim "${versatility}/imported/imported_p50_v2.csv", clear
+	import delim "${versatility}/imported/imported_p50_v2_m.csv", clear
 	drop if ifnative == 1
 	keep adm0 country ingredient
 	duplicates drop adm0 country ingredient, force
 	gen native = 0
 	gen source = "imported"
-	merge 1:m ingredient adm0 using "${versatility}/2ingredient.dta", gen(imported_merge)
+	merge 1:m ingredient adm0 using "${versatility}/2ingredient_m.dta", gen(imported_merge)
 	keep if imported_merge == 3
 	
 	tempfile imported
 	save `imported'
 	
-	use "${versatility}/native/native_clean_p50.dta", replace
+	use "${versatility}/native/native_clean_p50_m.dta", replace
 	
 	ren nativeadm0 adm0
 	ren nativecountry country
@@ -28,16 +30,15 @@
 	gen native = 1
 	gen source = "native"
 	
-	merge 1:m ingredient adm0 using "${versatility}/2ingredient.dta", gen(native_merge)
+	merge 1:m ingredient adm0 using "${versatility}/2ingredient_m.dta", gen(native_merge)
 	keep if native_merge == 3
 	
 	append using `imported'
 	
-	
 	ren ingredient ingredient1
 	ren ingredient2 ingredient
 	
-	joinby ingredient using "${versatility}/native/native_clean_p50.dta"
+	joinby ingredient using "${versatility}/native/native_clean_p50_m.dta"
 	
 	gen native2 = 1
 	gen source2 = "native"
@@ -68,14 +69,14 @@
 	drop if ingredient == ingredient1
 	drop *_merge _fillin ifnative suitability
 	
-	save "$versatility/interim_all_versatility.dta", replace
+	save "$versatility/interim_all_versatility_m.dta", replace
 	
 	ren adm0 nativeadm0
 	ren adm1 adm0
 	ren (ingredient1 ingredient) (ingredient ingredient2)
 	
 	* get common flavors 
-	merge m:1 ingredient ingredient2 using "${versatility}/common_flavor_clean.dta"
+	merge m:1 ingredient ingredient2 using "${versatility}/common_flavor_clean_m.dta"
 	keep if _merge == 3
 	drop _merge
 	**** Nothing missing here
@@ -148,4 +149,4 @@
 	
 	keep adm0 versatility suit_versatility
 	duplicates drop adm0, force
-	save "$versatility/all_versatility.dta", replace
+	save "$versatility/all_versatility_m.dta", replace

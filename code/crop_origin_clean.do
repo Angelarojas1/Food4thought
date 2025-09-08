@@ -18,79 +18,48 @@
 	
 	tab common_name_crop if dup_tag > 0
 	
-	drop if common_name_crop == "na"
-	
 	*br if dup_tag == 1
 	
-	rename common_name_crop ingredient
-	replace ingredient = lower(ingredient)
-	replace ingredient = subinstr(ingredient, "_", " ", .)
-	keep ingredient mode_ecoreg_name mode_ecoreg_centroid_lon mode_ecoreg_centroid_lat mode_ecoreg_code biogeografic_realm sd_longitude sd_latitude
+	*- Drop observations without information
 	
-	** Get native countries using lat and lon information
-	
-	*net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
-	
-	replace mode_ecoreg_centroid_lon = "" if mode_ecoreg_centroid_lon == "NA"	
-	replace mode_ecoreg_centroid_lat = "" if mode_ecoreg_centroid_lat == "NA"
-	
+	drop if common_name_crop == "na"
 	drop if mode_ecoreg_code == "NA"
 	
-	destring mode_ecoreg_centroid_lat mode_ecoreg_centroid_lon, replace dpcomma
+	*- Keep variables of interest
 	
-	geoinpoly mode_ecoreg_centroid_lat mode_ecoreg_centroid_lon using "geo2xy_world_coor.dta"
+	rename (common_name_crop mode_ecoreg_name mode_ecoreg_centroid_lat mode_ecoreg_centroid_lon  mode_ecoreg_code) ///
+	(ingredient ecoreg_name lat lon eco_code)
+	replace ingredient = lower(ingredient)
+	replace ingredient = subinstr(ingredient, "_", " ", .)
+	keep ingredient ecoreg_name lat lon eco_code biogeografic_realm sd_longitude sd_latitude
+	order ingredient ingredient ecoreg_name lat lon 
 	
-	merge m:1 _ID using "geo2xy_world_data.dta", ///
-    keep(master match) keepusing(geounit) nogen
-
-	gsort ingredient
-	
-	* Fill empty geounits using coordinates and search them in google
-	
-	*br if geounit == ""
-	replace geounit = "Japan" if mode_ecoreg_centroid_lat == 34.361 & mode_ecoreg_centroid_lon == 134.6892
-	replace geounit = "France" if mode_ecoreg_centroid_lat == 42.6939 & mode_ecoreg_centroid_lon == 3.4335
-	replace geounit = "Australia" if mode_ecoreg_centroid_lat == -19.2227 & mode_ecoreg_centroid_lon == 147.1827
-	replace geounit = "Brazil" if mode_ecoreg_centroid_lat == -24.6212 & mode_ecoreg_centroid_lon == -46.8115
-	replace geounit = "Honduras" if mode_ecoreg_centroid_lat == 13.2743 & mode_ecoreg_centroid_lon == -87.489
-	replace geounit = "United States of America" if mode_ecoreg_centroid_lat == 28.9732 & mode_ecoreg_centroid_lon == -94.6914
-	replace geounit = "Greece" if mode_ecoreg_centroid_lat == 38.757 & mode_ecoreg_centroid_lon == 24.783
-	replace geounit = "United Kingdom" if mode_ecoreg_centroid_lat == 53.6337 & mode_ecoreg_centroid_lon == -4.1459
-	replace geounit = "Vanuatu" if mode_ecoreg_centroid_lat == -15.9008 & mode_ecoreg_centroid_lon == 167.6143
-	replace geounit = "Costa Rica" if mode_ecoreg_centroid_lat == 10.2027 & mode_ecoreg_centroid_lon == -82.4885
-	replace geounit = "Cabo Verde" if mode_ecoreg_centroid_lat == 15.8858 & mode_ecoreg_centroid_lon == -23.9164
-	replace geounit = "United States of America" if mode_ecoreg_centroid_lat == 14.5189 & mode_ecoreg_centroid_lon == 145.1588
-	replace geounit = "Indonesia" if mode_ecoreg_centroid_lat == -2.1611 & mode_ecoreg_centroid_lon == 121.7733
-	replace geounit = "Japan" if mode_ecoreg_centroid_lat == 38.4691 & mode_ecoreg_centroid_lon == 139.3263
-	replace geounit = "United States of America" if mode_ecoreg_centroid_lat == 20.3482 & mode_ecoreg_centroid_lon == -156.4066
-	replace geounit = "Germany" if mode_ecoreg_centroid_lat == 54.5537 & mode_ecoreg_centroid_lon == 13.5193
-	replace geounit = "Papua New Guinea" if mode_ecoreg_centroid_lat == 6.6523 & mode_ecoreg_centroid_lon == 157.877
-	replace geounit = "Croatia" if mode_ecoreg_centroid_lat == 42.3298 & mode_ecoreg_centroid_lon == 18.0836
-
 	* Rename ingredients so they match suitability dataset
+	gsort ingredient
 	replace ingredient = "alfalfa" if ingredient == "alfalfa for fodder"
 	replace ingredient = "almonds" if ingredient == "almond" | ingredient == "country almond"
-	replace ingredient = "anise_seed" if ingredient == "anise seeds" | ingredient == "star anise"
+	replace ingredient = "anise" if ingredient == "anise seeds" | ingredient == "star anise"
 	replace ingredient = "annatto" if ingredient == "annato"
 	replace ingredient = "apples" if ingredient == "apple" | ingredient == "asiatic apple" | ingredient == "cainito star apple" | ingredient == "chinese apple" | ingredient == "malay apple" | ingredient == "velvet apple" | ingredient == "wax apple" | ingredient == "wood apple" | ingredient == "african star apple"
 	replace ingredient = "apricots" if ingredient == "apricot" | ingredient == "apricot plum" | ingredient == "japanese apricot"
 	replace ingredient = "artichokes" if ingredient == "jerusalem artichoke" | ingredient == "chinese artichoke"
 	replace ingredient = "avocados" if ingredient == "avocado"
 	replace ingredient = "banana" if ingredient == "enset abyssinian banana"	
-	replace ingredient = "beans" if ingredient == "african locust bean"	| ingredient == "bean dry edible" | ingredient == "bitter bean"| ingredient == "butter bean lima bean" | ingredient == "hyacinth bean" | ingredient == "ice cream bean" | ingredient == "jack bean" | ingredient == "mat bean" | ingredient == "mung bean" | ingredient == "narbon bean" | ingredient == "oblique seed jackbean" | ingredient == "ricebean" | ingredient == "runner bean" | ingredient == "sword bean" | ingredient == "tepary bean" | ingredient == "tonka beans" | ingredient == "year long bean"
+	replace ingredient = "beans" if ingredient == "african locust bean"	| ingredient == "bean dry edible" | ingredient == "bitter bean"| ingredient == "butter bean lima bean" | ingredient == "hyacinth bean" | ingredient == "ice cream bean" | ingredient == "jack bean" | ingredient == "mat bean" | ingredient == "mung bean" | ingredient == "narbon bean" | ingredient == "oblique seed jackbean" | ingredient == "ricebean" | ingredient == "runner bean" | ingredient == "sword bean" | ingredient == "tepary bean" | ingredient == "tonka beans" | ingredient == "year long bean" | ingredient == "adzuki bean"
 	replace ingredient = "blueberries" if ingredient == "blueberry"
-	replace ingredient = "cabbage" if ingredient == "ethiopian cabbage"	
+	replace ingredient = "cabbages" if ingredient == "ethiopian cabbage" | ingredient == "cabbage"
 	replace ingredient = "cardamom" if ingredient == "cambodian cardamom"	
+	replace ingredient = "carrots" if ingredient == "carrot"
 	replace ingredient = "cherries" if ingredient == "cereza" | ingredient == "cherry plum" | ingredient == "ground cherry" | ingredient == "ground cherry husk tomato" | ingredient == "nanking cherry" | ingredient == "sour cherry" | ingredient == "sweet cherry" | ingredient == "acerola cherry" | ingredient == "cambridge cherry" 
-	replace ingredient = "chickpea" if ingredient == "chickpea gram pea"
-	replace ingredient = "chillies_peppers" if ingredient == "chilly"
+	replace ingredient = "chickpeas" if ingredient == "chickpea gram pea"
+	replace ingredient = "chillies&peppers" if ingredient == "chilly"
 	replace ingredient = "cinnamon" if ingredient == "saigon cinnamon" | ingredient == "chinese cinnamon" | ingredient == "cinnamomum tamala"
 	replace ingredient = "clover" if ingredient == "alsike clover" | ingredient == "barrelclover" | ingredient == "crimson clover italian clover" | ingredient == "egyptian clover berseem clover" | ingredient == "hungarian clover" | ingredient =="kenya clover" | ingredient == "kura clover" | ingredient == "red clover" | ingredient == "reversed clover" | ingredient == "strawberry clover" | ingredient == "subterranean clover" | ingredient == "white clover"
 	replace ingredient = "cloves" if ingredient == "clove"
-	replace ingredient = "cocoa" if ingredient == "cocoa cacao" | ingredient == "cacao de monte"
+	replace ingredient = "cocoa beans" if ingredient == "cocoa cacao" | ingredient == "cacao de monte"
 	replace ingredient = "coffee" if ingredient == "eugenioides coffee" | ingredient == "liberian coffee" | ingredient == "robusta coffee"
 	replace ingredient = "coriander" if ingredient == "vietnamese coriander"
-	replace ingredient = "cotton" if inlist(ingredient, "seed cotton", "short staple cotton")
+	replace ingredient = "cottonseed oil" if inlist(ingredient, "seed cotton", "short staple cotton")
 	replace ingredient = "cowpeas" if ingredient == "cowpea"
 	replace ingredient = "cranberries" if ingredient == "cranberry" | ingredient == "small cranberry" 
 	replace ingredient = "cucumbers" if ingredient == "cucumber" | ingredient == "cucumber tree" | ingredient == "horned cucumber"
@@ -100,7 +69,6 @@
 	replace ingredient = "eggplants" if ingredient == "eggplant" | ingredient == "gboma eggplant" | ingredient == "scarlet eggplant" 
 	replace ingredient = "faba beans" if ingredient == "broad bean"
 	replace ingredient = "figs" if ingredient == "fig" | ingredient == "roxburgh fig" | ingredient == "sicomore fig"
-	replace ingredient = "foxtail millet" if ingredient == "millet" | ingredient == "white millet siberian millet" | ingredient == "japanese millet" | ingredient == "kodo millet" | ingredient == "millet finger" | ingredient == "millet italian" | ingredient == "millet pearl" 
 	replace ingredient = "garlic" if ingredient == "garlic chives"
 	replace ingredient = "ginger" if ingredient == "japanese ginger" | ingredient == "java ginger" | ingredient == "torch ginger" 
 	replace ingredient = "gram" if ingredient == "chickpea gram pea" | ingredient == "black gram" | ingredient == "horse gram"
@@ -115,49 +83,345 @@
 	replace ingredient = "leeks" if ingredient == "leek"
 	replace ingredient = "lemon_balm" if ingredient == "wild mint"
 	replace ingredient = "lemons_limes" if ingredient == "lemon"
-	replace ingredient = "lentiles" if ingredient == "lentil" | ingredient == "black lentil" 
+	replace ingredient = "lentils" if ingredient == "lentil" | ingredient == "black lentil" 
 	replace ingredient = "lettuce" if ingredient == "indian lettuce" | ingredient == "african lettuce"
 	replace ingredient = "mangoes" if ingredient == "mango" | ingredient == "wild mango" | ingredient == "horse mango"
 	replace ingredient = "mate" if ingredient == "yerba mate"
 	replace ingredient = "melons" if ingredient == "melon and cantaloupe" | ingredient == "bitter melon"
+	replace ingredient = "millets" if ingredient == "millet pearl"
+	replace ingredient = "millets" if ingredient == "millet" | ingredient == "white millet siberian millet" | ingredient == "japanese millet" | ingredient == "kodo millet" | ingredient == "millet finger" | ingredient == "millet italian" | ingredient == "millet pearl" 
 	replace ingredient = "mint" if ingredient == "minth" | ingredient == "round leaved mint"
-	replace ingredient = "mustard_seed" if ingredient == "mustard" | ingredient == "musttard"
-	replace ingredient = "nutmeg_mace" if ingredient == "nutmeg and mace"
-	replace ingredient = "oat" if ingredient == "oats" | ingredient == "sideoats grama" | ingredient == "abyssinian oat" | ingredient == "false oat grass"
+	replace ingredient = "mustard seed" if ingredient == "mustard" | ingredient == "musttard"
+	replace ingredient = "oats" if ingredient == "sideoats grama" | ingredient == "abyssinian oat" | ingredient == "false oat grass"
 	replace ingredient = "olives" if ingredient == "indian olive" | ingredient == "olive"
 	replace ingredient = "onions" if ingredient == "onion" | ingredient == "welsh onion" | ingredient == "wild onion"
+	replace ingredient = "oranges" if ingredient == "orange" 
 	replace ingredient = "palm oil" if ingredient == "oil palm" 
 	replace ingredient = "pandan_leaf" if ingredient == "pandan"
 	replace ingredient = "papayas" if ingredient == "papaya pawpaw" | ingredient == "mountain papaya"
 	replace ingredient = "parsley" if ingredient == "parsely"
 	replace ingredient = "peaches_nectarines" if ingredient == "peach" | ingredient == "peach of gansu" | ingredient == "peach palm" | ingredient == "peach plum" | ingredient == "smoothpit peach"
-	replace ingredient = "pearl millet" if ingredient == "millet pearl"
 	replace ingredient = "pears" if ingredient == "pear" | ingredient == "prickly pear" | ingredient == "red flower prickly pear" | ingredient == "sand pear" | ingredient == "arborescent pricklypear" | ingredient == "chinese white pear" 
 	replace ingredient = "peas" if ingredient == "grass pea common chickling"	
 	replace ingredient = "pepper" if ingredient == "long pepper" | ingredient == "melegueta pepper" |ingredient == "pepper elder" | ingredient == "shichuan pepper" | ingredient == "tree pepper" | ingredient == "water pepper" | ingredient == "ashanti pepper" | ingredient == "balinese long pepper" | ingredient == "bonnet pepper" 
 	replace ingredient = "peppercorn" if ingredient == "black pepper"
-	replace ingredient = "phaseolus bean" if ingredient == "adzuki bean"
-	replace ingredient = "pigeonpea" if ingredient == "pigeon pea"
+	replace ingredient = "pigeonpeas" if ingredient == "pigeon pea"
 	replace ingredient = "pineapples" if ingredient == "pineapple"
 	replace ingredient = "plums" if ingredient == "plum and prune" | ingredient == "wild goose plum" | ingredient == "american plum" | ingredient == "black plum" | ingredient == "canadian plum" | ingredient == "chickasaw plum" | ingredient == "cocoplum" | ingredient == "japanese plum" | ingredient == "malabar plum" | ingredient == "natal plum"
 	replace ingredient = "pumpkins" if ingredient == "pumpkin giant pumpkin"
 	replace ingredient = "potatoes" if ingredient == "air potato" | ingredient == "kaffir potato" | ingredient == "potato" 
-	replace ingredient = "rape_mustard_seed" if ingredient == "rapeseed"
+	replace ingredient = "rape&mustard seed" if ingredient == "rapeseed"
 	replace ingredient = "reed canary grass" if ingredient == "common reed" | ingredient == "reedmace"
-	replace ingredient = "rice" if ingredient == "wild rice american" | ingredient == "wild rice" | ingredient == "jungle rice"
+	replace ingredient = "rice" if ingredient == "wild rice american" | ingredient == "wild rice" | ingredient == "rice african"
+	replace ingredient = "wetland rice" if ingredient == "jungle rice"
 	replace ingredient = "rye" if ingredient == "rye brome" | ingredient == "ryegrass" | ingredient == "canadian wild rye"
 	replace ingredient = "seasame" if ingredient == "false sesame" | ingredient == "sesame" | ingredient == "sesame grass" | ingredient == "sesame of the gazelle"
 	replace ingredient = "spinach" if ingredient == "ceylan spinach" | ingredient == "ceylon spinach" | ingredient == "kangkong water spinach" | ingredient == "new zealand spinach"
 	replace ingredient = "strawberries" if ingredient == "strawberry" | ingredient == "green strawberry" | ingredient == "hautbois strawberry" | ingredient == "scarlet strawberry" | ingredient == "strawberry raspberry" | ingredient == "beach strawberry"
-	replace ingredient = "sugarbeet" if ingredient == "beet chard"
-	replace ingredient = "sweet potato" if ingredient == "potato sweet"
+	replace ingredient = "sugar beet" if ingredient == "beet chard"
+	replace ingredient = "sweet potatoes" if ingredient == "potato sweet"
 	replace ingredient = "taro" if ingredient == "chinese taro" | ingredient == "giant taro"
 	replace ingredient = "thyme_bayleaf" if ingredient == "common thyme" | ingredient == "caraway thyme"
 	replace ingredient = "tomatoes" if ingredient == "husk tomato tomatillo" | ingredient == "tomato" | ingredient == "tree tomato" | ingredient == "childrens tomatoes" 
 	replace ingredient = "watermelons" if ingredient == "watermelon"
-	replace ingredient = "wetland rice" if ingredient == "rice african"
 	replace ingredient = "wheat" if ingredient == "bread wheat" | ingredient == "durum wheat" | ingredient == "einkorn wheat" | ingredient == "emmer wheat" | ingredient == "persian wheat" | ingredient == "shot wheat"
-	replace ingredient = "yam" if ingredient == "white yam"	| ingredient == "ube yam" | ingredient == "yam sp1" | ingredient == "yam sp2" | ingredient == "african bitter yam" | ingredient == "elephant yam" | ingredient == "fanleaf yam" | ingredient == "fiveleaf yam" | ingredient == "indian yam" | ingredient == "japanese yam" | ingredient == "lesser yam" | ingredient == "mountain yam" | ingredient == "pacific yam"
+	replace ingredient = "yams" if ingredient == "white yam"	| ingredient == "ube yam" | ingredient == "yam sp1" | ingredient == "yam sp2" | ingredient == "african bitter yam" | ingredient == "elephant yam" | ingredient == "fanleaf yam" | ingredient == "fiveleaf yam" | ingredient == "indian yam" | ingredient == "japanese yam" | ingredient == "lesser yam" | ingredient == "mountain yam" | ingredient == "pacific yam"
 	
+	*- Get native countries using lat and lon information
+	
+	*net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
+	
+	replace lon = "" if lon == "NA"	
+	replace lat = "" if lat == "NA"
+	
+	destring lat lon, replace dpcomma
+	
+	geoinpoly lat lon using "geo2xy_world_coor.dta"
+	
+	merge m:1 _ID using "geo2xy_world_data.dta", ///
+    keep(master match) keepusing(geounit iso_a3) nogen
+	
+	*- Fill empty geounits using coordinates and search them in google
+	
+	*br if geounit == ""
+	replace geounit = "Japan" if lat == 34.361 & lon == 134.6892
+	replace geounit = "France" if lat == 42.6939 & lon == 3.4335
+	replace geounit = "Australia" if lat == -19.2227 & lon == 147.1827
+	replace geounit = "Brazil" if lat == -24.6212 & lon == -46.8115
+	replace geounit = "Honduras" if lat == 13.2743 & lon == -87.489
+	replace geounit = "United States" if lat == 28.9732 & lon == -94.6914
+	replace geounit = "Greece" if lat == 38.757 & lon == 24.783
+	replace geounit = "United Kingdom" if lat == 53.6337 & lon == -4.1459
+	replace geounit = "Vanuatu" if lat == -15.9008 & lon == 167.6143
+	replace geounit = "Costa Rica" if lat == 10.2027 & lon == -82.4885
+	replace geounit = "Cabo Verde" if lat == 15.8858 & lon == -23.9164
+	replace geounit = "United States" if lat == 14.5189 & lon == 145.1588
+	replace geounit = "Indonesia" if lat == -2.1611 & lon == 121.7733
+	replace geounit = "Japan" if lat == 38.4691 & lon == 139.3263
+	replace geounit = "United States" if lat == 20.3482 & lon == -156.4066
+	replace geounit = "Germany" if lat == 54.5537 & lon == 13.5193
+	replace geounit = "Papua New Guinea" if lat == 6.6523 & lon == 157.877
+	replace geounit = "Croatia" if lat == 42.3298 & lon == 18.0836
+	
+	replace geounit = "United States" if geounit == "United States of America"
+	replace geounit = "Cote D'Ivoire" if geounit == "Ivory Coast"
+	replace geounit = "Democratic Republic of the Congo" if geounit == "Republic of Congo"
+	replace geounit = "United Republic of Tanzania" if geounit == "Tanzania"
+	
+	rename (geounit iso_a3) (country iso3)
+	
+	*- Organize ISO code
+	bys country: replace iso3 = iso3[_N]
+	tab country if iso3 == ""
+	
+	replace iso3 = "CPV" if country == "Cabo Verde"
+	replace iso3 = "HRV" if country == "Croatia"
+	replace iso3 = "GRC" if country == "Greece"
+	replace iso3 = "HND" if country == "Honduras"
+	replace iso3 = "JPN" if country == "Japan"
+	replace iso3 = "GBR" if country == "United Kingdom"
+	replace iso3 = "VUT" if country == "Vanuatu"
+	replace iso3 = "COD" if country == "Democratic Republic of the Congo"
+	
+	*- Countries in new dataset
+	preserve 
+	keep country 
 	duplicates drop
-
+	tempfile country
+	save `country'
+	restore
+	
+	*- Ingredients by region
+	preserve
+	keep ingredient eco_code
+	duplicates drop
+	
+	tempfile ing_eco
+	save `ing_eco' 
+	restore
+	
+	keep ingredient country iso3
+	tempfile ing_country
+	save `ing_country'
+		
+	*- For countries without native ingredients use region
+	import excel "${rawdata}\Crop_Origins_Phylo-master\ecoregion_country.xlsx", sheet("Sheet1") firstrow clear
+	
+	keep ECO_NAME G200_REGIO eco_code iso3 name continent region
+	duplicates drop 
+	rename name country
+	
+	replace country = "Bosnia And Herzegovina" if country == "Bosnia & Herzegovina"
+	replace country = "Democratic Republic of the Congo" if country == "Congo"
+	replace iso3 = "COD"					   if country == "Democratic Republic of the Congo"
+	replace country = "Cabo Verde" 			   if country == "Cape Verde"
+    replace country = "Cote D'Ivoire"		   if country == "Côte d'Ivoire"
+	replace country = "Iran" 				   if country == "Iran (Islamic Republic of)"
+	replace country = "Laos" 				   if country == "Lao People's Democratic Republic"
+    replace country = "Libya" 				   if country == "Libyan Arab Jamahiriya"
+	replace country = "Moldova" 			   if country == "Moldova, Republic of"
+	replace country = "North Korea" 		   if country == "Democratic People's Republic of Korea"
+    replace country = "Russia" 				   if country == "Russian Federation"
+	replace country = "South Korea" 		   if country == "Republic of Korea"
+	replace country = "Syria" 				   if country == "Syrian Arab Republic"
+    replace country = "United Kingdom" 		   if country == "U.K. of Great Britain and Northern Ireland"
+    replace country = "United States" 		   if country == "United States of America"
+	
+	*- Merge with recipe data to identify countries in both databases
+	preserve
+	use "${recipes}/recipe_all_countries.dta", clear
+	keep country
+	duplicates drop
+	
+	tempfile countries_recipes
+	save `countries_recipes'
+	restore
+	
+	merge m:1 country using `countries_recipes' // Kosovo is not in Milla data
+	
+	*gen recipe = 1 if _merge == 3 | _merge == 2
+	drop _merge
+	
+	*- Merge ingredient and region	
+	merge m:m eco_code using `ing_eco'
+	
+	unique country if _merge == 3
+	keep eco_code country ingredient iso3
+	
+	*- Get native ingredients for countries that didn't have this information 	
+	merge m:1 country using `country'
+	*keep if _merge == 1 // we keep countries without native ingredients to assign 
+						// ingredients based on the eco region
+						
+	keep country ingredient iso3
+	duplicates drop
+	drop if ingredient == ""
+	
+	append using `ing_country'
+	
+	rename iso3 adm0
+	
+	*- Create variables of interest	
+	tempfile working
+	save `working', replace
+	
+	*- generate controls: number of ingredients
+	duplicates drop
+	gen one = 1
+	collapse (sum)numNative = one, by(country)
+	
+	** merge back 
+	merge 1:m country using `working'
+	
+	duplicates drop adm0 ingredient, force
+	drop if adm0 == "" | adm0 == " "
+	
+	drop _merge 
+	
+	*- save dataset with native ingredients according to Milla data
+	save "${versatility}/Milla_ing_origin.dta", replace
+	
+	
+	*- Create dataset that combines Milla native ingredients and CIAT
+	use "${versatility}/cuisine_ciat.dta", clear
+	
+	gen CIAT = 1
+	keep country ingredient adm0 CIAT
+	
+	*- Clean ingredient variable
+	replace ingredient = "jicama" if ingredient == "jícama"
+	replace ingredient = "pig nut" if ingredient == "pignut"
+	replace ingredient = "pistachio" if ingredient == "pistachios"
+	replace ingredient = "walnut" if ingredient == "walnuts"
+	
+	append using `working'
+	
+	duplicates drop adm0 ingredient, force
+	
+	replace CIAT = 0 if missing(CIAT)
+	drop if adm0 == "" | adm0 == " "
+	
+	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
+	
+	*************************************************************
+	*            Native ingredient and suitability data         *
+	*************************************************************
+	use "${versatility}/suitability.dta", clear
+	
+	replace country = "Liechtenstein" if adm0 == "LIE"
+	
+	preserve
+	keep if country == "Rest of World"
+	isid ingredient
+	rename suitability suitability_rest
+	tempfile rest
+	save `rest', replace
+	restore
+	
+	merge 1:1 adm0 ingredient using "${versatility}/Milla_ing_origin.dta"
+	
+	drop if _merge == 1
+	rename _merge _merge1
+	
+	* if missing suitability, use the suitability from the rest of the world
+	merge m:1 ingredient using `rest'
+	drop if _merge == 2 
+	tab _merge1 _merge
+	assert !missing(suitability_rest) if _merge1 == 2 & _merge == 3
+	assert missing(suitability_rest) if _merge1 == 2 & _merge == 1 //For these ing we definetly don't have information
+	replace suitability = suitability_rest if _merge1 == 2 & _merge == 3 
+	drop _merge1 _merge suitability_rest
+	
+	sort adm0 ingredient
+	isid adm0 ingredient
+	
+	** drop ingredients that we don't have suitability data at all
+	gen flag = 0
+	bys ingredient(suitability adm0): replace flag = 1 if suitability[1] == suitability[_N] & suitability[1] == .
+	assert missing(suitability) if flag == 1
+	
+	tab ingredient if flag == 1 //identify ingredients without suitability information
+	
+	drop if flag == 1
+	drop flag
+	
+	drop if suitability == . | suitability == 0
+	
+	replace country = "Taiwan" if adm0 == "TWN"
+	
+	unique adm0
+	unique country
+	
+	bys adm0 (country ingredient): replace country = country[_N]
+	
+	assert `r(sum)' == 104 // we have 104 countries with suitability information
+	
+	save "${versatility}/milla_ing_suit.dta", replace 
+	
+*** Find median of suitability for native ingredients  ***
+	collapse (p10) p10 = suitability (p25) p25 = suitability (p33) p33 = suitability (median) p50 = suitability (p60) p60 = suitability (p66) p66 = suitability (p70) p70 = suitability, by(ingredient)
+ isid ingredient // there's information for 64 ingredients
+	save "${versatility}/median_suitability_m.dta", replace
+	
+	************************************
+	**** Milla + CIAT + Suitability ****
+	************************************
+	
+	use "${versatility}/suitability.dta", clear
+	
+	replace country = "Liechtenstein" if adm0 == "LIE"
+	
+	preserve
+	keep if country == "Rest of World"
+	isid ingredient
+	rename suitability suitability_rest
+	tempfile rest
+	save `rest', replace
+	restore
+	
+	merge 1:1 adm0 ingredient using "${versatility}/Milla_CIAT_ing_origin.dta"
+	
+	drop if _merge == 1
+	rename _merge _merge1
+	
+	* if missing suitability, use the suitability from the rest of the world
+	merge m:1 ingredient using `rest'
+	drop if _merge == 2 
+	tab _merge1 _merge
+	assert !missing(suitability_rest) if _merge1 == 2 & _merge == 3
+	assert missing(suitability_rest) if _merge1 == 2 & _merge == 1 //For these ing we definetly don't have information
+	replace suitability = suitability_rest if _merge1 == 2 & _merge == 3 
+	drop _merge1 _merge suitability_rest
+	
+	sort adm0 ingredient
+	isid adm0 ingredient
+	
+	** drop ingredients that we don't have suitability data at all
+	gen flag = 0
+	bys ingredient(suitability adm0): replace flag = 1 if suitability[1] == suitability[_N] & suitability[1] == .
+	assert missing(suitability) if flag == 1
+	
+	tab ingredient if flag == 1 //identify ingredients without suitability information
+	
+	drop if flag == 1
+	drop flag
+	
+	drop if suitability == . | suitability == 0
+	
+	replace country = "Hong Kong" if adm0 == "HKG"
+	replace country = "Taiwan" if adm0 == "TWN"
+	
+	unique adm0
+	unique country
+		
+	bys adm0 (country ingredient): replace country = country[_N]
+	
+	assert `r(sum)' == 150 // we have 150 countries with suitability information
+	
+	save "${versatility}/milla_ciat_ing_suit.dta", replace 
+	
+*** Find median of suitability for native ingredients  ***
+	collapse (p10) p10 = suitability (p25) p25 = suitability (p33) p33 = suitability (median) p50 = suitability (p60) p60 = suitability (p66) p66 = suitability (p70) p70 = suitability, by(ingredient)
+ isid ingredient // there's information for 64 ingredients
+	save "${versatility}/median_suitability_m_c.dta", replace
+	

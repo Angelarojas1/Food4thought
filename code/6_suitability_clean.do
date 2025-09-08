@@ -112,6 +112,8 @@ tab ingredient
  tempfile suit
  save `suit', replace
  
+ save "${versatility}/suitability.dta", replace 
+ 
  preserve
  keep if country == "Rest of World"
  isid ingredient

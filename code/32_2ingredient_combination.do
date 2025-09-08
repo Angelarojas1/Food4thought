@@ -39,4 +39,78 @@
 	restore
 	}
 	use `bycountry', replace
-	save "$outputs/2ingredient.dta", replace
+	save "${versatility}/2ingredient.dta", replace
+	
+	*********************
+	* For Milla database
+	*********************
+	
+local x "p50"
+	
+	* imported data
+	import delimited "${versatility}/imported/imported_`x'_v2_m.csv", clear 
+
+	* keep variables
+	keep adm0 ingredient suitability country ifnative
+	duplicates drop adm0 ingredient suitability, force
+	
+	preserve
+	keep if country == "zzz"
+	tempfile bycountry
+	save `bycountry', emptyok
+	restore
+	
+	
+	* Generating every combination of ingredients
+	levelsof adm0, local(country)
+	* initialize the output data
+	foreach c of local country {
+		preserve
+	keep if adm0 == "`c'"
+
+	gen ingredient2 = ingredient
+	fillin ingredient ingredient2
+	replace adm0 = "`c'" if adm0 == ""
+	append using `bycountry', force
+	save `bycountry', replace
+	restore
+	}
+	use `bycountry', replace
+	save "${versatility}/2ingredient_m.dta", replace
+
+	***************************
+	* For Milla database + CIAT
+	***************************
+	
+local x "p50"
+	
+	* imported data
+	import delimited "${versatility}/imported/imported_`x'_v2_m_c.csv", clear 
+
+	* keep variables
+	keep adm0 ingredient suitability country ifnative
+	duplicates drop adm0 ingredient suitability, force
+	
+	preserve
+	keep if country == "zzz"
+	tempfile bycountry
+	save `bycountry', emptyok
+	restore
+	
+	
+	* Generating every combination of ingredients
+	levelsof adm0, local(country)
+	* initialize the output data
+	foreach c of local country {
+		preserve
+	keep if adm0 == "`c'"
+
+	gen ingredient2 = ingredient
+	fillin ingredient ingredient2
+	replace adm0 = "`c'" if adm0 == ""
+	append using `bycountry', force
+	save `bycountry', replace
+	restore
+	}
+	use `bycountry', replace
+	save "${versatility}/2ingredient_m_c.dta", replace

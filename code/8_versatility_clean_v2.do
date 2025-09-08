@@ -87,3 +87,124 @@
  restore
  
 }
+
+******************************************
+* Milla Data cleaning for versatility data
+******************************************
+
+// Limit ingredients to only suitable ingredients: = 1 if >= p0/p10/p25/... of suitability for region that's native for the ingredient
+
+***** Prep for native versatility *****
+
+use  "${versatility}/milla_ing_suit.dta", clear
+	
+	** save to csv file
+	outsheet using "${versatility}/native/native_`var'_m.csv", replace
+	
+	* Save native ingredients files based on cutoff
+	keep adm0 country ingredient
+	rename adm0 nativeadm0
+	rename country nativecountry
+	
+	save "${versatility}/native/native_clean_`var'_m.dta", replace
+
+ 	
+
+***** prep for imported versatility *****
+
+ use "${versatility}/milla_ing_suit.dta", clear
+ keep adm0 ingredient
+ rename ingredient nativeIng
+ duplicates drop
+ tempfile native
+ save `native', replace
+ 
+ use  "${versatility}/milla_ing_suit.dta", clear
+ merge m:1 ingredient using "${versatility}/median_suitability_m.dta"
+ drop _merge
+ 
+ gen p0 = 0
+ foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
+ 
+ preserve
+ gen aboveCutoff = (suitability > `var') & (!missing(suitability))
+ joinby adm0 using `native'
+ 
+ keep if aboveCutoff == 1
+ gen ifNative = (nativeIng == ingredient)
+
+ drop nativeIng
+
+** save to csv file
+ outsheet using "${versatility}/imported/imported_`var'_v2_m.csv", replace
+ save "${versatility}/imported/imported_`var'_v2_m.dta", replace
+ 
+ restore
+ }
+ 
+*************************************************
+* Milla Data + CIAT cleaning for versatility data
+*************************************************
+
+// Limit ingredients to only suitable ingredients: = 1 if >= p0/p10/p25/... of suitability for region that's native for the ingredient
+
+***** Prep for native versatility *****
+
+ use  "${versatility}/milla_ciat_ing_suit.dta", clear
+ merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
+ drop _merge
+ 
+ gen p0 = 0
+ foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
+ 	
+	preserve
+ 	gen aboveCutoff = (suitability > `var') & (!missing(suitability)) & CIAT == 1
+	replace aboveCutoff = 1 if CIAT == 0
+	keep if aboveCutoff == 1
+	
+	** save to csv file
+	outsheet using "${versatility}/native/native_`var'_m_c.csv", replace
+	
+	* Save native ingredients files based on cutoff
+	keep adm0 country ingredient
+	rename adm0 nativeadm0
+	rename country nativecountry
+	
+	save "${versatility}/native/native_clean_`var'_m_c.dta", replace
+	
+	restore
+ 	
+ }
+
+***** prep for imported versatility *****
+
+ use "${versatility}/milla_ciat_ing_suit.dta", clear
+ keep adm0 ingredient
+ rename ingredient nativeIng
+ duplicates drop
+ tempfile native
+ save `native', replace
+ 
+ use  "${versatility}/milla_ciat_ing_suit.dta", clear
+ merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
+ drop _merge
+ 
+ gen p0 = 0
+ foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
+ 
+ preserve
+ gen aboveCutoff = (suitability > `var') & (!missing(suitability))
+ joinby adm0 using `native'
+ 
+ keep if aboveCutoff == 1
+ gen ifNative = (nativeIng == ingredient)
+
+ drop nativeIng
+
+** save to csv file
+ outsheet using "${versatility}/imported/imported_`var'_v2_m_c.csv", replace
+ save "${versatility}/imported/imported_`var'_v2_m_c.dta", replace
+ 
+ restore
+ }
+
