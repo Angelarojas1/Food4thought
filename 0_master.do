@@ -133,6 +133,7 @@
 
 	* 	The purpose of this dofile is:
 	*		-  Clean data from Millan data 
+	*		-  Creates dataset for Millan + CIAT
 	
 		do "$code/crop_origin_clean.do"
 		
@@ -145,6 +146,7 @@
 
 		do "$code/6_suitability_clean.do"
 
+		do "$code/suitability_clean_milla.do"
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:

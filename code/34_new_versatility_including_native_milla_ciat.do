@@ -10,20 +10,20 @@
 	*				Milla database							*
 	* ***************************************************** *
 	
-	import delim "${versatility}/imported/imported_p50_v2_m.csv", clear
+	import delim "${versatility}/imported/imported_p50_v2_m_c.csv", clear
 	*drop if ifnative == 1 
 	keep adm0 country ingredient abovecutoff
 	duplicates drop adm0 country ingredient, force
 	gen native = 0
 	gen source = "imported"
-	merge 1:m ingredient adm0 using "${versatility}/2ingredient_m.dta", gen(imported_merge)
+	merge 1:m ingredient adm0 using "${versatility}/2ingredient_m_c.dta", gen(imported_merge)
 	keep if imported_merge == 3
 	drop if _fillin == 0
 	
 	tempfile imported
 	save `imported'
 	
-	use "${versatility}/native/native_clean_p50_m.dta", replace
+	use "${versatility}/native/native_clean_p50_m_c.dta", replace
 	
 	ren nativeadm0 adm0
 	ren nativecountry country
@@ -31,7 +31,7 @@
 	gen native = 1
 	gen source = "native"
 	
-	merge 1:m ingredient adm0 using "${versatility}/2ingredient_m.dta", gen(native_merge)
+	merge 1:m ingredient adm0 using "${versatility}/2ingredient_m_c.dta", gen(native_merge)
 	keep if native_merge == 3
 	drop if _fillin == 0 // drop the same ingredient
 	*keep if imported2 == 0 // combinations native native
@@ -41,7 +41,7 @@
 	ren ingredient ingredient1 // native or imported
 	ren ingredient2 ingredient // other - combination
 	
-	joinby ingredient using "${versatility}/native/native_clean_p50_m.dta" // identify native country of ingredient 2
+	joinby ingredient using "${versatility}/native/native_clean_p50_m_c.dta" // identify native country of ingredient 2
 	drop if native == 0 & imported2 == 0
 	drop if native == 1 & imported2 == 0 & nativecountry != country
 	*replace abovecutoff = 0 if missing(abovecutoff)
@@ -81,16 +81,16 @@
 	drop _fillin native_merge imported_merge
 	
 	*- Organize abovecutoff
-	save "$versatility/interim_all_versatility_m.dta", replace
+	save "$versatility/interim_all_versatility_m_c.dta", replace
 	
-	use "$versatility/interim_all_versatility_m.dta",  clear
+	*use "$versatility/interim_all_versatility_m_c.dta",  clear
 	
 	ren adm0 nativeadm0
 	ren adm1 adm0
 	ren (ingredient1 ingredient) (ingredient ingredient2)
 	
 	* get common flavors 
-	merge m:1 ingredient ingredient2 using "${versatility}/common_flavor_clean_m.dta"
+	merge m:1 ingredient ingredient2 using "${versatility}/common_flavor_clean_m_c.dta"
 	keep if _merge == 3
 	drop _merge
 	**** Nothing missing here
@@ -168,4 +168,4 @@
 	
 	keep adm0 native_versatility versatility suit_versatility
 	duplicates drop adm0, force
-	save "$versatility/all_versatility_m.dta", replace
+	save "$versatility/all_versatility_m_c.dta", replace

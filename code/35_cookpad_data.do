@@ -34,9 +34,18 @@
 	keep adm0
 	duplicates drop
 	
+	preserve
 	merge 1:1 adm0 using "$versatility/all_versatility.dta", gen(cookpad_merge)
 	
 	drop if cookpad_merge == 1
 	gen cookpad = (cookpad_merge == 3)
 	
 	save "$versatility/final_versatility.dta", replace
+	restore
+	
+	merge 1:1 adm0 using "$versatility/all_versatility_m.dta", gen(cookpad_merge)
+	
+	drop if cookpad_merge == 1
+	gen cookpad = (cookpad_merge == 3)
+	
+	save "$versatility/final_versatility_m.dta", replace

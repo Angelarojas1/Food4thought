@@ -99,14 +99,14 @@
 use  "${versatility}/milla_ing_suit.dta", clear
 	
 	** save to csv file
-	outsheet using "${versatility}/native/native_`var'_m.csv", replace
+	outsheet using "${versatility}/native/native_p50_m.csv", replace
 	
 	* Save native ingredients files based on cutoff
-	keep adm0 country ingredient
+	keep adm0 country ingredient suitability
 	rename adm0 nativeadm0
 	rename country nativecountry
 	
-	save "${versatility}/native/native_clean_`var'_m.dta", replace
+	save "${versatility}/native/native_clean_p50_m.dta", replace
 
  	
 
@@ -114,33 +114,34 @@ use  "${versatility}/milla_ing_suit.dta", clear
 
  use "${versatility}/milla_ing_suit.dta", clear
  keep adm0 ingredient
- rename ingredient nativeIng
+ *rename ingredient nativeIng
  duplicates drop
  tempfile native
  save `native', replace
  
- use  "${versatility}/milla_ing_suit.dta", clear
+ use  "${versatility}/cuisine_suit_m.dta", clear // file contains country and all ingredients
  merge m:1 ingredient using "${versatility}/median_suitability_m.dta"
  drop _merge
  
- gen p0 = 0
- foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
+ *gen p0 = 0
+ *foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
  
- preserve
- gen aboveCutoff = (suitability > `var') & (!missing(suitability))
- joinby adm0 using `native'
+ *preserve
+ gen aboveCutoff = (suitability > p50) & (!missing(suitability))
+ merge m:1 adm0 ingredient using `native'
  
- keep if aboveCutoff == 1
- gen ifNative = (nativeIng == ingredient)
-
- drop nativeIng
+ *gen ifNative = 1 if _merge == 3
+ *keep if aboveCutoff == 1
+ drop if _merge == 3
+ drop _merge
+ *drop nativeIng
 
 ** save to csv file
- outsheet using "${versatility}/imported/imported_`var'_v2_m.csv", replace
- save "${versatility}/imported/imported_`var'_v2_m.dta", replace
+ outsheet using "${versatility}/imported/imported_p50_v2_m.csv", replace
+ save "${versatility}/imported/imported_p50_v2_m.dta", replace
  
- restore
- }
+ *restore
+ *}
  
 *************************************************
 * Milla Data + CIAT cleaning for versatility data
@@ -151,60 +152,45 @@ use  "${versatility}/milla_ing_suit.dta", clear
 ***** Prep for native versatility *****
 
  use  "${versatility}/milla_ciat_ing_suit.dta", clear
- merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
- drop _merge
- 
- gen p0 = 0
- foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
- 	
-	preserve
- 	gen aboveCutoff = (suitability > `var') & (!missing(suitability)) & CIAT == 1
-	replace aboveCutoff = 1 if CIAT == 0
-	keep if aboveCutoff == 1
 	
 	** save to csv file
-	outsheet using "${versatility}/native/native_`var'_m_c.csv", replace
+	outsheet using "${versatility}/native/native_p50_m_c.csv", replace
 	
 	* Save native ingredients files based on cutoff
 	keep adm0 country ingredient
 	rename adm0 nativeadm0
 	rename country nativecountry
 	
-	save "${versatility}/native/native_clean_`var'_m_c.dta", replace
-	
-	restore
- 	
- }
+	save "${versatility}/native/native_clean_p50_m_c.dta", replace
 
 ***** prep for imported versatility *****
 
  use "${versatility}/milla_ciat_ing_suit.dta", clear
  keep adm0 ingredient
- rename ingredient nativeIng
+* rename ingredient nativeIng
  duplicates drop
  tempfile native
  save `native', replace
  
- use  "${versatility}/milla_ciat_ing_suit.dta", clear
+ use  "${versatility}/cuisine_suit_m_c.dta", clear
  merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
  drop _merge
  
- gen p0 = 0
- foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
+* gen p0 = 0
+* foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
  
- preserve
- gen aboveCutoff = (suitability > `var') & (!missing(suitability))
- joinby adm0 using `native'
+ *preserve
+ gen aboveCutoff = (suitability > p50) & (!missing(suitability))
+ merge m:1 adm0 ingredient using `native'
  
- keep if aboveCutoff == 1
- gen ifNative = (nativeIng == ingredient)
-
- drop nativeIng
+ drop if _merge == 3
+ drop _merge
+ *drop nativeIng
 
 ** save to csv file
- outsheet using "${versatility}/imported/imported_`var'_v2_m_c.csv", replace
- save "${versatility}/imported/imported_`var'_v2_m_c.dta", replace
+ outsheet using "${versatility}/imported/imported_p50_v2_m_c.csv", replace
+ save "${versatility}/imported/imported_p50_v2_m_c.dta", replace
  
- restore
- }
+ *restore
+ *}
 

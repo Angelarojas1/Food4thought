@@ -226,6 +226,7 @@
 	replace country = "Syria" 				   if country == "Syrian Arab Republic"
     replace country = "United Kingdom" 		   if country == "U.K. of Great Britain and Northern Ireland"
     replace country = "United States" 		   if country == "United States of America"
+	replace country = "Palestine" 		   	   if iso3 == "PSE"
 	
 	*- Merge with recipe data to identify countries in both databases
 	preserve
@@ -243,9 +244,9 @@
 	drop _merge
 	
 	*- Merge ingredient and region	
-	merge m:m eco_code using `ing_eco'
+	joinby eco_code using `ing_eco'
 	
-	unique country if _merge == 3
+	*unique country if _merge == 3
 	keep eco_code country ingredient iso3
 	
 	*- Get native ingredients for countries that didn't have this information 	
@@ -281,7 +282,6 @@
 	*- save dataset with native ingredients according to Milla data
 	save "${versatility}/Milla_ing_origin.dta", replace
 	
-	
 	*- Create dataset that combines Milla native ingredients and CIAT
 	use "${versatility}/cuisine_ciat.dta", clear
 	
@@ -301,127 +301,8 @@
 	replace CIAT = 0 if missing(CIAT)
 	drop if adm0 == "" | adm0 == " "
 	
+	gen one = 1
+	bys country : egen numNative = total(one)
+	drop one
+	
 	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
-	
-	*************************************************************
-	*            Native ingredient and suitability data         *
-	*************************************************************
-	use "${versatility}/suitability.dta", clear
-	
-	replace country = "Liechtenstein" if adm0 == "LIE"
-	
-	preserve
-	keep if country == "Rest of World"
-	isid ingredient
-	rename suitability suitability_rest
-	tempfile rest
-	save `rest', replace
-	restore
-	
-	merge 1:1 adm0 ingredient using "${versatility}/Milla_ing_origin.dta"
-	
-	drop if _merge == 1
-	rename _merge _merge1
-	
-	* if missing suitability, use the suitability from the rest of the world
-	merge m:1 ingredient using `rest'
-	drop if _merge == 2 
-	tab _merge1 _merge
-	assert !missing(suitability_rest) if _merge1 == 2 & _merge == 3
-	assert missing(suitability_rest) if _merge1 == 2 & _merge == 1 //For these ing we definetly don't have information
-	replace suitability = suitability_rest if _merge1 == 2 & _merge == 3 
-	drop _merge1 _merge suitability_rest
-	
-	sort adm0 ingredient
-	isid adm0 ingredient
-	
-	** drop ingredients that we don't have suitability data at all
-	gen flag = 0
-	bys ingredient(suitability adm0): replace flag = 1 if suitability[1] == suitability[_N] & suitability[1] == .
-	assert missing(suitability) if flag == 1
-	
-	tab ingredient if flag == 1 //identify ingredients without suitability information
-	
-	drop if flag == 1
-	drop flag
-	
-	drop if suitability == . | suitability == 0
-	
-	replace country = "Taiwan" if adm0 == "TWN"
-	
-	unique adm0
-	unique country
-	
-	bys adm0 (country ingredient): replace country = country[_N]
-	
-	assert `r(sum)' == 104 // we have 104 countries with suitability information
-	
-	save "${versatility}/milla_ing_suit.dta", replace 
-	
-*** Find median of suitability for native ingredients  ***
-	collapse (p10) p10 = suitability (p25) p25 = suitability (p33) p33 = suitability (median) p50 = suitability (p60) p60 = suitability (p66) p66 = suitability (p70) p70 = suitability, by(ingredient)
- isid ingredient // there's information for 64 ingredients
-	save "${versatility}/median_suitability_m.dta", replace
-	
-	************************************
-	**** Milla + CIAT + Suitability ****
-	************************************
-	
-	use "${versatility}/suitability.dta", clear
-	
-	replace country = "Liechtenstein" if adm0 == "LIE"
-	
-	preserve
-	keep if country == "Rest of World"
-	isid ingredient
-	rename suitability suitability_rest
-	tempfile rest
-	save `rest', replace
-	restore
-	
-	merge 1:1 adm0 ingredient using "${versatility}/Milla_CIAT_ing_origin.dta"
-	
-	drop if _merge == 1
-	rename _merge _merge1
-	
-	* if missing suitability, use the suitability from the rest of the world
-	merge m:1 ingredient using `rest'
-	drop if _merge == 2 
-	tab _merge1 _merge
-	assert !missing(suitability_rest) if _merge1 == 2 & _merge == 3
-	assert missing(suitability_rest) if _merge1 == 2 & _merge == 1 //For these ing we definetly don't have information
-	replace suitability = suitability_rest if _merge1 == 2 & _merge == 3 
-	drop _merge1 _merge suitability_rest
-	
-	sort adm0 ingredient
-	isid adm0 ingredient
-	
-	** drop ingredients that we don't have suitability data at all
-	gen flag = 0
-	bys ingredient(suitability adm0): replace flag = 1 if suitability[1] == suitability[_N] & suitability[1] == .
-	assert missing(suitability) if flag == 1
-	
-	tab ingredient if flag == 1 //identify ingredients without suitability information
-	
-	drop if flag == 1
-	drop flag
-	
-	drop if suitability == . | suitability == 0
-	
-	replace country = "Hong Kong" if adm0 == "HKG"
-	replace country = "Taiwan" if adm0 == "TWN"
-	
-	unique adm0
-	unique country
-		
-	bys adm0 (country ingredient): replace country = country[_N]
-	
-	assert `r(sum)' == 150 // we have 150 countries with suitability information
-	
-	save "${versatility}/milla_ciat_ing_suit.dta", replace 
-	
-*** Find median of suitability for native ingredients  ***
-	collapse (p10) p10 = suitability (p25) p25 = suitability (p33) p33 = suitability (median) p50 = suitability (p60) p60 = suitability (p66) p66 = suitability (p70) p70 = suitability, by(ingredient)
- isid ingredient // there's information for 64 ingredients
-	save "${versatility}/median_suitability_m_c.dta", replace
-	
