@@ -152,7 +152,14 @@ use  "${versatility}/milla_ing_suit.dta", clear
 ***** Prep for native versatility *****
 
  use  "${versatility}/milla_ciat_ing_suit.dta", clear
-	
+ merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
+ assert _merge == 3
+ drop _merge
+ 
+ gen aboveCutoff = (suitability > p50) & (!missing(suitability)) & CIAT == 1
+ 
+ keep if aboveCutoff == 1 | CIAT == 0
+
 	** save to csv file
 	outsheet using "${versatility}/native/native_p50_m_c.csv", replace
 	
@@ -165,9 +172,10 @@ use  "${versatility}/milla_ing_suit.dta", clear
 
 ***** prep for imported versatility *****
 
- use "${versatility}/milla_ciat_ing_suit.dta", clear
+ use "${versatility}/native/native_clean_p50_m_c.dta", clear
+ rename nativeadm0 adm0
+ rename nativecountry country
  keep adm0 ingredient
-* rename ingredient nativeIng
  duplicates drop
  tempfile native
  save `native', replace
