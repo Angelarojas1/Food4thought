@@ -204,6 +204,15 @@
 
 		do "$code/34_new_versatility_including_native.do"
 		
+	* 	The purpose of this dofile is:
+	*		- Generate versatility by country using Milla data
+
+		do "$code/34_new_versatility_including_native_milla.do"	
+		
+	* 	The purpose of this dofile is:
+	*		- Generate versatility by country using Milla + CIAT data
+
+		do "$code/34_new_versatility_including_native_milla_ciat.do"	
 		
 	* ***************************************************** *
 	*                 Cookpad Data Coding                   *
