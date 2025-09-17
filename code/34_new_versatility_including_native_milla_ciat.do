@@ -11,7 +11,6 @@
 	* ***************************************************** *
 	
 	import delim "${versatility}/imported/imported_p50_v2_m_c.csv", clear
-	*drop if ifnative == 1 
 	keep adm0 country ingredient abovecutoff
 	duplicates drop adm0 country ingredient, force
 	gen native = 0
@@ -53,7 +52,7 @@
 	ren adm0 adm1 
 	ren country country1
 	ren nativeadm0 adm0
-	
+{	
 /*
 	tempfile  native
 	save `native'
@@ -78,12 +77,13 @@
 	drop *_merge _fillin suitability
 	
 */
+}
 	drop _fillin native_merge imported_merge
 	
 	*- Organize abovecutoff
 	save "$versatility/interim_all_versatility_m_c.dta", replace
 	
-	*use "$versatility/interim_all_versatility_m_c.dta",  clear
+	use "$versatility/interim_all_versatility_m_c.dta",  clear
 	
 	ren adm0 nativeadm0
 	ren adm1 adm0

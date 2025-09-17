@@ -103,7 +103,8 @@ end
 ******************************************************************************
 * Calculate the number of common flavors between ingredients in Milla database
 ******************************************************************************
-
+{
+/*
 **** Between 2 ingredients as a group ****
 
 ** import data
@@ -194,6 +195,8 @@ common.to_stata("common_flavor_3ing_clean_m.dta")
 end
 */
 
+*/
+}
 *********************************************************************************
 * Calculate the number of common flavors between ingredients in Milla data + CIAT
 *********************************************************************************

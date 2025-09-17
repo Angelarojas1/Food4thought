@@ -5,7 +5,8 @@
    *
    * Input: https://github.com/rubenmilla/Crop_Origins_Phylo?tab=readme-ov-file
    * ******************************************************************** *
-   
+{   
+/*
    clear
    
    	*************************************************************
@@ -138,14 +139,25 @@
 	isid adm0 ingredient
  
 	save "${versatility}/cuisine_suit_m.dta", replace
-
+*/
+}
 	************************************
 	**** Milla + CIAT + Suitability ****
 	************************************
 	
+	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+	keep adm0 country
+	duplicates drop
+	tempfile adm0
+	save `adm0'
+	
 	use "${versatility}/suitability.dta", clear
 	
-	replace country = "Liechtenstein" if adm0 == "LIE"
+	merge m:1 adm0 country using `adm0'
+	bys adm0 (country): replace country = country[_N] 
+	drop if _merge == 2
+	
+	keep adm0 ingredient suitability country
 	
 	tempfile suit
 	save `suit', replace
@@ -187,14 +199,9 @@
 	
 	drop if suitability == . | suitability == 0
 	
-	replace country = "Hong Kong" if adm0 == "HKG"
-	replace country = "Taiwan" if adm0 == "TWN"
-	
 	unique adm0
 	unique country
-		
-	bys adm0 (country ingredient): replace country = country[_N]
-	
+			
 	assert `r(sum)' == 159 // we have 159 countries with suitability information
 	
 	save "${versatility}/milla_ciat_ing_suit.dta", replace 
@@ -210,7 +217,7 @@
 	
 	* Keep country names information
 	preserve
-	keep adm0 country
+	keep adm0 country region continent
 	duplicates drop 
 	isid adm0
 	tempfile adm0
@@ -287,5 +294,4 @@
 	isid adm0 ingredient
  
 	save "${versatility}/cuisine_suit_m_c.dta", replace
-
 	

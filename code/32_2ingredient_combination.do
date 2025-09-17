@@ -44,7 +44,8 @@
 	*********************
 	* For Milla database
 	*********************
-	
+{
+/*	
 local x "p50"
 	
 	* imported data
@@ -91,7 +92,8 @@ local x "p50"
 	bys adm0 (country): replace country = country[_N] if missing(country)
 
 	save "${versatility}/2ingredient_m.dta", replace
-
+*/
+}
 	***************************
 	* For Milla database + CIAT
 	***************************

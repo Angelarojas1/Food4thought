@@ -91,11 +91,12 @@
 ******************************************
 * Milla Data cleaning for versatility data
 ******************************************
-
+{
 // Limit ingredients to only suitable ingredients: = 1 if >= p0/p10/p25/... of suitability for region that's native for the ingredient
 
 ***** Prep for native versatility *****
 
+/*
 use  "${versatility}/milla_ing_suit.dta", clear
 	
 	** save to csv file
@@ -103,7 +104,7 @@ use  "${versatility}/milla_ing_suit.dta", clear
 	
 	* Save native ingredients files based on cutoff
 	keep adm0 country ingredient suitability
-	rename adm0 nativeadm0
+	
 	rename country nativecountry
 	
 	save "${versatility}/native/native_clean_p50_m.dta", replace
@@ -139,10 +140,12 @@ use  "${versatility}/milla_ing_suit.dta", clear
 ** save to csv file
  outsheet using "${versatility}/imported/imported_p50_v2_m.csv", replace
  save "${versatility}/imported/imported_p50_v2_m.dta", replace
+*/
  
  *restore
  *}
- 
+}
+
 *************************************************
 * Milla Data + CIAT cleaning for versatility data
 *************************************************
@@ -164,22 +167,21 @@ use  "${versatility}/milla_ing_suit.dta", clear
 	outsheet using "${versatility}/native/native_p50_m_c.csv", replace
 	
 	* Save native ingredients files based on cutoff
-	keep adm0 country ingredient
+	keep adm0 country ingredient region continent CIAT numNative
 	rename adm0 nativeadm0
 	rename country nativecountry
 	
 	save "${versatility}/native/native_clean_p50_m_c.dta", replace
 
-***** prep for imported versatility *****
-
- use "${versatility}/native/native_clean_p50_m_c.dta", clear
- rename nativeadm0 adm0
+ rename nativeadm0 adm0 
  rename nativecountry country
  keep adm0 ingredient
  duplicates drop
  tempfile native
  save `native', replace
- 
+
+***** prep for imported versatility ***** 
+
  use  "${versatility}/cuisine_suit_m_c.dta", clear
  merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
  drop _merge
@@ -189,9 +191,9 @@ use  "${versatility}/milla_ing_suit.dta", clear
  
  *preserve
  gen aboveCutoff = (suitability > p50) & (!missing(suitability))
- merge m:1 adm0 ingredient using `native'
+ merge 1:1 adm0 ingredient using `native'
  
- drop if _merge == 3
+ drop if _merge == 3 | _merge == 2
  drop _merge
  *drop nativeIng
 

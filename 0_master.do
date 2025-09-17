@@ -55,6 +55,9 @@
 	global figures				"$outputs/Figures"
 	
 	* ***************************************************** *
+	
+	* Setting the ado path with required packages
+	sysdir set PLUS "${code}/ado"
 
 	** Install packages (run once)
 	

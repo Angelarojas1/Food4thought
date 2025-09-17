@@ -14,34 +14,34 @@
    ** EDITTED BY:       Angela Rojas
    ** Last date modified: Dec 13, 2023
 
-* Check time, ingredients and spices variables
-* import data
-use "${recipes}/recipe_all_countries.dta", clear
+	* Check time, ingredients and spices variables
+	* import data
+	use "${recipes}/recipe_all_countries.dta", clear
 
-** Clean recipes information
-do "$code/subcode/2_2_recipes_clean.do"
+	** Clean recipes information
+	do "$code/subcode/2_2_recipes_clean.do"
 
-* Organize country and continent codes
-kountry country, from(other) stuck marker
-rename _ISO3N_ iso3
-kountry iso3, from(iso3n) to(iso3c)
-kountry iso3, from(iso3n) to(iso2c)
-kountry iso3, from(iso3n) geo(un) 
+	* Organize country and continent codes
+	kountry country, from(other) stuck marker
+	rename _ISO3N_ iso3
+	kountry iso3, from(iso3n) to(iso3c)
+	kountry iso3, from(iso3n) to(iso2c)
+	kountry iso3, from(iso3n) geo(un) 
 
-rename (_ISO3C_ _ISO2C_ GEO)(adm0 two_letter_country_code continent_name)
+	rename (_ISO3C_ _ISO2C_ GEO)(adm0 two_letter_country_code continent_name)
 
-* Fill missing information
-replace continent_name = "Africa" if country == "Cabo Verde"
-replace continent_name = "Europe" if country == "Kosovo"
-replace two_letter_country_code = "CV" if country == "Cabo Verde"
-replace two_letter_country_code = "XK" if country == "Kosovo"
-replace adm0 = "CPV" if country == "Cabo Verde"
-replace adm0 = "XXK" if country == "Kosovo"
+	* Fill missing information
+	replace continent_name = "Africa" if country == "Cabo Verde"
+	replace continent_name = "Europe" if country == "Kosovo"
+	replace two_letter_country_code = "CV" if country == "Cabo Verde"
+	replace two_letter_country_code = "XK" if country == "Kosovo"
+	replace adm0 = "CPV" if country == "Cabo Verde"
+	replace adm0 = "XXK" if country == "Kosovo"
 
-* Winsorize time variable and create dataset
-encode country, gen(Country)
+	* Winsorize time variable and create dataset
+	encode country, gen(Country)
 
-* Min Max Mean by Country
+	* Min Max Mean by Country
 	bys Country: egen min_totaltime = min(totaltime)
 	bys Country: egen max_totaltime = max(totaltime)
 	bys Country: egen mean_totaltime = mean(totaltime)
@@ -65,7 +65,7 @@ encode country, gen(Country)
 
 
 
-** collapse to country level, multiple percentiles
+	** collapse to country level, multiple percentiles
 	gen cnt = 1
 	collapse (p10)time_p10 = totaltime (p25)time_p25 = totaltime (median)time_median = totaltime (p75)time_p75 = totaltime  (p90)time_p90 = totaltime  (mean)time_mean = totaltime  ///
 (p10)ingredients_p10 = numberofingredients (p25)ingredients_p25 = numberofingredients (median)ingredients_median = numberofingredients (p75)ingredients_p75 = numberofingredients  (p90)ingredients_p90 = numberofingredients (mean)ingredients_mean = numberofingredients ///
@@ -76,10 +76,10 @@ encode country, gen(Country)
 		assert !missing(`var')
 	}
 
-** save dataset
+	** save dataset
 	save "${recipes}/cuisine_complexity_all.dta", replace
 
-* Keep only mean and median measures
+	* Keep only mean and median measures
 	keep time_mean time_median ingredients_mean ingredients_median spices_mean spices_median num_recipes continent_name two_letter_country_code adm0 country
 
 	save "${recipes}/cuisine_complexity_sum.dta", replace

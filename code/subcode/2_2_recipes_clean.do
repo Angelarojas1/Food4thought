@@ -13,10 +13,13 @@
    ** EDITTED BY:       
    ** Last date modified: April 19, 2024
 
- * Remove duplicates
- duplicates drop nameoftherecipe totaltime listofingredients listofinstructions numberofservings preptime cooktime numberofingredients_raw numberofingredients country, force // Drop 9249 observations
- sort country
- bysort nameoftherecipe country: gen numrecipe = _n
+	* Remove duplicates
+	duplicates drop nameoftherecipe totaltime listofingredients ///
+	listofinstructions numberofservings preptime cooktime ///
+	numberofingredients_raw numberofingredients country, force // Drop 9249 observations
+	
+	sort country
+	bysort nameoftherecipe country: gen numrecipe = _n
  
 /*
 * Create table to know how many recipes we have and we lose
@@ -46,35 +49,34 @@
 	}
 	
 	drop welose* percent totalrecipe
-
-* Fix number of ingredients variable
+	
+	* Fix variable of number of ingredients 
 	destring numberofingredients_raw, replace
 	replace numberofingredients = numberofingredients_raw if numberofingredients == 0 
 	replace numberofingredients = numberofingredients_raw if numberofingredients == 1 & inlist(country, "Chile", "Libya", "Peru")
 	
-	* Count ingredients
+	* Count ingredients for each recipe
 	local len = length(",")
 	gen n_ing = (length(listofingredients) - length(subinstr(listofingredients, ",", "", .))) / `len' 
 	replace numberofingredients = n_ing + 1 if numberofingredients == 1 & inlist(country, "Jordan", "Latvia")
 	drop n_ing
-	drop if numberofingredients >= 47 & country == "Iraq" // The code is counting wrong the ingredients, I drop 13 observations
+	drop if numberofingredients >= 47 & country == "Iraq" // The precode is counting wrong the ingredients, I drop 13 observations
 	
-* Fix time variable 
+	* Fix time variable  using prep time and cook time
 	gen prep = preptime
-	replace prep = "" if strpos(preptime,"P")>0 | strpos(preptime,"m")>0 | strpos(preptime,"M")>0 | strpos(preptime,"h")>0 | strpos(preptime,"R")>0
+	replace prep = "" if strpos(preptime,"P")>0 | strpos(preptime,"m")>0 | ///
+	strpos(preptime,"M")>0 | strpos(preptime,"h")>0 | strpos(preptime,"R")>0
 	destring prep , replace
 
 	gen cook = cooktime
-	replace cook = "" if strpos(cooktime,"P")>0 | strpos(cooktime,"m")>0 | strpos(cooktime,"M")>0 | strpos(cooktime,"h")>0 | strpos(cooktime,"R")>0 | strpos(cooktime,"H")>0 | strpos(cooktime,"~")>0
+	replace cook = "" if strpos(cooktime,"P")>0 | strpos(cooktime,"m")>0 | ///
+	strpos(cooktime,"M")>0 | strpos(cooktime,"h")>0 | strpos(cooktime,"R")>0 | ///
+	strpos(cooktime,"H")>0 | strpos(cooktime,"~")>0
 	destring cook , replace
 
 	replace totaltime = prep + cook if totaltime == 0 | totaltime == .
-	
-	* dealing with Kosovo outliers: totaltime 21605 27289001
-	drop if country == "Kosovo" & totaltime == 21605
-	drop if country == "Kosovo" & totaltime == 27289001
 
-* Organize time variable
+	* Organize time variable
 	replace totaltime = 4320 if cooktime == "~ 3-4 days"
 	replace totaltime = 1440 if cooktime == "~ 1 day"
 	replace totaltime = 255 if strpos(cooktime,"4 hrs 15")>0
@@ -98,19 +100,16 @@
 	replace totaltime = 30 if preptime == "PT30M" & cooktime == "" 
 	replace totaltime = 20 if preptime == "PT20M" & cooktime == "" 
 	replace totaltime = 10 if preptime == "PT10M" & cooktime == "" 
+	
+	* dealing with Kosovo outliers: totaltime 21605 27289001
+	drop if country == "Kosovo" & totaltime == 21605
+	drop if country == "Kosovo" & totaltime == 27289001
 
-* Drop recipes with information as zero in time and number of ingredients
+	* Drop recipes with zeros in time and number of ingredients
 	drop if totaltime==0 | missing(totaltime) // 70 observations deleted
 	drop if numberofingredients==0 // 39 observations deleted
 	
-* Check Mexico, Brazil and Bangladesh that are the ones with higher 
-
-*- Mexico
-	*keep if country == "Mexico" | country == "Brazil" | country == "Bangladesh"
-	gen n = 1
-	*collapse (sum) n, by(country)
-	*sum totaltime if country == "Bangladesh", de
-	
+	* Check Mexico, Brazil and Bangladesh that are the ones with higher 	
 	gsort country -totaltime
 	replace totaltime = 120 if nameoftherecipe == "Kol de pavo de monte" & country == "Mexico"
 	replace totaltime = 60 if nameoftherecipe == "Dulce de calabaza" & country == "Mexico"
@@ -143,15 +142,17 @@
 	replace totaltime = 20 if nameoftherecipe == "Cazón frito" & country == "Mexico"
 	replace totaltime = 60 if nameoftherecipe == "Chilaquiles de rancho" & country == "Mexico"
 	replace totaltime = 50 if nameoftherecipe == "Chul de frijol verde" & country == "Mexico"
-	*replace totaltime = 20 if nameoftherecipe == "" & country == "Mexico"
-	
-	
-** drop recipes that the total time are higher than 99%
+	replace totaltime = 30 if nameoftherecipe == "Жент" & country == "Kazakhstan"
+	replace totaltime = 30 if nameoftherecipe == "Валгаская булка" & country == "Estonia"
+	replace totaltime = 100 if nameoftherecipe == "Мульгикапсад" & country == "Estonia"
+	replace totaltime = 30 if nameoftherecipe == "How To Make "Trahana" (Crushed Wheat Soup)" & country == "Cyprus"
+	replace totaltime = 240 if nameoftherecipe == "Orange Easter Bread (Tsoureki)" & country == "Cyprus"
+	replace totaltime = 45 if nameoftherecipe == "Olive Bread (Eliopita)" & country == "Cyprus"
+	replace totaltime = 180 if nameoftherecipe == "Savoury Meat Doughnuts (Koupes)" & country == "Cyprus"
+
+	** drop recipes that the total time are higher than 99%
 	bys country: egen p99 = pctile(totaltime), p(99)
 	drop if totaltime > p99
 	note: `r(N_drop)' recipes are dropped because of higher than 99%.
 
-*replace listofingredients = ",'" if strpos(listofingredients,", '")>0
-*replace listofingredients = subinstr(listofingredients, ", '", ",'", .)
-*gen int number = ustrlen(ustrregexra(listofingredients, ",'", ""))
-
+	*br totaltime numberofingredients numberofspices country if inlist(country, "Cyprus", "Estonia", "Kazakhstan", "Malaysia", "Paraguay")

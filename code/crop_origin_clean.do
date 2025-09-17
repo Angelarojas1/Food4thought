@@ -139,7 +139,7 @@
 	geoinpoly lat lon using "geo2xy_world_coor.dta"
 	
 	merge m:1 _ID using "geo2xy_world_data.dta", ///
-    keep(master match) keepusing(geounit iso_a3) nogen
+    keep(master match) keepusing(geounit iso_a3 continent region_un) nogen
 	
 	*- Fill empty geounits using coordinates and search them in google
 	
@@ -168,7 +168,7 @@
 	replace geounit = "Democratic Republic of the Congo" if geounit == "Republic of Congo"
 	replace geounit = "United Republic of Tanzania" if geounit == "Tanzania"
 	
-	rename (geounit iso_a3) (country iso3)
+	rename (geounit iso_a3 region_un) (country iso3 region)
 	
 	*- Organize ISO code
 	bys country: replace iso3 = iso3[_N]
@@ -185,8 +185,10 @@
 	
 	*- Countries in new dataset
 	preserve 
-	keep country 
+	keep country continent region
 	duplicates drop
+	bysort country: gen keep = (_n == _N)
+	drop if keep == 0 
 	tempfile country
 	save `country'
 	restore
@@ -200,7 +202,7 @@
 	save `ing_eco' 
 	restore
 	
-	keep ingredient country iso3
+	keep ingredient country iso3 continent region
 	tempfile ing_country
 	save `ing_country'
 		
@@ -247,46 +249,49 @@
 	joinby eco_code using `ing_eco'
 	
 	*unique country if _merge == 3
-	keep eco_code country ingredient iso3
+	keep eco_code country ingredient iso3 continent region
 	
 	*- Get native ingredients for countries that didn't have this information 	
 	merge m:1 country using `country'
 	*keep if _merge == 1 // we keep countries without native ingredients to assign 
 						// ingredients based on the eco region
 						
-	keep country ingredient iso3
+	keep country ingredient iso3 continent region
 	duplicates drop
 	drop if ingredient == ""
 	
 	append using `ing_country'
 	
 	rename iso3 adm0
-	
+	duplicates drop
+
 	*- Create variables of interest	
 	tempfile working
 	save `working', replace
 	
-	*- generate controls: number of ingredients
-	duplicates drop
-	gen one = 1
-	collapse (sum)numNative = one, by(country)
-	
-	** merge back 
-	merge 1:m country using `working'
-	
-	duplicates drop adm0 ingredient, force
-	drop if adm0 == "" | adm0 == " "
-	
-	drop _merge 
-	
-	*- save dataset with native ingredients according to Milla data
-	save "${versatility}/Milla_ing_origin.dta", replace
-	
+{	
+// 	*- generate controls: number of ingredients
+// 	duplicates drop
+// 	gen one = 1
+// 	collapse (sum)numNative = one, by(country)
+//	
+// 	** merge back 
+// 	merge 1:m country using `working'
+//	
+// 	duplicates drop adm0 ingredient, force
+// 	drop if adm0 == "" | adm0 == " "
+//	
+// 	drop _merge 
+//	
+// 	*- save dataset with native ingredients according to Milla data
+// 	save "${versatility}/Milla_ing_origin.dta", replace
+}	
 	*- Create dataset that combines Milla native ingredients and CIAT
 	use "${versatility}/cuisine_ciat.dta", clear
 	
 	gen CIAT = 1
-	keep country ingredient adm0 CIAT
+	keep country ingredient adm0 CIAT region_nice continent_name
+	rename (region_nice continent_name) (region continent)
 	
 	*- Clean ingredient variable
 	replace ingredient = "jicama" if ingredient == "jícama"
@@ -294,15 +299,26 @@
 	replace ingredient = "pistachio" if ingredient == "pistachios"
 	replace ingredient = "walnut" if ingredient == "walnuts"
 	
-	append using `working'
+	append using `working', gen(source)
 	
-	duplicates drop adm0 ingredient, force
+	bys country (adm0): replace adm0 = adm0[_N] 
+	bys adm0 (region): replace region = region[_N] 
+	bys adm0 (continent): replace continent = continent[_N] 
+
+	* If we have duplicates, keep the one from Milla
+	bysort adm0 country ingredient (source): gen keep = (_n == _N)
+	drop if keep == 0 
+	
+	* Drop countries that are not in recipe data
+	drop if adm0 == " "
+	drop source keep 
 	
 	replace CIAT = 0 if missing(CIAT)
-	drop if adm0 == "" | adm0 == " "
-	
+
 	gen one = 1
 	bys country : egen numNative = total(one)
 	drop one
+	
+	duplicates drop
 	
 	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
