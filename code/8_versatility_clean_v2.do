@@ -166,8 +166,15 @@ use  "${versatility}/milla_ing_suit.dta", clear
 	** save to csv file
 	outsheet using "${versatility}/native/native_p50_m_c.csv", replace
 	
+	drop numNative
+	
+	gen one = 1
+	bys country : egen numNative = total(one)
+	bys country : egen numNativeCIAT = total(CIAT)
+	drop one
+	
 	* Save native ingredients files based on cutoff
-	keep adm0 country ingredient region continent CIAT numNative
+	keep adm0 country ingredient region continent CIAT numNative numNativeCIAT
 	rename adm0 nativeadm0
 	rename country nativecountry
 	

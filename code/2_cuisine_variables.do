@@ -57,8 +57,13 @@
 	bys Country: egen w_mean_totaltime = mean(TotalTime)
 	bys Country: egen w_mean_spices = mean(w_numberofspices)
 	
+	* Count number of recipes
+	gen one = 1
+	bys country : egen numrecipes = total(one)
+	drop one
+	
 	preserve
-	keep w_mean_totaltime w_mean_spices Country country mean_ingredients median_spices median_ingredients median_totaltime
+	keep w_mean_totaltime w_mean_spices Country country mean_ingredients median_spices median_ingredients median_totaltime numrecipes
 	duplicates drop 
 	save "$recipes/complexity_recipe.dta", replace
 	restore

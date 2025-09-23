@@ -16,6 +16,7 @@
 	** Root folder globals 
 
 	if "`c(username)'" == "stell" {
+	cd "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
 	global projectfolder "C:/Users/stell/Dropbox/food4thought/analysis23"
 	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
 	}

@@ -41,59 +41,59 @@
 	use `bycountry', replace
 	save "${versatility}/2ingredient.dta", replace
 	
-	*********************
-	* For Milla database
-	*********************
-{
-/*	
-local x "p50"
+	***************************************
+	* For Milla database + CIAT only native
+	***************************************
 	
-	* imported data
-	import delimited "${versatility}/imported/imported_`x'_v2_m.csv", clear 
-	gen imported = 1
-	
-	append using "${versatility}/native/native_clean_p50_m.dta"
-	replace imported = 0 if imported == .
-	replace country = nativecountry if country == ""
-	replace adm0 = nativeadm0 if adm0== ""
+	use "${versatility}/native/native_clean_p50_m_c.dta", clear
+	rename nativecountry country
+	rename nativeadm0 adm0
 	
 	* keep variables
-	keep adm0 ingredient suitability country imported
-	duplicates drop adm0 ingredient suitability, force
+	keep adm0 ingredient country
 	
+	* Create all possible combinations of ingredients 
 	preserve
-	keep if country == "zzz"
-	tempfile bycountry
-	save `bycountry', emptyok
-	restore
-	
-	
-	* Generating every combination of ingredients
-	levelsof adm0, local(country)
-	* initialize the output data
-	foreach c of local country {
-	preserve
-	keep if adm0 == "`c'"
-
+	keep ingredient
+	duplicates drop 
 	gen ingredient2 = ingredient
 	fillin ingredient ingredient2
-	replace adm0 = "`c'" if adm0 == ""
-	append using `bycountry', force
-	save `bycountry', replace
+	tempfile ingredients
+	save `ingredients', replace
 	restore
-	}
-	use `bycountry', replace
 	
-	bys adm0 ingredient (suitability): replace suitability = suitability[_n-1] if missing(suitability)
-	bys adm0 ingredient (imported): replace imported = imported[_n-1] if missing(imported)
-	gen imported2 = 0 if ingredient == ingredient2 & imported == 0
-	bys adm0 ingredient2 (imported2): replace imported2 = imported2[_n-1] if missing(imported2)
-	replace imported2 = 1 if imported2 == .
-	bys adm0 (country): replace country = country[_N] if missing(country)
+	* Generating every combination 
+	duplicates drop adm0 country, force
+	tempfile countries
+	save `countries'
 
-	save "${versatility}/2ingredient_m.dta", replace
-*/
-}
+	tempfile bycountry
+	save `bycountry', emptyok
+	
+	use `countries', clear
+	levelsof adm0, local(adm0s)
+
+	* initialize the output data
+	foreach c of local adm0s {
+		preserve
+		keep if adm0 == "`c'"
+		local ctry = country[1]  
+		restore
+	
+		preserve
+		use `ingredients', clear
+		gen adm0 = "`c'"
+		gen country = "`ctry'"
+		append using `bycountry'
+		save `bycountry', replace
+		restore
+	}
+	
+	use `bycountry', replace
+
+	save "${versatility}/2ingredient_m_c.dta", replace
+
+	/*
 	***************************
 	* For Milla database + CIAT
 	***************************

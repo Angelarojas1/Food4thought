@@ -42,6 +42,16 @@
 	
 	save "$versatility/final_versatility.dta", replace
 	restore
+
+	preserve
+	merge 1:1 adm0 using "$versatility/native_versatility_m_c.dta", gen(cookpad_merge)
+	
+	drop if cookpad_merge == 1
+	gen cookpad = (cookpad_merge == 3)
+	drop cookpad_merge
+	
+	save "$versatility/final_native_versatility.dta", replace
+	restore
 	
 	preserve
 	merge 1:1 adm0 using "$versatility/all_versatility_m.dta", gen(cookpad_merge)

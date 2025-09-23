@@ -204,13 +204,13 @@ end
 **** Between 2 ingredients as a group ****
 
 ** import data
- use  "${versatility}/milla_ciat_ing_suit.dta", clear
+ use  "${versatility}/Milla_CIAT_ing_origin.dta", clear
  keep ingredient
  duplicates drop
  sort ingredient
  
 ** Drop ingredients without compounds data
- drop if ingredient == "annatto" | ingredient == "jatropha" | ingredient == "reed canary grass" | ingredient == "sugarcane" | ingredient == "switchgrass" | ingredient == "watermelons" | ingredient == "wetland rice" | ingredient == "kokum"
+* drop if ingredient == "annatto" | ingredient == "jatropha" | ingredient == "reed canary grass" | ingredient == "sugarcane" | ingredient == "switchgrass" | ingredient == "watermelons" | ingredient == "wetland rice" | ingredient == "kokum"
  
 ** generate every combination of ingredients(group of 2)
  gen ingredient2 = ingredient
@@ -229,17 +229,34 @@ python
 
 import pandas as pd
 import json
+import os
 
 common = pd.read_csv("common_flavor_m_c.csv", sep="\t")
-common.head()
 
-def getjson(ingredient): return json.load(open("../../precoded/flavor_profile/CIAT/{}.json".format(ingredient)))
-def getflavor(ingredient): return [i["common_name"] for i in getjson(ingredient)["molecules"]]
-def calCommon(ingredient, ingredient2): return len(list(set(getflavor(ingredient)).intersection(getflavor(ingredient2))))
+# List ingredients for which we have compounds data
+def has_json(ingredient):
+    return os.path.exists(f"../../precoded/flavor_profile/CIAT/{ingredient}.json")
 
-common["common"] = common.apply(lambda row: calCommon(row["ingredient"],row["ingredient2"]), axis=1)
-common["common"].describe()
+valid_ingredients = {ing for ing in common["ingredient"].unique() if has_json(ing)}
 
-common.to_stata("common_flavor_clean_m_c.dta")
+# Filter dataset to keep ingredients with compounds info
+common = common[common["ingredient"].isin(valid_ingredients) & 
+                common["ingredient2"].isin(valid_ingredients)].copy()
+
+def getjson(ingredient):
+    with open(f"../../precoded/flavor_profile/CIAT/{ingredient}.json", "r") as f:
+        return json.load(f)
+
+def getflavor(ingredient):
+    return [i["common_name"] for i in getjson(ingredient).get("molecules", [])]
+
+def calCommon(ingredient, ingredient2):
+    return len(set(getflavor(ingredient)).intersection(getflavor(ingredient2)))
+
+# Get common compounds
+common["common"] = common.apply(lambda row: calCommon(row["ingredient"], row["ingredient2"]), axis=1)
+
+print(common["common"].describe())
+common.to_stata("common_flavor_clean_m_c.dta", write_index=False)
 
 end
