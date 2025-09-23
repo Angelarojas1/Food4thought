@@ -1,7 +1,7 @@
 * **************************************************************************** *
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
-*               Author: Varun C
+*               Author: Girija Borker, Margarita Gáfaro, Steve Berggreen
 * 				Last date modified: June 17, 2025 						   	   *
 *				Modified by: Ángela Rojas
 *				Master dataset generation file
@@ -26,7 +26,7 @@
 	global github "C:\Users\wb641362\OneDrive - WBG\Documents\GitHub\Food4thought"
 	}
 	
-	if "c(username)" == "mgafargo" { // Margarita
+	if "c(username)" == "mgafargo" { // Margarita 
 	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
 	global github "C:\Users\mgafargo\Dropbox\food4thought"
 	}
@@ -123,8 +123,7 @@
 		do "$code/4_distance_clean.do"	
 		
 	* ***************************************************** *
-	*              		 IV Data Coding             	    *
-	*               Native & Imported versatility           *
+	*        Native ingredients clasification       	    *
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
@@ -142,6 +141,8 @@
 		do "$code/crop_origin_clean.do"
 		
 	* ***************************************************** *
+	*              		 Suitability                	    *
+	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		- Clean data from suitability databases
@@ -149,8 +150,23 @@
 	*       - For the other 5 countries we create the suitability data
 
 		do "$code/6_suitability_clean.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Merge Milla and CIAT data with suitability data
 
 		do "$code/suitability_clean_milla.do"
+	
+	* ***************************************************** *
+	*             FAO suitability Data Coding               *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Read in crop suitability data from FAO
+	*		- Creates suitability variable
+	*  		- Don't run this part. Treat the suitability data as raw
+	
+		do "$code/13_FAO_suitability.do"
+		
 	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
@@ -159,12 +175,31 @@
 		do "$code/7_common_flavor.do"
 
 	* ***************************************************** *
+	*              		 IV Data Coding             	    *
+	*               Native & Imported versatility           *
+	* ***************************************************** *
 	
 	* 	The purpose of this dofile is:
 	*		- Clean data for calculating versatility.
 	*       - Creates native versatility and imported versatility files
 
 		do "$code/8_versatility_clean_v2.do" 
+		
+	* ***************************************************** *
+		
+	*	The purpose of this dofile is:
+	*		- Create every combination between 2 ingredients
+		
+	    do "$code/32_2ingredient_combination.do"
+		
+	* ***************************************************** *
+	*         Geographical Controls from Galor              *
+	* ***************************************************** *	
+	
+	* 	The purpose of this dofile is:
+	*		- Clean control variables from Galor data 
+
+		do "$code/10_galor_clean.do"
 		
 	* ***************************************************** *
 	*              Geographical Data Coding                 *
@@ -184,52 +219,48 @@
 	*		- Clean cookpad data
 
 		do "$code/12_cookpad_clean.do"
-
+		
 	* ***************************************************** *
-	*             FAO suitability Data Coding               *
+	*              		 IV Data Analysis             	    *
+	*                  Versatility variables                *
 	* ***************************************************** *
-
+		
 	* 	The purpose of this dofile is:
-	*		- Read in crop suitability data from FAO
-	*		- Creates suitability variable
-	*  		- Don't run this part. Treat the suitability data as raw
-	
-		do "$code/13_FAO_suitability.do"
-		
-	* ***************************************************** *
-		
-	*	The purpose of this dofile is:
-	*		- Create every combination between 2 ingredients
-		
-	    do "$code/32_2ingredient_combination.do"
+	*		- Generate only native versatility measures. 
+
+		do "$code/34_new_versatility_only_native_m_c.do"
 	
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country
 
-		do "$code/34_new_versatility_including_native.do"
+		*do "$code/34_new_versatility_including_native.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country using Milla data
 
-		do "$code/34_new_versatility_including_native_milla.do"	
+		*do "$code/34_new_versatility_including_native_milla.do"	
 		
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country using Milla + CIAT data
 
-		do "$code/34_new_versatility_including_native_milla_ciat.do"	
+		*do "$code/34_new_versatility_including_native_milla_ciat.do"	
 		
 	* ***************************************************** *
 	*                 Cookpad Data Coding                   *
 	* ***************************************************** *
 
 	* 	The purpose of this dofile is:
-	*		- Clean cookpad data
+	*		- Merge cookpad and versatility data
+	*		- Add a cookpad indicator to versatility dataset
 
 		do "$code/35_cookpad_data.do"
 		
 	*********************************************************
 	*					Cookpad Analysis
 	*********************************************************
+	
+	* 	The purpose of this dofile is:
+	*		- Run cookpad regressions
 	
 		do "$code/36_cookpad_analysis.do"
 		
@@ -238,7 +269,8 @@
 	* ***************************************************** *
 
 	* 	The purpose of this dofile is:
-	*		- Add a cookpad indicator to versatility dataset
+	*		- Create database with all variables needed for 
+	*		  regressions
 	
 		do "$code/37_FirstStage_versatility_dataset.do"
 		
@@ -246,9 +278,14 @@
 	*					Versatility Analysis
 	*********************************************************
 	
+	* 	The purpose of this dofile is:
+	*		- Run regressions
+	
 		do "$code/38_FirstStage_versatility_analysis.do"
 
-	** other regressions
+	* 	The purpose of this dofile is:
+	*		- Run cookpad regressions
+	*		- The file was created by MG
 	
 		do "$code/es-cookpad-mg.do"
 		
