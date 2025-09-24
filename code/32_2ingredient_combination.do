@@ -44,10 +44,19 @@
 	***************************************
 	* For Milla database + CIAT only native
 	***************************************
-	
+	use "${versatility}/common_flavor_clean_m_c.dta", clear
+	keep ingredient
+	duplicates drop
+	tempfile ing
+	save `ing'
+
 	use "${versatility}/native/native_clean_p50_m_c.dta", clear
 	rename nativecountry country
 	rename nativeadm0 adm0
+	
+	*- Keep only ingredients in common flavor data
+	merge m:1 ingredient using `ing'
+	keep if _merge == 3 // we lose 13 countries
 	
 	* keep variables
 	keep adm0 ingredient country

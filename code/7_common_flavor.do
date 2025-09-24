@@ -209,9 +209,6 @@ end
  duplicates drop
  sort ingredient
  
-** Drop ingredients without compounds data
-* drop if ingredient == "annatto" | ingredient == "jatropha" | ingredient == "reed canary grass" | ingredient == "sugarcane" | ingredient == "switchgrass" | ingredient == "watermelons" | ingredient == "wetland rice" | ingredient == "kokum"
- 
 ** generate every combination of ingredients(group of 2)
  gen ingredient2 = ingredient
  fillin ingredient ingredient2

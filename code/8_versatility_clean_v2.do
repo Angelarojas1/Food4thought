@@ -156,11 +156,13 @@ use  "${versatility}/milla_ing_suit.dta", clear
 
  use  "${versatility}/milla_ciat_ing_suit.dta", clear
  merge m:1 ingredient using "${versatility}/median_suitability_m_c.dta"
- assert _merge == 3
+ tab flag if CIAT == 1
+ drop if flag == 1 & CIAT == 1 // we drop this ingredients because we won't be 
+							  // able to identify if it is native based on suitability
  drop _merge
  
  gen aboveCutoff = (suitability > p50) & (!missing(suitability)) & CIAT == 1
- 
+
  keep if aboveCutoff == 1 | CIAT == 0
 
 	** save to csv file

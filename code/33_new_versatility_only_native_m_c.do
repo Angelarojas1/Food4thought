@@ -63,7 +63,7 @@
 	
 	* Calculating weights
 	merge m:1 adm0 using `coordinates'
-	keep if _merge == 3 // drop countries that are not in recipe database
+	keep if _merge == 3 // drop countries that are not in data
 	
 	* native versatility
 	bys adm0: egen native_versatility = mean(common) if only_native == 1
@@ -72,7 +72,7 @@
 	
 	// Some countries don't have native versatility because they only have 1
 	// native ingredient.
-	replace native_versatility = 0 if native_versatility == .
+	*replace native_versatility = 0 if native_versatility == .
 	
 	* native versatility 2
 	bys adm0: egen native_versatility2 = mean(common) 

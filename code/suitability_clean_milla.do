@@ -153,6 +153,18 @@
 	
 	use "${versatility}/suitability.dta", clear
 	
+	replace country = "United States" if country == "United States of America"
+	replace country = "Bolivia" if country == "Bolivia (Plurinational State of)"
+	replace country = "Bosnia And Herzegovina" if country == "Bosnia and Herzegovina"
+	replace country = "Cote D'Ivoire" if country == "Côte d'Ivoire"
+	replace country = "United Kingdom" if country == "United Kingdom and N. Ireland"
+	replace country = "Guam" if country == "Guam (USA)"
+	replace country = "Iran" if country == "Iran  (Islamic Republic of)"
+	replace country = "Moldova" if country == "Moldova, Republic of"
+	replace country = "Palestine" if country == "Palestine, State of"
+	replace country = "Russia" if country == "Russian Federation"
+	replace country = "Syria" if country == "Syrian Arab Republic"
+	
 	merge m:1 adm0 country using `adm0'
 	bys adm0 (country): replace country = country[_N] 
 	drop if _merge == 2
@@ -193,25 +205,26 @@
 	assert missing(suitability) if flag == 1
 	
 	tab ingredient if flag == 1 //identify ingredients without suitability information
-	
-	drop if flag == 1
-	drop flag
-	
-	drop if suitability == . | suitability == 0
+	label var flag "ingredient without suitability information"
 	
 	unique adm0
 	unique country
 			
-	assert `r(sum)' == 159 // we have 159 countries with suitability information
+	assert `r(sum)' == 184 
+	// we have 159 countries with suitability information
 	
 	save "${versatility}/milla_ciat_ing_suit.dta", replace 
 	
 *** Find median of suitability for native ingredients  ***
+
+	drop flag
+	
+	drop if suitability == . | suitability == 0
+
 	collapse (p10) p10 = suitability (p25) p25 = suitability (p33) p33 = suitability (median) p50 = suitability (p60) p60 = suitability (p66) p66 = suitability (p70) p70 = suitability, by(ingredient)
  isid ingredient // there's information for 64 ingredients
 	save "${versatility}/median_suitability_m_c.dta", replace
-	
-	
+		
 	*** limit to suitability data of all ingredients that are from Milla data  ***
 	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
 	
