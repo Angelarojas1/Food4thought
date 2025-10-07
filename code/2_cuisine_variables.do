@@ -17,10 +17,7 @@
 	* Check time, ingredients and spices variables
 	* import data
 	use "${recipes}/recipe_all_countries.dta", clear
-
-	** Clean recipes information
-	do "$code/subcode/2_2_recipes_clean.do"
-
+	
 	* Organize country and continent codes
 	kountry country, from(other) stuck marker
 	rename _ISO3N_ iso3
@@ -38,8 +35,12 @@
 	replace adm0 = "CPV" if country == "Cabo Verde"
 	replace adm0 = "XXK" if country == "Kosovo"
 
-	* Winsorize time variable and create dataset
 	encode country, gen(Country)
+
+	** Clean recipes information
+	do "$code/subcode/2_2_recipes_clean.do"
+	
+	* Winsorize time variable and create dataset
 
 	* Min Max Mean by Country
 	bys Country: egen min_totaltime = min(totaltime)
@@ -67,7 +68,6 @@
 	duplicates drop 
 	save "$recipes/complexity_recipe.dta", replace
 	restore
-
 
 
 	** collapse to country level, multiple percentiles

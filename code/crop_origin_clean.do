@@ -321,4 +321,60 @@
 	
 	duplicates drop
 	
+	
+	*-- Organize continent variable
+	tab continent
+	tab country if continent == "Americas"
+	replace continent = "Central America" if continent == "Americas"
+	
+	tab country if continent == "Central America"
+	replace continent = "Central America" if inlist(country, ///
+    "Costa Rica", "Honduras","Panama", "Dominican Republic", "Puerto Rico")
+	
+	tab country if continent == "South America"
+	replace continent = "South America" if inlist(country, ///
+    "Guyana", "Paraguay","Venezuela", "French Guiana")
+
+	tab country if continent == "North America"
+	
 	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
+	
+	
+	*---- Merge with spice indicator ----*
+	import excel "${rawdata}\roster_spices\roster_spices_edited.xlsx", sheet("Spices") firstrow clear
+	
+	* Organize spice variable
+	drop if missing(Spice)
+	keep Spice
+	gsort Spice
+	
+	replace Spice = lower(Spice)
+	
+	tempfile spice
+	save `spice'
+	
+	*- Import other dataset
+	import excel "${rawdata}\roster_spices\spices.xlsx", sheet("spices") firstrow clear
+	
+	rename SpiceName Spice
+	replace Spice = lower(Spice)
+	duplicates drop
+	
+	append using `spice'
+	
+	duplicates drop
+	rename Spice ingredient
+	
+	*-- Merge with crop origin data
+	merge 1:m ingredient using "${versatility}/Milla_CIAT_ing_origin.dta"
+	
+	gen spice = (_merge == 3)
+	
+	drop if _merge == 1 
+	drop _merge
+	
+	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
+	
+	
+	
+	

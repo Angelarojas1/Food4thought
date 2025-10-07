@@ -27,7 +27,8 @@
 	}
 	
 	if "c(username)" == "mgafargo" { // Margarita 
-	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought"
+	cd "C:\Users\mgafargo\Dropbox\food4thought\analysis23\"
+	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought/analysis23"
 	global github "C:\Users\mgafargo\Dropbox\food4thought"
 	}
 	
@@ -45,6 +46,7 @@
 	
 	global recipes              "$codedata/recipes"
 	global flfp             	"$codedata/FLFP"
+	global mlfp             	"$codedata/MLFP"
 	global versatility          "$codedata/iv_versatility"
 	global cookpad              "$codedata/cookpad"
 	global fao_suit             "$codedata/FAO_suitability"
@@ -102,7 +104,7 @@
 		do "$code/2_cuisine_variables.do" 
 		
 	* ***************************************************** *
-	*     				FLFP Data Coding				    *
+	*     				 LFP Data Coding				    *
 	* ***************************************************** *
 
 	* 	The purpose of this dofile is:
@@ -110,6 +112,17 @@
 	* 		- 134 countries with FLFP information
 	
 		do "$code/3_flfp_clean.do" 	
+
+	* 	The purpose of this dofile is:
+	*		- Clean MLFP data
+	* 		- 221 countries with MLFP information
+	
+		do "$code/mlfp_clean.do" 	
+		
+	* 	The purpose of this dofile is:
+	*		- Merges FLFP and MLFP data
+	
+		do "$code/lfp_clean.do" 	
 	
 	* ***************************************************** *
 	*                 Distance Data Coding                  *
@@ -288,6 +301,8 @@
 	*		- The file was created by MG
 	
 		do "$code/es-cookpad-mg.do"
+		
+		do "$code/temp-mg.do"
 		
 	* ***************************************************** *
 	*                        Graphs                         *

@@ -65,6 +65,10 @@
 	merge m:1 adm0 using `coordinates'
 	keep if _merge == 3 // drop countries that are not in data
 	
+	*-----------------------------*
+	*     Native versatility      *
+	*-----------------------------*
+	
 	* native versatility
 	bys adm0: egen native_versatility = mean(common) if only_native == 1
 	sort adm0 native
@@ -77,6 +81,24 @@
 	* native versatility 2
 	bys adm0: egen native_versatility2 = mean(common) 
 	sort adm0 native
+		
+	*-----------------------------------*
+	*     Native versatility - SPICES   *
+	*-----------------------------------*
+	
+	* native versatility
+	bys adm0: egen native_spice_vers = mean(common) if only_native == 1 & spice == 1
+	sort adm0 native
+	bys adm0 (native_spice_vers): replace native_spice_vers = native_spice_vers[_n-1] if missing(native_spice_vers)
+
+	* native versatility 2
+	bys adm0: egen native_spice_vers2 = mean(common) if spice == 1
+	sort adm0 native
+	bys adm0 (native_spice_vers2): replace native_spice_vers2 = native_spice_vers2[_n-1] if missing(native_spice_vers2)
+	
+	*-----------------------------------*
+	*       suitability weighted		*
+	*-----------------------------------*
 	
 	* Suitability measure
 	merge m:1 adm0 ingredient using "${versatility}/cuisine_suit_m_c.dta", gen(suit_merge)
@@ -93,10 +115,21 @@
 	gen weight = suitability/sum_suitability
 	
 	gen weighted_versatility = native_versatility2 * weight	
+	gen weighted_spice_vers  = native_spice_vers2 * weight	
+	
 	bys adm0: egen suit_versatility = mean(weighted_versatility)
+	bys adm0: egen suit_spice_vers = mean(weighted_spice_vers)
 	
 	bys adm0: egen avg_suitability = mean(suitability)
 	
-	keep adm0 country region continent numNative numNativeCIAT lat lon native_versatility native_versatility2 avg_suitability suit_versatility
+	keep adm0 country region continent numNative numNativeCIAT numSpice lat lon ///
+	native_versatility native_versatility2 suit_versatility ///
+	native_spice_vers native_spice_vers2 suit_spice_vers avg_suitability 
 	duplicates drop 
+	
+	order adm0 country region continent numNative numNativeCIAT numSpice /// 
+	avg_suitability  lat lon ///
+	native_versatility native_versatility2 suit_versatility ///
+	native_spice_vers native_spice_vers2 suit_spice_vers 
+	
 	save "$versatility/native_versatility_m_c.dta", replace

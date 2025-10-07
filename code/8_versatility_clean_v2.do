@@ -173,10 +173,12 @@ use  "${versatility}/milla_ing_suit.dta", clear
 	gen one = 1
 	bys country : egen numNative = total(one)
 	bys country : egen numNativeCIAT = total(CIAT)
+	bys country : egen numSpice = total(spice)
 	drop one
 	
 	* Save native ingredients files based on cutoff
-	keep adm0 country ingredient region continent CIAT numNative numNativeCIAT
+	keep adm0 country ingredient region continent CIAT spice numNative ///
+	numNativeCIAT  numSpice
 	rename adm0 nativeadm0
 	rename country nativecountry
 	

@@ -12,6 +12,7 @@
 		import Versatility Median
 		native Versatility Weighted Median
 		*******************************************************/
+/*
 		
 	use "$recipes/complexity_recipe.dta", clear
 	
@@ -23,6 +24,7 @@
 	merge 1:1 adm0 using "$versatility/final_versatility.dta", gen(final_versatility_merge)
 	
 	save "$versatility/first_stage_dataset.dta", replace
+*/
 	
 	/* ***************************************************** *
 	* File Details: Milla + CIAT only native versatility
@@ -31,35 +33,46 @@
 	use "$recipes/complexity_recipe.dta", clear
 	
 	*-- FLFP data
-	merge 1:1 country using "$flfp\FLFPlong2019.dta", gen(flfp_merge)
+	merge 1:m country using "${codedata}/merge/lfplong2019.dta", gen(lfp_merge)
 	
-	keep if flfp_merge != 2
-	drop continent_code flfp_merge two_letter_country_code country_name ///
-	country_number flfp_merge
+	keep if lfp_merge != 2
+	drop continent_code lfp_merge two_letter_country_code 
 	encode continent_name, gen(continent_code)
 	
 	*-- Native Versatility measure
-	merge 1:1 adm0 using "$versatility/final_native_versatility.dta", gen(final_versatility_merge)	
+	merge m:1 adm0 using "$versatility/final_native_versatility.dta", gen(final_versatility_merge)	
 	keep if final_versatility_merge == 3
 	
 	*-- Geographical controls
-	merge 1:1 adm0 using "${versatility}/geographical.dta"
+	merge m:1 adm0 using "${versatility}/geographical.dta"
 	keep if _merge == 3
 	
 	drop final_versatility_merge _merge
 	
 	*-- Galor controls
-	merge 1:1 adm0 using "${versatility}/galor_controls.dta"
+	merge m:1 adm0 using "${versatility}/galor_controls.dta"
 	keep if _merge != 2 
 	drop _merge
 	
 	*-- Staple suitability data
-	merge 1:m adm0 using "${precodedata}/suitability/staple_suitability.dta"
-	keep if _merge != 2 
+	preserve
+	use "${precodedata}/suitability/staple_suitability.dta", clear
 	egen staple_suitability = mean(suitability), by(adm0)
-	drop admin0_name crp extents suit_vs suit_s suit_ms suit_vms suit_ns ingredient suitability _merge
+	keep adm0 staple_suitability
 	duplicates drop
+	tempfile staple_suitability
+	save `staple_suitability'
+	restore
 	
+	merge m:1 adm0 using `staple_suitability'
+	keep if _merge != 2 
+	
+	drop continent _merge
+	
+	*-- Create old and new world variable
+	gen oldworld = inlist(continent_name, "Africa", "Asia", "Europe")
+	rename continent_name continent
+		
 	*--- Label vars
 	label var country "Country" 
 	label var Country "Encoded country" 
@@ -70,16 +83,21 @@
 	label var w_mean_totaltime "Winsorized mean total time" 
 	label var w_mean_spices "Winsorized mean spices" 
 	label var numrecipes "Number of recipes" 
-	label var year "FLFP year" 
-	label var FLFP "Female Labor Force Participation" 
+	label var year "LFP year" 
+	label var LFP "Labor Force Participation" 
+	label var fem_lfp "Is Female Labor Force Participation" 
 	label var numNative "Number of Native ingredients" 
 	label var numNativeCIAT "Number of Native ingredients on CIAT database" 
 	label var native_versatility "Native versatility, country's ingredients" 
 	label var native_versatility2 "Native versatility, all ingredients" 
+	label var native_spice_vers "Native spices versatility, country's ingredients" 
+	label var native_spice_vers2 "Native spices versatility, all ingredients" 
 	label var suit_versatility "Native versatility 2 weighted by suitability" 
+	label var suit_spice_vers "Native spice versatility 2 weighted by suitability" 
 	label var avg_suitability "Mean Suitability" 
 	label var cookpad "Cookpad (Dummy)" 
 	label var staple_suitability "Mean saple suitability"
+	label var oldworld "Country is from Old World"
 	
 	save "$versatility/first_stage_dataset_native_m_c.dta", replace
 	
@@ -87,6 +105,7 @@
 	* File Details: Milla + CIAT
 	*******************************************************/
 		
+/*
 	use "$recipes/complexity_recipe.dta", clear
 	
 	merge 1:1 country using "$flfp\FLFPlong2019.dta", gen(flfp_merge)
@@ -97,3 +116,4 @@
 	merge 1:1 adm0 using "$versatility/final_versatility_m_c.dta", gen(final_versatility_merge)
 	
 	save "$versatility/first_stage_dataset_m_c.dta", replace
+*/
