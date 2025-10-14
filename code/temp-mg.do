@@ -308,6 +308,8 @@ tab Country if  median_totaltime>=90
 *------------------------------------------*
 *       	 Regressions - LFP Gap		   *
 *------------------------------------------*
+
+use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
  
 global c1 "numrecipes"
 global c2 "numrecipes avg_suitability  al_mn"
