@@ -385,10 +385,13 @@ estout using reg-rfsp-s`j'-gap.tex, style(tex) cells(b(star f(3)) se(par f(3))) 
 
 use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
  
-global c1 "numrecipes"
-global c2 "numrecipes avg_suitability  al_mn"
-global c3 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon "
-global c4 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability"
+egen LFP_mean = mean(LFP), by(country)
+label var LFP_mean "LFP Mean"
+
+global c1 "numrecipes LFP_mean"
+global c2 "numrecipes avg_suitability  al_mn LFP_mean"
+global c3 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon LFP_mean"
+global c4 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability LFP_mean"
 reghdfe LFP median_spices $c4, absorb(region cl_md)
 cap drop s
 gen s=1 if  e(sample) 
@@ -399,16 +402,16 @@ global s1 "if s==1" // indicator of countries with all information
  cd "$tables"
 eststo clear
 forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.median_totaltime ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.median_totaltime ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
 forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.median_spices ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.median_spices ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
  forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.w_mean_spices ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.w_mean_spices ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
  forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.median_ingredients ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.median_ingredients ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
 estout using reg-ols-s1-gap-region.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)  order(1.fem_lfp#c.median_totaltime median_totaltime 1.fem_lfp#c.median_spices median_spices 1.fem_lfp#c.w_mean_spices w_mean_spices 1.fem_lfp#c.median_ingredients median_ingredients) drop(_cons 0.fem_lfp 0.fem_lfp#c.median_totaltime 0.fem_lfp#c.median_spices 0.fem_lfp#c.w_mean_spices 0.fem_lfp#c.median_ingredients) label  ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace
 
@@ -417,13 +420,13 @@ estout using reg-ols-s1-gap-region.tex, style(tex) cells(b(star f(3)) se(par f(3
 
 eststo clear
 forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.native_versatility ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.native_versatility ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
 forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.native_versatility2 ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.native_versatility2 ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
  forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.suit_versatility ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.suit_versatility ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
 estout using reg-rf-s1-gap-region.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)  order(1.fem_lfp#c.native_versatility native_versatility 1.fem_lfp#c.native_versatility2 native_versatility2 1.fem_lfp#c.suit_versatility suit_versatility) drop(_cons 0.fem_lfp 0.fem_lfp#c.native_versatility 0.fem_lfp#c.native_versatility2 0.fem_lfp#c.suit_versatility) label ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared"   ) fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace
 
@@ -431,13 +434,13 @@ estout using reg-rf-s1-gap-region.tex, style(tex) cells(b(star f(3)) se(par f(3)
 * Spices
 eststo clear
 forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.native_spice_vers ${c`i'}  ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.native_spice_vers ${c`i'}  ${s1}, absorb(region cl_md) vce(robust)
  }
 forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.native_spice_vers2 ${c`i'} ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.native_spice_vers2 ${c`i'} ${s1}, absorb(region cl_md) vce(robust)
  }
  forvalue i=1/4{ 
-eststo: reghdfe LFP i.fem_lfp##c.suit_spice_vers ${c`i'} ${s1}, absorb(region) vce(robust)
+eststo: reghdfe LFP i.fem_lfp##c.suit_spice_vers ${c`i'} ${s1}, absorb(region cl_md) vce(robust)
  }
 estout using reg-rfsp-s1-gap-region.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)  order(1.fem_lfp#c.native_spice_vers native_spice_vers 1.fem_lfp#c.native_spice_vers2 native_spice_vers2 1.fem_lfp#c.suit_spice_vers suit_spice_vers) drop(_cons 0.fem_lfp 1.fem_lfp 0.fem_lfp#c.native_spice_vers 0.fem_lfp#c.native_spice_vers2 0.fem_lfp#c.suit_spice_vers) label ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared"   ) fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace 
 
