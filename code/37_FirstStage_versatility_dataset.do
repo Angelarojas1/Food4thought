@@ -39,6 +39,12 @@
 	drop continent_code lfp_merge two_letter_country_code 
 	encode continent_name, gen(continent_code)
 	
+	*-- GDP data
+	merge m:1 country using "${gdp}/GDPlong2019.dta", gen(gdp_merge)
+	
+	keep if gdp_merge != 2
+	drop gdp_merge 
+	
 	*-- Native Versatility measure
 	merge m:1 adm0 using "$versatility/final_native_versatility.dta", gen(final_versatility_merge)	
 	keep if final_versatility_merge == 3
@@ -86,6 +92,7 @@
 	label var year "LFP year" 
 	label var LFP "Labor Force Participation" 
 	label var fem_lfp "Is Female Labor Force Participation" 
+	label var GDP "Gross Domestic Product"
 	label var numNative "Number of Native ingredients" 
 	label var numNativeCIAT "Number of Native ingredients on CIAT database" 
 	label var native_versatility "Native versatility, country's ingredients" 

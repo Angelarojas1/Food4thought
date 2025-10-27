@@ -1,9 +1,12 @@
 use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
-
-global c1 "numrecipes LFP"
-global c2 "numrecipes avg_suitability  al_mn LFP"
-global c3 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon LFP"
-global c4 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability LFP"
+gen log_gdp = ln(GDP)
+drop GDP
+rename log_gdp GDP 
+global c1 "numrecipes"
+global c2 "numrecipes avg_suitability  al_mn"
+global c3 "numrecipes avg_suitability  al_mn GDP"
+global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
+global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
 
 encode region, gen(region_cat)
 
@@ -11,7 +14,7 @@ gen LFP_female = LFP if fem_lfp == 1
 gen LFP_male   = LFP if fem_lfp == 0
 
 * creating the LFP gap at the country-level
-collapse (mean) $c4 LFP_male LFP_female median_spices w_mean_spices native_spice_vers native_spice_vers2 suit_spice_vers (first) continent region_cat cl_md , by(adm0)
+collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices native_spice_vers native_spice_vers2 suit_spice_vers (first) continent region_cat cl_md , by(adm0)
 
 gen LFP_gap = LFP_female-LFP_male
 
@@ -44,10 +47,10 @@ foreach v of varlist * {
 *--- OLS
 
 eststo clear
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe LFP_gap c.w_mean_spices ${c`i'}  , absorb(region_cat cl_md) vce(robust)
  }
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe LFP_gap c.median_spices ${c`i'} , absorb(region_cat cl_md) vce(robust)
  }
 
@@ -55,7 +58,7 @@ eststo: reghdfe LFP_gap c.median_spices ${c`i'} , absorb(region_cat cl_md) vce(r
  
 estout using reg_gap_OLS.tex, ///
     style(tex) ///
-	prehead("\begin{tabular}{lcccccccc}" "\toprule") ///
+	prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
     postfoot("\bottomrule" "\end{tabular}") ///
     cells(b(star f(3)) se(par f(3))) ///
     starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -69,13 +72,13 @@ estout using reg_gap_OLS.tex, ///
 *--- REDUCED FORM
 
 eststo clear
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe LFP_gap c.native_spice_vers ${c`i'} , absorb(region_cat cl_md) vce(robust)
  }
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe LFP_gap c.native_spice_vers2 ${c`i'}, absorb(region_cat cl_md) vce(robust)
  }
- forvalue i=1/4{ 
+ forvalue i=1/5{ 
 eststo: reghdfe LFP_gap c.native_spice_vers2_dist ${c`i'} , absorb(region_cat cl_md) vce(robust)
  }
 
@@ -83,7 +86,7 @@ eststo: reghdfe LFP_gap c.native_spice_vers2_dist ${c`i'} , absorb(region_cat cl
  
 estout using reg_gap_RF.tex, ///
     style(tex)  ///
-	prehead("\begin{tabular}{lcccccccccccc}" "\toprule") ///
+	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
     postfoot("\bottomrule" "\end{tabular}") ///
     cells(b(star f(3)) se(par f(3))) ///
     starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -97,13 +100,13 @@ estout using reg_gap_RF.tex, ///
 *--- FIRST STAGE - mean spices
 
 eststo clear
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe w_mean_spices  native_spice_vers  ${c`i'}  , absorb(region_cat cl_md) vce(robust)
  }
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe w_mean_spices  native_spice_vers2  ${c`i'}  , absorb(region_cat cl_md) vce(robust)
  }
- forvalue i=1/4{ 
+ forvalue i=1/5{ 
 eststo: reghdfe w_mean_spices  native_spice_vers2_dist  ${c`i'} , absorb(region_cat cl_md) vce(robust)
  }
 
@@ -111,7 +114,7 @@ eststo: reghdfe w_mean_spices  native_spice_vers2_dist  ${c`i'} , absorb(region_
  
 estout using reg_gap_first_mean_spice.tex, ///
     style(tex) ///
-	prehead("\begin{tabular}{lcccccccccccc}" "\toprule") ///
+	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
     postfoot("\bottomrule" "\end{tabular}") ///
     cells(b(star f(3)) se(par f(3))) ///
     starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -124,13 +127,13 @@ estout using reg_gap_first_mean_spice.tex, ///
 *-- FIRST STAGE - median spices --*
 
 eststo clear
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe median_spices  native_spice_vers  ${c`i'}, absorb(region_cat cl_md) vce(robust)
  }
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: reghdfe median_spices  native_spice_vers2  ${c`i'}, absorb(region_cat cl_md) vce(robust)
  }
- forvalue i=1/4{ 
+ forvalue i=1/5{ 
 eststo: reghdfe median_spices  native_spice_vers2_dist  ${c`i'}, absorb(region_cat cl_md) vce(robust)
  }
 
@@ -138,7 +141,7 @@ eststo: reghdfe median_spices  native_spice_vers2_dist  ${c`i'}, absorb(region_c
  
 estout using reg_gap_first_median_spice.tex, ///
     style(tex) ///
-	prehead("\begin{tabular}{lcccccccccccc}" "\toprule") ///
+	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
     postfoot("\bottomrule" "\end{tabular}") ///
     cells(b(star f(3)) se(par f(3))) ///
     starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -152,13 +155,13 @@ estout using reg_gap_first_median_spice.tex, ///
 * IV REGRESSIONS FOR native_spice_vers, native_spice_vers2, native_spice_vers2_dist2
 
 eststo clear
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: ivreg2 LFP_gap (w_mean_spices = native_spice_vers ) ${c`i'}  i.region_cat i.cl_md, robust
  }
-forvalue i=1/4{ 
+forvalue i=1/5{ 
 eststo: ivreg2 LFP_gap (w_mean_spices = native_spice_vers2 ) ${c`i'}  i.region_cat i.cl_md, robust
  }
- forvalue i=1/4{ 
+ forvalue i=1/5{ 
 eststo: ivreg2 LFP_gap (w_mean_spices = native_spice_vers2_dist ) ${c`i'}  i.region_cat i.cl_md, robust
  }
 
@@ -166,7 +169,7 @@ eststo: ivreg2 LFP_gap (w_mean_spices = native_spice_vers2_dist ) ${c`i'}  i.reg
  
 estout using reg_gap_IV.tex, ///
     style(tex) ///
-	prehead("\begin{tabular}{lcccccccccccc}" "\toprule") ///
+	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
     postfoot("\bottomrule" "\end{tabular}") ///
     cells(b(star f(3)) se(par f(3))) ///
     starlevels(* 0.10 ** 0.05 *** 0.01) ///

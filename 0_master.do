@@ -15,15 +15,10 @@
 	
 	** Root folder globals 
 
-	if "`c(username)'" == "stell" {
+	if "`c(username)'" == "stell" { // Angela
 	cd "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
 	global projectfolder "C:/Users/stell/Dropbox/food4thought/analysis23"
 	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
-	}
-	
-	if "`c(username)'" == "wb641362" { // Varun
-	global projectfolder "C:\Users\wb641362\Dropbox\food4thought\analysis23"
-	global github "C:\Users\wb641362\OneDrive - WBG\Documents\GitHub\Food4thought"
 	}
 	
 	if "c(username)" == "mgafargo" { // Margarita 
@@ -47,6 +42,7 @@
 	global recipes              "$codedata/recipes"
 	global flfp             	"$codedata/FLFP"
 	global mlfp             	"$codedata/MLFP"
+	global gdp	             	"$codedata/GDP"
 	global versatility          "$codedata/iv_versatility"
 	global cookpad              "$codedata/cookpad"
 	global fao_suit             "$codedata/FAO_suitability"
