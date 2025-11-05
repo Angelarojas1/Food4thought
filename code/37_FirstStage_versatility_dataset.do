@@ -40,7 +40,7 @@
 	encode continent_name, gen(continent_code)
 	
 	*-- GDP data
-	merge m:1 country using "${gdp}/GDPlong2019.dta", gen(gdp_merge)
+	merge m:1 country using "${gdp}/GDPlong2019_pc.dta", gen(gdp_merge)
 	
 	keep if gdp_merge != 2
 	drop gdp_merge 

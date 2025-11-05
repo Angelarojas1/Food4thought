@@ -298,7 +298,15 @@
 	
 		do "$code/es-cookpad-mg.do"
 		
+	* 	The purpose of this dofile is:
+	*		- Run country level regressions
+	*		- The file was created by MG
+		
 		do "$code/temp-mg.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Run country level regressions
+	*		- The file was created by Steve
 		
 		dp "$code/native_spice_reg_251015.do"
 		

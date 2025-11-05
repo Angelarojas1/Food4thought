@@ -305,7 +305,7 @@ tab Country if  median_totaltime>=90
 */
  }
 *------------------------------------------*
-**# 		Regressions - LFP Gap	 	   *
+**# 	Regressions - interactions	 	   *
 * Continent FE
 *------------------------------------------*
 
@@ -379,7 +379,7 @@ estout using reg-rfsp-s`j'-gap.tex, style(tex) cells(b(star f(3)) se(par f(3))) 
 } 
 
 *------------------------------------------*
-**# 		Regressions - LFP Gap	 	   *
+**# 		Regressions - interactions	 	   *
 * Region FE
 *------------------------------------------*
 
@@ -586,7 +586,7 @@ estout using reg_flfp_IV.tex, ///
     replace
 
 
-*--------- Control for MLFP instead of LFP -----------------*
+*--------- Control for MLFP instead of GDP -----------------*
 
 global c5 "numrecipes LFP_male"
 global c6 "numrecipes avg_suitability  al_mn LFP_male"

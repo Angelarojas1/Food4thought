@@ -10,7 +10,7 @@
 version 16
 
 use "$cookpad/cookpad_adm0.dta", replace
-merge m:1 adm0 using "$rawdata\suitability\spices\20250616-spices-suitability" /// AR: I don't know the origin of this data.
+merge m:1 adm0 using "$rawdata\suitability\spices\20250616-spices-suitability" 
 // BEN MLT and SGP not in spices data 
 drop _merge 
 
