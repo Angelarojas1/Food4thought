@@ -88,63 +88,6 @@
  
 }
 
-******************************************
-* Milla Data cleaning for versatility data
-******************************************
-{
-// Limit ingredients to only suitable ingredients: = 1 if >= p0/p10/p25/... of suitability for region that's native for the ingredient
-
-***** Prep for native versatility *****
-
-/*
-use  "${versatility}/milla_ing_suit.dta", clear
-	
-	** save to csv file
-	outsheet using "${versatility}/native/native_p50_m.csv", replace
-	
-	* Save native ingredients files based on cutoff
-	keep adm0 country ingredient suitability
-	
-	rename country nativecountry
-	
-	save "${versatility}/native/native_clean_p50_m.dta", replace
-
- 	
-
-***** prep for imported versatility *****
-
- use "${versatility}/milla_ing_suit.dta", clear
- keep adm0 ingredient
- *rename ingredient nativeIng
- duplicates drop
- tempfile native
- save `native', replace
- 
- use  "${versatility}/cuisine_suit_m.dta", clear // file contains country and all ingredients
- merge m:1 ingredient using "${versatility}/median_suitability_m.dta"
- drop _merge
- 
- *gen p0 = 0
- *foreach var of varlist p50 { // p0 p10 p25 p33 p50 p60 p66 p70
- 
- *preserve
- gen aboveCutoff = (suitability > p50) & (!missing(suitability))
- merge m:1 adm0 ingredient using `native'
- 
- *gen ifNative = 1 if _merge == 3
- *keep if aboveCutoff == 1
- drop if _merge == 3
- drop _merge
- *drop nativeIng
-
-** save to csv file
- outsheet using "${versatility}/imported/imported_p50_v2_m.csv", replace
- save "${versatility}/imported/imported_p50_v2_m.dta", replace
-*/
- 
- *restore
- *}
-}
 
 *************************************************
 * Milla Data + CIAT cleaning for versatility data

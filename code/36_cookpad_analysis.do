@@ -1,52 +1,18 @@
 * **************************************************************************** *
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
-*               Author: Varun C
+*               Author: 
 * 				Last date modified: June 16, 2025 						   	   *
 *				Cookpad Data Exploration
-* **************************************************************************** *
-	
-	*======================================================
-	*				Cookpad Analysis
-	*------------------------------------------------------
-	
-	
-	use "$cookpad/cookpad_adm0.dta", replace
-	
-	
-	*** regressions
-	/*
-	i.	FLFP = average cooking time + average cooking time*number of meals
-	ii.	FLFP = average cooking time*number of meals
-	iii.FLFP = log (average cooking time) + log (average cooking time*number of meals)
-	iv.	FLFP = log (average cooking time* number of meals)
+* **************************************************************************** *	
 
-	*/
-	 
-	ren (median_ingredients median_spices median_totaltime) (ingredients spices time)
-	ren (emp_ftemp emp_ftemp_pop emp_lfpr emp_work_hours) (ft p2p lfpr hours)
-	
-	gen log_time = log(time)
-	gen femx = fem * time
-	gen fem_logx = fem*log_time
-	
-	est clear
-	foreach o of varlist p2p lfpr hours {
-		eststo f1_`o': reghdfe `o' fem fem_logx if covid == 0, absorb(adm0 ym) cluster(adm0)
-	}
-	esttab f1_* using "$tables/cookpad_regressions.csv", replace star(* 0.1 ** 0.05 *** 0.01) r2 ar2 p label
-	
-	
-	
 	********************************************
 	**#  		Regressions -  COOKPAD 	       *
 	********************************************
 	
-	
 	use "$cookpad/cookpad_adm0.dta", replace
 	
 	*-- Rename variables
-	*ren (median_ingredients median_spices median_totaltime) (ingredients spices time)
 	ren (emp_ftemp emp_ftemp_pop emp_lfpr emp_work_hours) (ft p2p lfpr hours)
 	
 	gen log_gdp = ln(GDP)
@@ -78,17 +44,15 @@ foreach v of varlist * {
     }
 
     label variable `v' "`lblclean'"
-}
+	}
 	
- 
-global c1 "numrecipes"
-global c2 "numrecipes avg_suitability  al_mn"
-global c3 "numrecipes avg_suitability  al_mn GDP"
-global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
-global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	global c1 "numrecipes"
+	global c2 "numrecipes avg_suitability  al_mn"
+	global c3 "numrecipes avg_suitability  al_mn GDP"
+	global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
+	global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
 
-encode region, gen(region_cat)
-
+	encode region, gen(region_cat)
 	
 	*------------------------------------------*
 	**#  		        OLS                    *
@@ -96,283 +60,284 @@ encode region, gen(region_cat)
 	
 	*-------- FLFP --------*
 
- cd "$tables"
-	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
-	}
-	forvalue i=1/5{ 
-eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	 cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+		}
+		forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- estout using reg_flfp_OLS_cookpad.tex, ///
-    style(tex) ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(median_totaltime w_mean_spices median_ingredients) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 estout using reg_flfp_OLS_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(median_totaltime w_mean_spices median_ingredients) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 	
 	*-------- MLFP --------*
 
- cd "$tables"
-	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
-	}
-	forvalue i=1/5{ 
-eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	 cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+		}
+		forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- estout using reg_mlfp_OLS_cookpad.tex, ///
-    style(tex) ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(median_totaltime w_mean_spices median_ingredients) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 estout using reg_mlfp_OLS_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(median_totaltime w_mean_spices median_ingredients) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 	*-------- Gap --------*
 
- cd "$tables"
-	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.median_totaltime  ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
-	}
-	forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.w_mean_spices ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	 cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr i.fem##c.median_totaltime  ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+		}
+		forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.w_mean_spices ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- estout using reg_gap_OLS_cookpad.tex, ///
-    style(tex) ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(median_totaltime w_mean_spices median_ingredients) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 estout using reg_gap_OLS_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem#c.median_totaltime median_totaltime 1.fem#c.w_mean_spices w_mean_spices 1.fem#c.median_ingredients median_ingredients) ///
+		drop(_cons 0.fem 0.fem#c.median_totaltime 0.fem#c.w_mean_spices 0.fem#c.median_ingredients) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+
 	*------------------------------------------*
 	**#  	        Reduced form               *
 	*------------------------------------------*
 	
 	*-------- FLFP --------*
 
-eststo clear
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- cd "$tables"
- 
-estout using reg_flfp_RF_cookpad.tex, ///
-    style(tex)  ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
+	 cd "$tables"
+	 
+	estout using reg_flfp_RF_cookpad.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
 	
 		*-------- MLFP --------*
 
-eststo clear
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- cd "$tables"
- 
-estout using reg_mlfp_RF_cookpad.tex, ///
-    style(tex)  ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 cd "$tables"
+	 
+	estout using reg_mlfp_RF_cookpad.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 			*-------- GAP --------*
 
-eststo clear
-forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.native_spice_vers ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
-forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.native_spice_vers2 ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.native_spice_vers2_dist ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.native_spice_vers ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.native_spice_vers2 ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.native_spice_vers2_dist ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- cd "$tables"
- 
-estout using reg_gap_RF_cookpad.tex, ///
-    style(tex)  ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 cd "$tables"
+	 
+	estout using reg_gap_RF_cookpad.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem#c.native_spice_vers native_spice_vers 1.fem#c.native_spice_vers2 native_spice_vers2 1.fem#c.native_spice_vers2_dist native_spice_vers2_dist) ///
+		drop(_cons 0.fem 0.fem#c.native_spice_vers 0.fem#c.native_spice_vers 0.fem#c.native_spice_vers2_dist) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 	*------------------------------------------*
 	**#   IV  - native spices versatility       *
 	*------------------------------------------*
 
 	*-------- FLFP --------*
 
-eststo clear
+	eststo clear
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0) 
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0) 
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
-	i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
+		i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
+	}
 
-cd "${tables}"
+	cd "${tables}"
 
-* Export table with F-stat
-estout using reg_flfp_IV_cookpad.tex, ///
-    style(tex) ///
-    prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(w_mean_spices) ///
-    drop(_cons *.region_cat *.cl_md *.ym) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2 widstat, ///
-          labels(" " "Observations" "R-squared" "First-stage F-stat") ///
-          fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
-    replace
+	* Export table with F-stat
+	estout using reg_flfp_IV_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md *.ym) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2 widstat, ///
+			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
 	
 		*-------- MLFP --------*
 
-eststo clear
+	eststo clear
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0) 
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0) 
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
-	i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
+		i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
+	}
 
-cd "${tables}"
+	cd "${tables}"
 
-* Export table with F-stat
-estout using reg_mlfp_IV_cookpad.tex, ///
-    style(tex) ///
-    prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(w_mean_spices) ///
-    drop(_cons *.region_cat *.cl_md *.ym) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2 widstat, ///
-          labels(" " "Observations" "R-squared" "First-stage F-stat") ///
-          fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
-    replace
+	* Export table with F-stat
+	estout using reg_mlfp_IV_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md *.ym) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2 widstat, ///
+			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
 
 		*-------- Gap --------*
 
-eststo clear
+	eststo clear
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers) ${c`i'} ///
-	i.region_cat i.cl_md i.ym, robust cluster(adm0) 
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers) ${c`i'} ///
+		i.region_cat i.cl_md i.ym, robust cluster(adm0) 
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2) ${c`i'} ///
-	i.region_cat i.cl_md i.ym, robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2) ${c`i'} ///
+		i.region_cat i.cl_md i.ym, robust cluster(adm0)
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2_dist) ${c`i'}  ///
-	i.region_cat i.cl_md i.ym, robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2_dist) ${c`i'}  ///
+		i.region_cat i.cl_md i.ym, robust cluster(adm0)
+	}
 
-cd "${tables}"
+	cd "${tables}"
 
-* Export table with F-stat
-estout using reg_gap_IV_cookpad.tex, ///
-    style(tex) ///
-    prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(w_mean_spices) ///
-    drop(_cons *.region_cat *.cl_md *.ym) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2 widstat, ///
-          labels(" " "Observations" "R-squared" "First-stage F-stat") ///
-          fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
-    replace
+	* Export table with F-stat
+	estout using reg_gap_IV_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md *.ym) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2 widstat, ///
+			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
+	
 	
 	********************************************
 	**#  		Regressions -  COOKPAD 	       *
-	**# Correcting migrants data 				   *
+	**# Correcting migrants data 			   *
 	********************************************
 	
 	use "$cookpad/cookpad_adm0.dta", replace
@@ -416,30 +381,30 @@ estout using reg_gap_IV_cookpad.tex, ///
 	merge m:1 adm0 using `distance', keep(3) nogen
 	
 	* relabel everything
-foreach v of varlist * {
-    local lbl : variable label `v'
+	foreach v of varlist * {
+		local lbl : variable label `v'
 
-    * Clean up symbols
-    local lblclean : subinstr local lbl "_" " ", all
-    local lblclean : subinstr local lblclean "(" "", all
-    local lblclean : subinstr local lblclean ")" "", all
+		* Clean up symbols
+		local lblclean : subinstr local lbl "_" " ", all
+		local lblclean : subinstr local lblclean "(" "", all
+		local lblclean : subinstr local lblclean ")" "", all
 
-    * Remove "mean " if it occurs at the beginning (within first 5 characters)
-    if strpos(lower(substr("`lblclean'", 1, 5)), "mean") {
-        local lblclean = substr("`lblclean'", 6, .)
-    }
+		* Remove "mean " if it occurs at the beginning (within first 5 characters)
+		if strpos(lower(substr("`lblclean'", 1, 5)), "mean") {
+			local lblclean = substr("`lblclean'", 6, .)
+		}
 
-    label variable `v' "`lblclean'"
-}
+		label variable `v' "`lblclean'"
+	}
 	
  
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability  al_mn"
-global c3 "numrecipes avg_suitability  al_mn GDP"
-global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
-global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	global c3 "numrecipes avg_suitability  al_mn GDP"
+	global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
+	global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
 
-encode region, gen(region_cat)
+	encode region, gen(region_cat)
 
 	
 	*------------------------------------------*
@@ -448,82 +413,82 @@ encode region, gen(region_cat)
 	
 	*-------- FLFP --------*
 
- cd "$tables"
+	 cd "$tables"
 	eststo clear
 	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+		eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
 	}
 	forvalue i=1/5{ 
-eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+		eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
  }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 forvalue i=1/5{ 
+		eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
  }
 
- estout using reg_flfp_OLS_cook_m.tex, ///
-    style(tex) ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(median_totaltime w_mean_spices median_ingredients) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 estout using reg_flfp_OLS_cook_m.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(median_totaltime w_mean_spices median_ingredients) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 	
 	*-------- MLFP --------*
 
- cd "$tables"
-	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
-	}
-	forvalue i=1/5{ 
-eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	 cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr c.median_totaltime  ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+		}
+		forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.w_mean_spices ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.median_ingredients ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- estout using reg_mlfp_OLS_cook_m.tex, ///
-    style(tex) ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(median_totaltime w_mean_spices median_ingredients) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 estout using reg_mlfp_OLS_cook_m.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(median_totaltime w_mean_spices median_ingredients) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 	*-------- Gap --------*
 
- cd "$tables"
-	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.median_totaltime  ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
-	}
-	forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.w_mean_spices ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	 cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr i.fem##c.median_totaltime  ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+		}
+		forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.w_mean_spices ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- estout using reg_gap_OLS_cook_m.tex, ///
-    style(tex) ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(median_totaltime w_mean_spices median_ingredients) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
+	 estout using reg_gap_OLS_cook_m.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem#c.median_totaltime median_totaltime 1.fem#c.w_mean_spices w_mean_spices 1.fem#c.median_ingredients median_ingredients) ///
+		drop(_cons 0.fem 0.fem#c.median_totaltime 0.fem#c.w_mean_spices 0.fem#c.median_ingredients) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
 	
 	*------------------------------------------*
 	**#  	        Reduced form               *
@@ -531,195 +496,195 @@ eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(r
 	
 	*-------- FLFP --------*
 
-eststo clear
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- cd "$tables"
- 
-estout using reg_flfp_RF_cook_m.tex, ///
-    style(tex)  ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
+	 cd "$tables"
+	 
+	estout using reg_flfp_RF_cook_m.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
 	
 		*-------- MLFP --------*
 
-eststo clear
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
-forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.native_spice_vers2_dist ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- cd "$tables"
- 
-estout using reg_mlfp_RF_cook_m.tex, ///
-    style(tex)  ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
+	 cd "$tables"
+	 
+	estout using reg_mlfp_RF_cook_m.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
 	
-			*-------- GAP --------*
+	*-------- GAP --------*
 
-eststo clear
-forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.native_spice_vers ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
-forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.native_spice_vers2 ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
- forvalue i=1/5{ 
-eststo: reghdfe lfpr i.fem##c.native_spice_vers2_dist ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
- }
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.native_spice_vers ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.native_spice_vers2 ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.native_spice_vers2_dist ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	 }
 
- cd "$tables"
- 
-estout using reg_gap_RF_cook_m.tex, ///
-    style(tex)  ///
-	prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
-    drop(_cons) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-    replace
-	
+	 cd "$tables"
+	 
+	estout using reg_gap_RF_cook_m.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem#c.native_spice_vers native_spice_vers 1.fem#c.native_spice_vers2 native_spice_vers2 1.fem#c.native_spice_vers2_dist native_spice_vers2_dist) ///
+		drop(_cons 0.fem 0.fem#c.native_spice_vers 0.fem#c.native_spice_vers 0.fem#c.native_spice_vers2_dist) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+		
 	*------------------------------------------*
 	**#   IV  - native spices versatility       *
 	*------------------------------------------*
 
 	*-------- FLFP --------*
 
-eststo clear
+	eststo clear
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0) 
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0) 
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
-	i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
+		i.region_cat i.cl_md i.ym if fem == 1 , robust cluster(adm0)
+	}
 
-cd "${tables}"
+	cd "${tables}"
 
-* Export table with F-stat
-estout using reg_flfp_IV_cook_m.tex, ///
-    style(tex) ///
-    prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(w_mean_spices) ///
-    drop(_cons *.region_cat *.cl_md *.ym) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2 widstat, ///
-          labels(" " "Observations" "R-squared" "First-stage F-stat") ///
-          fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
-    replace
+	* Export table with F-stat
+	estout using reg_flfp_IV_cook_m.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md *.ym) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2 widstat, ///
+			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
 	
 		*-------- MLFP --------*
 
-eststo clear
+	eststo clear
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0) 
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0) 
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
-	i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
+		i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
-	i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2_dist) ${c`i'}  ///
+		i.region_cat i.cl_md i.ym if fem == 0 , robust cluster(adm0)
+	}
 
-cd "${tables}"
+	cd "${tables}"
 
-* Export table with F-stat
-estout using reg_mlfp_IV_cook_m.tex, ///
-    style(tex) ///
-    prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(w_mean_spices) ///
-    drop(_cons *.region_cat *.cl_md *.ym) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2 widstat, ///
-          labels(" " "Observations" "R-squared" "First-stage F-stat") ///
-          fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
-    replace
+	* Export table with F-stat
+	estout using reg_mlfp_IV_cook_m.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md *.ym) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2 widstat, ///
+			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
 
-		*-------- Gap --------*
+	*-------- Gap --------*
 
-eststo clear
+	eststo clear
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers) ${c`i'} ///
-	i.region_cat i.cl_md i.ym, robust cluster(adm0) 
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers) ${c`i'} ///
+		i.region_cat i.cl_md i.ym, robust cluster(adm0) 
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2) ${c`i'} ///
-	i.region_cat i.cl_md i.ym, robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2) ${c`i'} ///
+		i.region_cat i.cl_md i.ym, robust cluster(adm0)
+	}
 
-forvalue i=1/5 { 
-    eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2_dist) ${c`i'}  ///
-	i.region_cat i.cl_md i.ym, robust cluster(adm0)
-}
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = i.fem##c.native_spice_vers2_dist) ${c`i'}  ///
+		i.region_cat i.cl_md i.ym, robust cluster(adm0)
+	}
 
-cd "${tables}"
+	cd "${tables}"
 
-* Export table with F-stat
-estout using reg_gap_IV_cook_m.tex, ///
-    style(tex) ///
-    prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
-    postfoot("\bottomrule" "\end{tabular}") ///
-    cells(b(star f(3)) se(par f(3))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    order(w_mean_spices) ///
-    drop(_cons *.region_cat *.cl_md *.ym) ///
-    label ml(none) collabels(none) ///
-    stats(j N r2 widstat, ///
-          labels(" " "Observations" "R-squared" "First-stage F-stat") ///
-          fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
-    replace
-	
+	* Export table with F-stat
+	estout using reg_gap_IV_cook_m.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md *.ym) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2 widstat, ///
+			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
+		
 	

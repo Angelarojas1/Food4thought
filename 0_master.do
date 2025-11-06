@@ -62,6 +62,10 @@
 	
 	* ssc install aaplot
 	* ssc install ivreghdfe
+	* ssc install ivreg2
+	* ssc install reghdfe
+	* ssc install ftools
+	* ssc install ranktest
 	* ssc install winsor4
 	* ssc install dataex
 	* ssc install geoinpoly
@@ -119,6 +123,16 @@
 	*		- Merges FLFP and MLFP data
 	
 		do "$code/lfp_clean.do" 	
+		
+	* ***************************************************** *
+	*     				 GDP Data Coding				    *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean GDP data (per capita and total)
+	* 		-  countries with GDP information
+	
+		do "$code/gdp_clean.do" 
 	
 	* ***************************************************** *
 	*                 Distance Data Coding                  *
@@ -242,17 +256,17 @@
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country
 
-		*do "$code/34_new_versatility_including_native.do"
+		*do "$code/34_new_versatility_including_native.do" // in archive folder
 		
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country using Milla data
 
-		*do "$code/34_new_versatility_including_native_milla.do"	
+		*do "$code/34_new_versatility_including_native_milla.do" // in archive folder	
 		
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country using Milla + CIAT data
 
-		*do "$code/34_new_versatility_including_native_milla_ciat.do"	
+		*do "$code/34_new_versatility_including_native_milla_ciat.do" // in archive folder	
 		
 	* ***************************************************** *
 	*                 Cookpad Data Coding                   *
@@ -288,15 +302,21 @@
 	*********************************************************
 	
 	* 	The purpose of this dofile is:
-	*		- Run regressions
+	*		- Run cookpad regressions
+	*		- Contains OLS, 1stage, RF, IV
 	
-		do "$code/38_FirstStage_versatility_analysis.do"
+		do "$code/36_cookpad_analysis.do"
 
 	* 	The purpose of this dofile is:
 	*		- Run cookpad regressions
 	*		- The file was created by MG
 	
 		do "$code/es-cookpad-mg.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Run country level regressions
+		
+		do "$code/country_level_analysis.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions
@@ -307,6 +327,7 @@
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions
 	*		- The file was created by Steve
+	*		- Focus on regression using native spices versatility 
 		
 		dp "$code/native_spice_reg_251015.do"
 		
@@ -314,13 +335,13 @@
 	*                        Graphs                         *
 	* ***************************************************** *
 	
-		do "$code/cuisine_histograms.do"
+	*	do "$code/cuisine_histograms.do" // in archive folder
 		
 	* ***************************************************** *
 	
 	*	The purpose of this dofile is:
 	*		- Creates plots: winsorized variables, outliers, mexico vs Colombia
 	
-		* do "$code/30_time_outliers.do"
+		* do "$code/30_time_outliers.do" // in archive folder
 	
 	
