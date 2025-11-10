@@ -140,10 +140,10 @@ use "$versatility/native_versatility_m_c.dta",  clear
 		merge m:1 adm0 nativeadm0 using `distances', nogen keep(match)		
 		
 		* Compute minimum distances per adm0–ingredient
-		bys adm0: egen min_dist1 = min(distance)
-		bys adm0: egen min_dist2 = min(lc_dist_preColumb)
-		bys adm0: egen min_dist3 = min(lc_dist_postColumb)
-		keep adm0 ingredient2 min_dist1 min_dist2 min_dist3
+		bys adm0: egen min_distCapital = min(distance)
+		bys adm0: egen min_distPreColumb = min(lc_dist_preColumb)
+		bys adm0: egen min_distPostColumb = min(lc_dist_postColumb)
+		keep adm0 ingredient2 min_distCapital min_distPreColumb min_distPostColumb
 		duplicates drop
 
 		append using `results'
@@ -160,7 +160,7 @@ use "$versatility/native_versatility_m_c.dta",  clear
 	*-------------------------------------------------------*
 	* 6. Create three sets of weights                       *
 	*-------------------------------------------------------*
-	forvalues i = 1/3 {
+	foreach i in Capital PreColumb PostColumb {
 		foreach hl_dist in 500 1000 2000 3000 {
 		gen weight`i'_`hl_dist' = 1 if only_native == 1
 		replace weight`i'_`hl_dist' = 1 / (1 + min_dist`i'/`hl_dist') if only_native == 0 & min_dist`i' < .
@@ -170,14 +170,14 @@ use "$versatility/native_versatility_m_c.dta",  clear
 	*-------------------------------------------------------*
 	* 7. Compute distance-weighted native spice versatility *
 	*-------------------------------------------------------*
-	forvalues i = 1/3 {
+	foreach i in Capital PreColumb PostColumb {
 		foreach hl_dist in 500 1000 2000 3000 {
 		bys adm0: egen wsum`i'_`hl_dist' = total(weight`i'_`hl_dist') if spice==1
 		gen w_rel`i'_`hl_dist' = weight`i'_`hl_dist'/wsum`i'_`hl_dist' if spice==1
 
-		bys adm0: egen native_spice_vers2_dist`i'_`hl_dist' = mean(common*weight`i'_`hl_dist') if spice == 1
+		bys adm0: egen vers_dist`i'_`hl_dist' = mean(common*weight`i'_`hl_dist') if spice == 1
 		sort adm0 native
-		bys adm0 (native_spice_vers2_dist`i'_`hl_dist'): replace native_spice_vers2_dist`i'_`hl_dist' = native_spice_vers2_dist`i'_`hl_dist'[_n-1] if missing(native_spice_vers2_dist`i'_`hl_dist')
+		bys adm0 (vers_dist`i'_`hl_dist'): replace vers_dist`i'_`hl_dist' = vers_dist`i'_`hl_dist'[_n-1] if missing(vers_dist`i'_`hl_dist')
 		
 		* create food trading factor: for all spice-producing countries, we just weight by combinations of ingredient pairs by distance
 		* measure of "food richness"? not taking into account their flavor potential we can also use as a placebo?
@@ -191,7 +191,7 @@ use "$versatility/native_versatility_m_c.dta",  clear
 		}
 	}
 
-	keep adm0 native_spice_vers2*
+	keep adm0 vers_dist* trade_dist*
 	duplicates drop
 	
 	*-------------------------------------------------------*
