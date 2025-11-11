@@ -12,7 +12,9 @@
    ** EDITTED BY:       
    ** Last date modified:
 
-	use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
+**# Regresions in 20251027 file. 
+
+	use "$codedata\iv_versatility\first_stage_native_m_c.dta", clear
 	gen log_gdp = ln(GDP)
 	drop GDP
 	rename log_gdp GDP 
@@ -192,3 +194,151 @@
 		label ml(none) collabels(none) ///
 		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
 		replace
+		
+
+*******************************************************************************
+**# Regresions including new versatility measure
+
+
+		
+	use "$codedata\iv_versatility\first_stage_native_m_c.dta", clear
+	gen log_gdp = ln(GDP)
+	drop GDP
+	rename log_gdp GDP 
+	
+	*--- Merge database to distance measures
+	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)
+	
+	global c1 "numrecipes"
+	global c2 "numrecipes avg_suitability  al_mn"
+	global c3 "numrecipes avg_suitability  al_mn GDP"
+	global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
+	global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+
+	encode region, gen(region_cat)
+
+	gen LFP_female = LFP if fem_lfp == 1
+	gen LFP_male   = LFP if fem_lfp == 0
+
+	* creating the LFP gap at the country-level
+	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices vers_distCapital_2000 vers_distCapital_3000 (first) continent region_cat cl_md, by(adm0)
+
+	gen LFP_gap = LFP_female-LFP_male
+
+	* relabel everything
+	foreach v of varlist * {
+		local lbl : variable label `v'
+
+		* Clean up symbols
+		local lblclean : subinstr local lbl "_" " ", all
+		local lblclean : subinstr local lblclean "(" "", all
+		local lblclean : subinstr local lblclean ")" "", all
+
+		* Remove "mean " if it occurs at the beginning (within first 5 characters)
+		if strpos(lower(substr("`lblclean'", 1, 5)), "mean") {
+			local lblclean = substr("`lblclean'", 6, .)
+		}
+
+		label variable `v' "`lblclean'"
+	}
+
+
+	*--- REDUCED FORM
+
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_gap c.vers_distCapital_2000 ${c`i'} , absorb(region_cat cl_md) vce(robust)
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_gap c.vers_distCapital_3000 ${c`i'}, absorb(region_cat cl_md) vce(robust)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_gap_RF_dist.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+
+
+	*--- FIRST STAGE - mean spices
+
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe w_mean_spices  vers_distCapital_2000  ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe w_mean_spices  vers_distCapital_3000  ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_gap_first_mean_spice_dist.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+
+	*-- FIRST STAGE - median spices --*
+
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe median_spices vers_distCapital_2000  ${c`i'}, absorb(region_cat cl_md) vce(robust)
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe median_spices  vers_distCapital_3000  ${c`i'}, absorb(region_cat cl_md) vce(robust)
+	 }
+
+	 cd "${tables}"
+	 
+	estout using reg_gap_first_median_spice_dist.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+
+		
+	* IV REGRESSIONS FOR vers_distCapital_2000, vers_distCapital_3000
+
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: ivreg2 LFP_gap (w_mean_spices = vers_distCapital_2000) ${c`i'}  i.region_cat i.cl_md, robust
+	 }
+	forvalue i=1/5{ 
+	eststo: ivreg2 LFP_gap (w_mean_spices = vers_distCapital_3000 ) ${c`i'}  i.region_cat i.cl_md, robust
+	 }
+
+
+	 cd "${tables}"
+	 
+	estout using reg_gap_IV_dist.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(w_mean_spices) ///
+		drop(_cons *.region_cat *.cl_md) ///
+		label ml(none) collabels(none) ///
+		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
+		replace
+

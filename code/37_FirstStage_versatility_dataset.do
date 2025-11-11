@@ -27,7 +27,7 @@
 	drop gdp_merge 
 	
 	*-- Native Versatility measure
-	merge m:1 adm0 using "$versatility/final_native_versatility.dta", gen(final_versatility_merge)	
+	merge m:1 adm0 using "$versatility/final_versatility_m_c.dta", gen(final_versatility_merge)	
 	keep if final_versatility_merge == 3
 	
 	*-- Geographical controls
@@ -87,5 +87,5 @@
 	label var staple_suitability "Mean saple suitability"
 	label var oldworld "Country is from Old World"
 	
-	save "$versatility/first_stage_dataset_native_m_c.dta", replace
+	save "$versatility/first_stage_native_m_c.dta", replace
 	

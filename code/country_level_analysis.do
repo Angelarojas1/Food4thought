@@ -170,7 +170,10 @@
 	gen log_gdp = ln(GDP)
 	drop GDP
 	rename log_gdp GDP 
-
+	
+	*--- Merge database to distance measures
+	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)
+	
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability  al_mn"
 	global c3 "numrecipes avg_suitability  al_mn GDP"
@@ -183,18 +186,10 @@
 	gen LFP_male   = LFP if fem_lfp == 0
 
 	* creating the LFP gap at the country-level
-	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices native_spice_vers native_spice_vers2 suit_spice_vers (first) continent region_cat cl_md , by(adm0)
+	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices vers_distCapital_2000 vers_distCapital_3000 (first) continent region_cat cl_md, by(adm0)
 
 	gen LFP_gap = LFP_female-LFP_male
 
-	preserve 
-	use "${versatility}\native_versatility_m_c_dist.dta", clear
-	collapse (mean) native_spice_vers2_dist, by(adm0)
-	tempfile distance
-	save `distance'
-	restore
-
-	merge 1:1 adm0 using `distance', keep(3) nogen
 
 	* relabel everything
 	foreach v of varlist * {
@@ -246,51 +241,52 @@
 
 	eststo clear
 	forvalue i=1/5{ 
-	eststo: reghdfe LFP_female c.native_spice_vers ${c`i'} , absorb(region_cat cl_md) vce(robust)
+	eststo: reghdfe LFP_female c.vers_distCapital_2000 ${c`i'} , absorb(region_cat cl_md) vce(robust)
 	 }
 	forvalue i=1/5{ 
-	eststo: reghdfe LFP_female c.native_spice_vers2 ${c`i'}, absorb(region_cat cl_md) vce(robust)
+	eststo: reghdfe LFP_female c.vers_distCapital_3000 ${c`i'}, absorb(region_cat cl_md) vce(robust)
 	 }
-	 forvalue i=1/5{ 
-	eststo: reghdfe LFP_female c.native_spice_vers2_dist ${c`i'} , absorb(region_cat cl_md) vce(robust)
-	 }
+// 	 forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_female c.native_spice_vers2_dist ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 	 }
 
 	 cd "$tables"
 	 
-	estout using reg_flfp_RF.tex, ///
+	estout using reg_flfp_RF_dist.tex, ///
 		style(tex)  ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(native_spice_vers native_spice_vers2 native_spice_vers2_dist) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
 		drop(_cons) ///
 		label ml(none) collabels(none) ///
 		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
 		replace
-
-	* IV REGRESSIONS FOR native_spice_vers, native_spice_vers2, native_spice_vers2_dist2
+		
+		
+	* IV REGRESSIONS FOR vers_distCapital_2000, vers_distCapital_3000
 
 	eststo clear
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 LFP_female (w_mean_spices = native_spice_vers) ${c`i'} i.region_cat i.cl_md, robust first
+		eststo: ivreg2 LFP_female (w_mean_spices = vers_distCapital_2000) ${c`i'} i.region_cat i.cl_md, robust first
 	}
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 LFP_female (w_mean_spices = native_spice_vers2) ${c`i'} i.region_cat i.cl_md, robust first
+		eststo: ivreg2 LFP_female (w_mean_spices = vers_distCapital_2000) ${c`i'} i.region_cat i.cl_md, robust first
 	}
 
-	forvalue i=1/5 { 
-		eststo: ivreg2 LFP_female (w_mean_spices = native_spice_vers2_dist) ${c`i'} i.region_cat i.cl_md, robust first
-	}
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP_female (w_mean_spices = native_spice_vers2_dist) ${c`i'} i.region_cat i.cl_md, robust first
+// 	}
 
 	cd "${tables}"
 
 	* Export table with F-stat
-	estout using reg_flfp_IV.tex, ///
+	estout using reg_flfp_IV_dist.tex, ///
 		style(tex) ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
