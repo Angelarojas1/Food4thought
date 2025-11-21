@@ -148,6 +148,129 @@
 		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
     replace
 
+	
+	*------------------------------------------*
+	**#  	        First Stage                *
+	*------------------------------------------*
+	
+	*-------- FLFP --------*
+
+	eststo clear
+
+	 forvalue i=1/5 { 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=1/5 { 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10 { 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15 { 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_flfp_fs_cookpad.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+	
+			*-------- MLFP --------*
+
+	eststo clear
+
+	 forvalue i=1/5{ 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10{ 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15{ 
+	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_mlfp_fs_cookpad.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+	*-------- GAP --------*
+
+	eststo clear
+
+	forvalue i=1/5{ 
+	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10{ 
+	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15{ 
+	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_gap_fs_cookpad.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem#c.vers_distCapital_2000 vers_distCapital_2000 1.fem#c.vers_distCapital_3000 vers_distCapital_3000) ///
+		drop(_cons fem*) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+
 	*------------------------------------------*
 	**#  	        Reduced form               *
 	*------------------------------------------*
@@ -262,22 +385,22 @@
 // 		estadd scalar Mean = r(mean)
 // 	 }
 	 	 forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.vers_distCapital_2000 ${c`i'} if covid == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe lfpr 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.vers_distCapital_3000 ${c`i'} if covid == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe lfpr 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=7/10{ 
-	eststo: reghdfe lfpr i.fem##c.vers_distCapital_2000 ${c`i'} i.fem#c.trade_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe lfpr 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=12/15{ 
-	eststo: reghdfe lfpr i.fem##c.vers_distCapital_3000 ${c`i'} i.fem#c.trade_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe lfpr 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
@@ -291,7 +414,7 @@
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		order(1.fem#c.vers_distCapital_2000 vers_distCapital_2000 1.fem#c.vers_distCapital_3000 vers_distCapital_3000) ///
-		drop(_cons 0.fem*) ///
+		drop(_cons fem*) ///
 		label ml(none) collabels(none) ///
 		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
     replace
@@ -446,29 +569,29 @@
 // 	}
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) fem ${c`i'}  ///
-		i.region_cat i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) ${c`i'}  ///
+		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) fem ${c`i'}  ///
-		i.region_cat i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) ${c`i'}  ///
+		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 
 	forvalue i=7/10 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) fem i.fem#c.trade_distCapital_2000 ${c`i'}  ///
-		i.region_cat i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) i.fem#c.trade_distCapital_2000 ${c`i'}  ///
+		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=12/15 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) fem i.fem#c.trade_distCapital_2000 ${c`i'}  ///
-		i.region_cat i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) i.fem#c.trade_distCapital_2000 ${c`i'}  ///
+		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
@@ -483,7 +606,7 @@
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		order(1.fem#c.w_mean_spices w_mean_spices) ///
-		drop(_cons 0.fem* *.region_cat *.cl_md *.ym) ///
+		drop(_cons 0.fem* *.region_cat* *.cl_md *.ym) ///
 		label ml(none) collabels(none) ///
 		stats(Mean N r2 widstat, ///
 			  labels("Mean LFPR" "Observations" "R-squared" "First-stage F-stat") ///
@@ -1064,10 +1187,22 @@
 	}
 	
 	global c1 "numrecipes"
-	global c2 "numrecipes avg_suitability  al_mn"
-	global c3 "numrecipes avg_suitability  al_mn GDP"
-	global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
-	global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	global c2 "numrecipes avg_suitability al_mn"
+	global c3 "numrecipes avg_suitability al_mn GDP"
+	global c4 "numrecipes avg_suitability al_mn precip ph_mn abslat lon GDP"
+	global c5 "numrecipes avg_suitability al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+	global c6 "numrecipes"
+	global c7 "numrecipes avg_suitability trade_distCapital_2000 al_mn"
+	global c8 "numrecipes avg_suitability trade_distCapital_2000 al_mn GDP"
+	global c9 "numrecipes avg_suitability trade_distCapital_2000 al_mn precip ph_mn abslat lon GDP"
+	global c10 "numrecipes  avg_suitability trade_distCapital_2000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+	global c11 "numrecipes"
+	global c12 "numrecipes avg_suitability trade_distCapital_3000 al_mn"
+	global c13 "numrecipes avg_suitability trade_distCapital_3000 al_mn GDP"
+	global c14 "numrecipes avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon GDP"
+	global c15"numrecipes  avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
 
 	encode region, gen(region_cat)
 	
@@ -1161,106 +1296,182 @@
 	*-------- FLFP --------*
 
 	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 1, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
-	 }
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 1, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
-	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 1, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 1, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.vers_distCapital_1000 ${c`i'} if covid == 0 & fem == 1, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	eststo: reghdfe lfpr c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+	estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=1/5 { 
+	eststo: reghdfe lfpr c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10 { 
+	eststo: reghdfe lfpr c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15 { 
+	eststo: reghdfe lfpr c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	 }
 
 	 cd "$tables"
 	 
 	estout using reg_flfp_RF_cook_m_o.tex, ///
 		style(tex)  ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(native_spice_vers native_spice_vers2 vers_distCapital_1000) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
 		drop(_cons) ///
 		label ml(none) collabels(none) ///
-		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-		replace
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
 	
 		*-------- MLFP --------*
 
 	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
-	 }
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe lfpr c.native_spice_vers ${c`i'} if covid == 0 & fem == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe lfpr c.native_spice_vers2 ${c`i'} if covid == 0 & fem == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe lfpr c.vers_distCapital_1000 ${c`i'} if covid == 0 & fem == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	eststo: reghdfe lfpr c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10{ 
+	eststo: reghdfe lfpr c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15{ 
+	eststo: reghdfe lfpr c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	 }
 
 	 cd "$tables"
 	 
 	estout using reg_mlfp_RF_cook_m_o.tex, ///
 		style(tex)  ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(native_spice_vers native_spice_vers2 vers_distCapital_1000) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
 		drop(_cons) ///
 		label ml(none) collabels(none) ///
-		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-		replace
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+		
 	
 	*-------- GAP --------*
 
 	eststo clear
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.native_spice_vers ${c`i'} if covid == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
-	 }
-	forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.native_spice_vers2 ${c`i'} if covid == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe lfpr i.fem##c.native_spice_vers ${c`i'} if covid == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe lfpr i.fem##c.native_spice_vers2 ${c`i'} if covid == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+// 	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe lfpr i.fem##c.vers_distCapital_2000 ${c`i'} if covid == 0 & vers_distCapital_2000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.vers_distCapital_1000 ${c`i'} if covid == 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	eststo: reghdfe lfpr i.fem##c.vers_distCapital_3000 ${c`i'} if covid == 0 & vers_distCapital_3000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10{ 
+	eststo: reghdfe lfpr i.fem##c.vers_distCapital_2000 ${c`i'} i.fem#c.trade_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15{ 
+	eststo: reghdfe lfpr i.fem##c.vers_distCapital_3000 ${c`i'} i.fem#c.trade_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(adm0_fe cl_md ym) cluster(adm0_fe) 
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	 }
 
 	 cd "$tables"
 	 
 	estout using reg_gap_RF_cook_m_o.tex, ///
 		style(tex)  ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(1.fem#c.native_spice_vers native_spice_vers 1.fem#c.native_spice_vers2 native_spice_vers2 1.fem#c.vers_distCapital_1000 vers_distCapital_1000) ///
+		order(1.fem#c.vers_distCapital_2000 vers_distCapital_2000 1.fem#c.vers_distCapital_3000 vers_distCapital_3000) ///
 		drop(_cons 0.fem*) ///
 		label ml(none) collabels(none) ///
-		stats(j N r2, labels(" " "Observations" "R-squared") fmt(%9.1gc %9.1gc %4.3f)) ///
-		replace
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
 		
 	*------------------------------------------*
 	**#   IV  - native spices versatility       *
 	*------------------------------------------*
+	
 	encode adm0_fe, gen(adm0_fe_code)
 	
 	*-------- FLFP --------*
 
 	eststo clear
 
-	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
-		i.adm0_fe_code i.cl_md i.ym if fem == 1 , robust cluster(adm0_fe) 
-	}
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
+// 		i.adm0_fe_code i.cl_md i.ym if fem == 1 , robust cluster(adm0_fe) 
+// 	}
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
+// 		i.adm0_fe_code i.cl_md i.ym if fem == 1 , robust cluster(adm0_fe)
+// 	}
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
-		i.adm0_fe_code i.cl_md i.ym if fem == 1 , robust cluster(adm0_fe)
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & fem == 1 & vers_distCapital_2000 != 0 , robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if  covid == 0 & fem == 1 & vers_distCapital_3000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
 
-	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_1000) ${c`i'}  ///
-		i.adm0_fe_code i.cl_md i.ym if fem == 1 , robust cluster(adm0_fe)
+	forvalue i=7/10 { 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if  covid == 0 & fem == 1 & vers_distCapital_2000 != 0 , robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	forvalue i=12/15 { 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if  covid == 0 & fem == 1 & vers_distCapital_3000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
 
 	cd "${tables}"
@@ -1268,35 +1479,56 @@
 	* Export table with F-stat
 	estout using reg_flfp_IV_cook_m_o.tex, ///
 		style(tex) ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		order(w_mean_spices) ///
 		drop(_cons *.adm0_fe_code *.cl_md *.ym) ///
 		label ml(none) collabels(none) ///
-		stats(j N r2 widstat, ///
-			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+		stats(Mean N r2 widstat, ///
+			  labels("Mean LFPR" "Observations" "R-squared" "First-stage F-stat") ///
 			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
 		replace
-	
+		
 		*-------- MLFP --------*
 
 	eststo clear
 
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
+// 		i.adm0_fe_code i.cl_md i.ym if fem == 0 , robust cluster(adm0_fe) 
+// 	}
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
+// 		i.adm0_fe_code i.cl_md i.ym if fem == 0 , robust cluster(adm0_fe)
+// 	}
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers) ${c`i'} ///
-		i.adm0_fe_code i.cl_md i.ym if fem == 0 , robust cluster(adm0_fe) 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if fem == 0 & vers_distCapital_2000 != 0 , robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	forvalue i=1/5{ 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		i.adm0_fe_code  i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
 
-	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = native_spice_vers2) ${c`i'} ///
-		i.adm0_fe_code i.cl_md i.ym if fem == 0 , robust cluster(adm0_fe)
+	forvalue i=7/10 { 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
-
-	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_1000) ${c`i'}  ///
-		i.adm0_fe_code i.cl_md i.ym if fem == 0 , robust cluster(adm0_fe)
+	
+	forvalue i=12/15 { 
+		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
 
 	cd "${tables}"
@@ -1304,50 +1536,74 @@
 	* Export table with F-stat
 	estout using reg_mlfp_IV_cook_m_o.tex, ///
 		style(tex) ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		order(w_mean_spices) ///
 		drop(_cons *.adm0_fe_code *.cl_md *.ym) ///
 		label ml(none) collabels(none) ///
-		stats(j N r2 widstat, ///
-			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+		stats(Mean N r2 widstat, ///
+			  labels("Mean LFPR" "Observations" "R-squared" "First-stage F-stat") ///
 			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
 		replace
 
 	*-------- Gap --------*
 	eststo clear
 
-	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.native_spice_vers native_spice_vers) ${c`i'} ///
-		i.adm0_fe_code i.cl_md i.ym, robust cluster(adm0_fe) 
-	}
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.native_spice_vers native_spice_vers) ${c`i'} ///
+// 		i.adm0_fe_code i.cl_md i.ym, robust cluster(adm0_fe) 
+// 	}
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.native_spice_vers2 native_spice_vers2) ${c`i'} ///
+// 		i.adm0_fe_code i.cl_md i.ym, robust cluster(adm0_fe)
+// 	}
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.native_spice_vers2 native_spice_vers2) ${c`i'} ///
-		i.adm0_fe_code i.cl_md i.ym, robust cluster(adm0_fe)
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	forvalue i=1/5 { 
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) fem ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
 
-	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_1000 vers_distCapital_1000) ${c`i'}  ///
-		i.adm0_fe_code i.cl_md i.ym, robust cluster(adm0_fe)
+	forvalue i=7/10 { 
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) fem i.fem#c.trade_distCapital_2000 ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
 	}
+	
+	forvalue i=12/15 { 
+		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) fem i.fem#c.trade_distCapital_2000 ${c`i'}  ///
+		i.adm0_fe_code i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0_fe)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
 
 	cd "${tables}"
 
 	* Export table with F-stat
 	estout using reg_gap_IV_cook_m_o.tex, ///
 		style(tex) ///
-		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		order(1.fem#c.w_mean_spices w_mean_spices) ///
 		drop(_cons *.adm0_fe_code *.cl_md *.ym 0.fem#c.w_mean_spices) ///
 		label ml(none) collabels(none) ///
-		stats(j N r2 widstat, ///
-			  labels(" " "Observations" "R-squared" "First-stage F-stat") ///
+		stats(Mean N r2 widstat, ///
+			  labels("Mean LFPR" "Observations" "R-squared" "First-stage F-stat") ///
 			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
 		replace
 
