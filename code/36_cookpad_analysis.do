@@ -28,6 +28,20 @@
     label variable `var' "`label'"
 	}
 	
+	*-- Create Principal Component Index 
+	*- Standarized
+	foreach v of varlist w_mean_spices median_totaltime median_ingredients {
+		sum `v'
+		gen z_`v' = (`v' - r(mean)) / r(sd)
+	}
+
+	* PCA con las variables estandarizadas
+	pca z_w_mean_spices z_median_totaltime z_median_ingredients
+
+	predict pca_index if e(sample), score
+	
+	label var pca_index "PCA Index"
+	
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability al_mn"
 	global c3 "numrecipes avg_suitability al_mn GDP"
@@ -53,6 +67,30 @@
 	*------------------------------------------*
 	
 	*-------- FLFP --------*
+	
+	*--- PCA 
+	
+	cd "$tables"
+	eststo clear
+	forvalue i=1/5{ 
+		eststo: reghdfe lfpr c.pca_index  ${c`i'} if covid == 0 & fem == 1, absorb(region_cat cl_md ym) cluster(adm0) 
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 
+	 estout using reg_flfp_pca_OLS_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(pca_index) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+	
+	*--- Separated cuisine complexity variables
 
 	 cd "$tables"
 		eststo clear
@@ -85,6 +123,30 @@
     replace
 		
 	*-------- MLFP --------*
+	
+	*--- PCA index
+	cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr c.pca_index  ${c`i'} if covid == 0 & fem == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+		}
+
+
+	 estout using reg_mlfp_pca_OLS_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(pca_index) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+	
+	*-- Separated Cuisine complexity variables
 
 	 cd "$tables"
 		eststo clear
@@ -117,21 +179,43 @@
     replace
 		
 	*-------- Gap --------*
+	
+		cd "$tables"
+		eststo clear
+		forvalue i=1/5{ 
+		eststo: reghdfe lfpr i.fem##c.pca_index  ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+		}
+		
+	 estout using reg_gap_pca_OLS_cookpad.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem#c.pca_index) ///
+		drop(_cons 0.fem*) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFPR" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+	
+	*--- Separated cuisine complexity variables
 
 	 cd "$tables"
 		eststo clear
 		forvalue i=1/5{ 
-		eststo: reghdfe lfpr i.fem##c.median_totaltime  ${c`i'} if covid == 0, absorb(adm0 cl_md ym) cluster(adm0) 
+		eststo: reghdfe lfpr i.fem##c.median_totaltime  ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		}
 		forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.w_mean_spices ${c`i'} if covid == 0, absorb(adm0 cl_md ym) cluster(adm0) 
+	eststo: reghdfe lfpr i.fem##c.w_mean_spices ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(adm0 cl_md ym) cluster(adm0) 
+	eststo: reghdfe lfpr i.fem##c.median_ingredients ${c`i'} if covid == 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
@@ -158,29 +242,29 @@
 	eststo clear
 
 	 forvalue i=1/5 { 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5 { 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=7/10 { 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=12/15 { 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 
 	 cd "$tables"
 	 
-	estout using reg_flfp_fs_cookpad.tex, ///
+	estout using reg_flfp_fs_pca_cookpad.tex, ///
 		style(tex)  ///
 		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
@@ -197,29 +281,29 @@
 	eststo clear
 
 	 forvalue i=1/5{ 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=7/10{ 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_2000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=12/15{ 
-	eststo: reghdfe w_mean_spices c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index c.vers_distCapital_3000 ${c`i'} if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, absorb(region_cat cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 
 	 cd "$tables"
 	 
-	estout using reg_mlfp_fs_cookpad.tex, ///
+	estout using reg_mlfp_fs_pca_cookpad.tex, ///
 		style(tex)  ///
 		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
@@ -236,29 +320,29 @@
 	eststo clear
 
 	forvalue i=1/5{ 
-	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=1/5{ 
-	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=7/10{ 
-	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index 1.fem#c.vers_distCapital_2000 ${c`i'} fem vers_distCapital_2000 if covid == 0 & vers_distCapital_2000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 	 forvalue i=12/15{ 
-	eststo: reghdfe w_mean_spices 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
+	eststo: reghdfe pca_index 1.fem#c.vers_distCapital_3000 ${c`i'} fem vers_distCapital_3000 if covid == 0 & vers_distCapital_3000 != 0, absorb(i.region_cat i.fem cl_md ym) cluster(adm0) 
 	qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	 }
 
 	 cd "$tables"
 	 
-	estout using reg_gap_fs_cookpad.tex, ///
+	estout using reg_gap_fs_pca_cookpad.tex, ///
 		style(tex)  ///
 		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
@@ -442,28 +526,28 @@
 // 	}
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_2000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 1 & vers_distCapital_2000 != 0 , robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_3000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 
 	forvalue i=7/10 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_2000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 1 & vers_distCapital_2000 != 0 , robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=12/15 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_3000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 1 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
@@ -472,13 +556,13 @@
 	cd "${tables}"
 
 	* Export table with F-stat
-	estout using reg_flfp_IV_cookpad.tex, ///
+	estout using reg_flfp_IV_pca_cookpad.tex, ///
 		style(tex) ///
 		prehead("\begin{tabular}{lcccccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(w_mean_spices) ///
+		order(pca_index) ///
 		drop(_cons *.region_cat *.cl_md *.ym) ///
 		label ml(none) collabels(none) ///
 		stats(Mean N r2 widstat, ///
@@ -505,28 +589,28 @@
 // 	}
 	
 		forvalue i=1/5{ 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_2000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=1/5{ 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_3000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 
 	forvalue i=7/10 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_2000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_2000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=12/15 { 
-		eststo: ivreg2 lfpr (w_mean_spices = vers_distCapital_3000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index = vers_distCapital_3000) ${c`i'}  ///
 		i.region_cat i.cl_md i.ym if covid == 0 & fem == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
@@ -536,13 +620,13 @@
 	cd "${tables}"
 
 	* Export table with F-stat
-	estout using reg_mlfp_IV_cookpad.tex, ///
+	estout using reg_mlfp_IV_pca_cookpad.tex, ///
 		style(tex) ///
 		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(w_mean_spices) ///
+		order(pca_index) ///
 		drop(_cons *.region_cat *.cl_md *.ym) ///
 		label ml(none) collabels(none) ///
 		stats(Mean N r2 widstat, ///
@@ -569,28 +653,28 @@
 // 	}
 
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index i.fem#c.pca_index = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) ${c`i'}  ///
 		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=1/5 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index i.fem#c.pca_index = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) ${c`i'}  ///
 		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 
 	forvalue i=7/10 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) i.fem#c.trade_distCapital_2000 ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index i.fem#c.pca_index = i.fem#c.vers_distCapital_2000 vers_distCapital_2000) i.fem#c.trade_distCapital_2000 ${c`i'}  ///
 		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_2000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 	}
 	
 	forvalue i=12/15 { 
-		eststo: ivreg2 lfpr (w_mean_spices i.fem#c.w_mean_spices = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) i.fem#c.trade_distCapital_2000 ${c`i'}  ///
+		eststo: ivreg2 lfpr (pca_index i.fem#c.pca_index = i.fem#c.vers_distCapital_3000 vers_distCapital_3000) i.fem#c.trade_distCapital_2000 ${c`i'}  ///
 		i.region_cat i.fem i.cl_md i.ym if covid == 0 & vers_distCapital_3000 != 0, robust cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
@@ -599,13 +683,13 @@
 	cd "${tables}"
 
 	* Export table with F-stat
-	estout using reg_gap_IV_cookpad.tex, ///
+	estout using reg_gap_IV_pca_cookpad.tex, ///
 		style(tex) ///
 		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
 		postfoot("\bottomrule" "\end{tabular}") ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		order(1.fem#c.w_mean_spices w_mean_spices) ///
+		order(1.fem#c.pca_index pca_index) ///
 		drop(_cons 0.fem* *.region_cat* *.cl_md *.ym) ///
 		label ml(none) collabels(none) ///
 		stats(Mean N r2 widstat, ///
