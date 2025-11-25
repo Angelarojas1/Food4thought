@@ -278,15 +278,6 @@
 
 		do "$code/35_cookpad_data.do"
 		
-	*********************************************************
-	*					Cookpad Analysis
-	*********************************************************
-	
-	* 	The purpose of this dofile is:
-	*		- Run cookpad regressions
-	
-		do "$code/36_cookpad_analysis.do"
-		
 	* ***************************************************** *
 	*            First Stage IV Dataset Creation            *
 	* ***************************************************** *

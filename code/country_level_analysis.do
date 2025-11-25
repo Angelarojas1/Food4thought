@@ -18,6 +18,11 @@
 	* Region FE
 	********************************************
 	
+global gnr "C:\Users\mgafargo\Dropbox\food4thought\analysis23"
+global codedata "$gnr\data\coded\"
+global versatility "$codedata\iv_versatility\"
+
+
 
 	use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
 	

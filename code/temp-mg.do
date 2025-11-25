@@ -1,306 +1,339 @@
-   * ******************************************************************** *
-   *                                                                      *
-   *        Cuisine Complexity and Female Labor Force Participation	      *
-   *              This dofile runs reduced form estimation	        	  *
-   *																	  *
-   * ******************************************************************** *
+/// country level 
 
-   ** IDS VAR:          adm0        // Uniquely identifies countries 
-   ** NOTES:
-   ** WRITTEN BY:       Margarita Gafaro
-   ** Created: 			20250915
-   ** EDITTED BY:       Angela Rojas
-   ** Last date modified: Oct 7, 2023
+   ** EDITTED BY:       
+   ** Last date modified: 
+   
 
-// reduced form estimation 
-// m gafaro 
-// 09152025
-
-*glo dir "C:\Users\mgafargo\Dropbox\food4thought\analysis23\"
+	********************************************
+**#	* 		Regressions - interactions	 	   *
+	* Region FE
+	********************************************
+	
  
-*----------------------------------*
-*       	  Graphs 			   *
-*----------------------------------*
+
+	
+	
+global gnr "C:\Users\mgafargo\Dropbox\food4thought\analysis23"
+global codedata "$gnr\data\coded\"
+global versatility "$codedata\iv_versatility\"
+global tables "$gnr\outputs\Tables"
+
 
 use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
- 
- sum native_versatility native_versatility2 suit_versatility
- 
- scatter native_versatility native_versatility2
- scatter   native_versatility2 suit_versatility
 
-histogram native_versatility2
-
-histogram suit_versatility
-
-lab var median_spices "Median spices"
-lab var median_totaltime "Median cooking time" 
-rename native_versatility versatility
-
- cd "$dir\outputs\Figures"
- 
- //1. Figures to motivate the analysis 
-  twoway ///
-    (scatter FLFP median_totaltime if continent_code==1, mlabel(adm0) msymbol(none) mlabcolor(red) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_totaltime if continent_code==2, mlabel(adm0) msymbol(none) mlabcolor(blue) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_totaltime if continent_code==3, mlabel(adm0) msymbol(none) mlabcolor(green) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_totaltime if continent_code==4, mlabel(adm0) msymbol(none) mlabcolor(orange) mlabposition(0) mlabsize(small)) ///
-    (scatter  FLFP median_totaltime if continent_code==5, mlabel(adm0) msymbol(none) mlabcolor(purple) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_totaltime if continent_code==6, mlabel(adm0) msymbol(none) mlabcolor(brown) mlabposition(0) mlabsize(small)), legend(off)
-graph export  "raw_time.png", replace 
-
- twoway ///
-    (scatter FLFP median_spices if continent_code==1, mlabel(adm0) msymbol(none) mlabcolor(red) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP  median_spices if continent_code==2, mlabel(adm0) msymbol(none) mlabcolor(blue) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_spices  if continent_code==3, mlabel(adm0) msymbol(none) mlabcolor(green) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_spices if continent_code==4, mlabel(adm0) msymbol(none) mlabcolor(orange) mlabposition(0) mlabsize(small)) ///
-    (scatter  FLFP median_spices if continent_code==5, mlabel(adm0) msymbol(none) mlabcolor(purple) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP median_spices if continent_code==6, mlabel(adm0) msymbol(none) mlabcolor(brown) mlabposition(0) mlabsize(small)), legend(off) 
-graph export  "raw_spices.png", replace 
-
- twoway ///
-    (scatter FLFP w_mean_spices if continent_code==1, mlabel(adm0) msymbol(none) mlabcolor(red) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP  w_mean_spices if continent_code==2, mlabel(adm0) msymbol(none) mlabcolor(blue) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP w_mean_spices  if continent_code==3, mlabel(adm0) msymbol(none) mlabcolor(green) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP w_mean_spices if continent_code==4, mlabel(adm0) msymbol(none) mlabcolor(orange) mlabposition(0) mlabsize(small)) ///
-    (scatter  FLFP w_mean_spices if continent_code==5, mlabel(adm0) msymbol(none) mlabcolor(purple) mlabposition(0) mlabsize(small)) ///
-    (scatter FLFP w_mean_spices if continent_code==6, mlabel(adm0) msymbol(none) mlabcolor(brown) mlabposition(0) mlabsize(small)), legend(off)  
-graph export  "raw_mspices.png", replace 	
-  
-  binscatter FLFP median_totaltime,  savegraph("scat_time.png") replace xtitle("Median cooking time") 
- binscatter FLFP median_spices,   savegraph("scat_spices.png" )  replace xtitle("Median  spices") 
- 
-  binscatter FLFP w_mean_spices,   savegraph("scat_mean_spices.png" )  replace xtitle("Mean  spices") 
- 
- 
-twoway ///
-    (scatter median_totaltime median_spices if continent_code==1, mlabel(adm0) msymbol(none) mlabcolor(red) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime median_spices if continent_code==2, mlabel(adm0) msymbol(none) mlabcolor(blue) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime median_spices if continent_code==3, mlabel(adm0) msymbol(none) mlabcolor(green) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime median_spices if continent_code==4, mlabel(adm0) msymbol(none) mlabcolor(orange) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime median_spices if continent_code==5, mlabel(adm0) msymbol(none) mlabcolor(purple) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime median_spices if continent_code==6, mlabel(adm0) msymbol(none) mlabcolor(brown) mlabposition(0) mlabsize(small)), legend(off)
-graph export  "time_spices.png", replace 
+	gen log_gdp = ln(GDP)
+	drop GDP
+	rename log_gdp GDP 
 	
+	*--- Merge database to distance measures
+	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)	
 	
-twoway ///
-    (scatter median_totaltime w_mean_spices if continent_code==1, mlabel(adm0) msymbol(none) mlabcolor(red) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime w_mean_spices if continent_code==2, mlabel(adm0) msymbol(none) mlabcolor(blue) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime w_mean_spices if continent_code==3, mlabel(adm0) msymbol(none) mlabcolor(green) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime w_mean_spices if continent_code==4, mlabel(adm0) msymbol(none) mlabcolor(orange) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime w_mean_spices if continent_code==5, mlabel(adm0) msymbol(none) mlabcolor(purple) mlabposition(0) mlabsize(small)) ///
-    (scatter median_totaltime w_mean_spices if continent_code==6, mlabel(adm0) msymbol(none) mlabcolor(brown) mlabposition(0) mlabsize(small)), legend(off)
-		graph export  "time_mspices.png", replace 
+	*-- Create Principal Component Index 
+	*- Standarized
+	foreach v of varlist w_mean_spices median_totaltime median_ingredients {
+		sum `v'
+		gen z_`v' = (`v' - r(mean)) / r(sd)
+	}
+
+	* PCA con las variables estandarizadas
+	pca z_w_mean_spices z_median_totaltime z_median_ingredients
+
+	predict pca_index if e(sample), score
 		
- 
-*----------------------------------*
-*       	 Regressions		   *
-*----------------------------------*
- 
-global c1 "numrecipes"
-global c2 "numrecipes avg_suitability  al_mn"
-global c3 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon "
-global c4 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability "
-
-*reghdfe FLFP median_spices numrecipes avg_suitability  al_mn  pt_mn ph_mn lat lon, absorb(continent cl_md)
-reghdfe FLFP median_spices $c4, absorb(continent cl_md)
-cap drop s
-gen s=1 if  e(sample)
-global s1 " if s==1"
-global s2 "if median_totaltime<90 &  s==1"  
-global s3 "if  cookpad==1 &  s==1"  
 
 
+	
+	encode region, gen(region_cat)
 
- //reduced form 
- cd "$dir\outputs\Tables"
-forvalue j=1/3 { 
-eststo clear
-forvalue i=1/4{ 
-eststo: reghdfe FLFP median_totaltime ${c`i'} ${s`j'}, absorb(continent)
- }
-forvalue i=1/4{ 
-eststo: reghdfe FLFP median_spices ${c`i'}  ${s`j'}, absorb(continent)
- }
- forvalue i=1/4{ 
-eststo: reghdfe FLFP w_mean_spices ${c`i'}  ${s`j'}, absorb(continent)
- }
-estout using reg-ols-s`j'.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)  order(median_totaltime median_spices w_mean_spices) drop(_cons) label  ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared"   ) fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace
+	gen LFP_female = LFP if fem_lfp == 1
+	gen LFP_male   = LFP if fem_lfp == 0
+	
+* creating the LFP gap at the country-level
+	collapse (mean) LFP_male LFP_female median_spices w_mean_spices vers_distCapital_2000 vers_distCapital_3000 trade_distCapital_2000 trade_distCapital_3000 avg_suitability staple_suitability numNative numNativeCIAT al_mn precip ph_mn   temp abslat lon rough  landlocked distcr  numrecipes  GDP (first) continent region_cat cl_md pca_index, by(adm0)
 
-} 
+	gen LFP_gap = LFP_female-LFP_male
 
+	* relabel everything
+	foreach v of varlist * {
+		local lbl : variable label `v'
 
+		* Clean up symbols
+		local lblclean : subinstr local lbl "_" " ", all
+		local lblclean : subinstr local lblclean "(" "", all
+		local lblclean : subinstr local lblclean ")" "", all
 
+		* Remove "mean " if it occurs at the beginning (within first 5 characters)
+		if strpos(lower(substr("`lblclean'", 1, 5)), "mean") {
+			local lblclean = substr("`lblclean'", 6, .)
+		}
+
+		label variable `v' "`lblclean'"
+	}
+	
+		label var pca_index "PCA Index"
+		label var vers_distCapital_2000 "Flavor versatility"
+	
+	
+	
+	
+
+	/// women only estimations 
+	
+ // --> missing in GDP for two countries 
+	reghdfe LFP_female vers_distCapital_2000 $c1 if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	
+	egen vers_distCapital_2000_std=std(vers_distCapital_2000 )	if e(sample)
+	label var vers_distCapital_2000_std  "Flavor versatility"
+	
+	lavel var w_mean_spices  "Average spices"
+	
+		
+	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
+	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
+	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability  trade_distCapital_2000 GDP"
+	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability  trade_distCapital_2000 GDP al_mn  precip ph_mn  temp"
+	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability   trade_distCapital_2000 GDP al_mn precip ph_mn   temp abslat lon rough  landlocked distcr  "
+	
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// TABLE	
+/// OLS table Panel A. female, Panel B. male, Panel C gap  
+/////////////////////////////////////////////////////////////////////////////////////////////	
+	
+cd "$tables"
+
+// PANEL A-C 
+
+foreach j in female male gap {
+	
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_`j' w_mean_spices   ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_ols_`j'.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(w_mean_spices) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}	
+	 
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// TABLE	
+/// Reduced form   Panel A. reduced form FLFP, Panel B gap,  and Panel C.  first stage 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+cd "$tables"
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_female vers_distCapital_2000_std ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_rf_fem_country.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_male vers_distCapital_2000_std ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_rf_male_country.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+
+	
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_gap vers_distCapital_2000_std ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_rf_gap_country.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+	
+	
+	
+	
 // first stage 
-forvalue j=1/3 { 
 eststo clear
-forvalue i=1/4{ 
-eststo: reghdfe   median_totaltime native_versatility2 ${c`i'}  ${s`j'}, absorb(continent)
-}
- 
-forvalue i=1/4{ 
-eststo: reghdfe   median_totaltime suit_versatility ${c`i'}  ${s`j'}, absorb(continent)
-}
- 
- forvalue i=1/4{ 
-eststo: reghdfe   median_totaltime  versatility ${c`i'} ${s`j'}, absorb(continent)
-}
- 
-estout using reg-fs-time-s`j'.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)   order( native_versatility2 suit_versatility  versatility)  drop(_cons) label  ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared"   ) fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace
-} 
-
-forvalue j=1/3 { 
-eststo clear
-forvalue i=1/4{ 
-eststo: reghdfe   median_spices native_versatility2 ${c`i'}  ${s`j'}, absorb(continent)
-}
- 
-forvalue i=1/4{ 
-eststo: reghdfe   median_spices suit_versatility ${c`i'}  ${s`j'}, absorb(continent)
-}
- 
- forvalue i=1/4{ 
-eststo: reghdfe   median_spices  versatility ${c`i'} ${s`j'}, absorb(continent)
-}
- 
-  
-estout using reg-fs-spices-s`j'.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)  order( native_versatility2 suit_versatility  versatility)  drop(_cons) label  ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared"   ) fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace
-} 
-
-forvalue j=1/3 { 
-eststo clear
-forvalue i=1/4{ 
-eststo: reghdfe    w_mean_spices native_versatility2 ${c`i'}  ${s`j'}, absorb(continent)
-}
- 
-forvalue i=1/4{ 
-eststo: reghdfe    w_mean_spices suit_versatility ${c`i'}  ${s`j'}, absorb(continent)
-}
- 
- forvalue i=1/4{ 
-eststo: reghdfe   w_mean_spices  versatility ${c`i'} ${s`j'}, absorb(continent)
-}
- 
-  
-estout using reg-fs-wspices-s`j'.tex, style(tex) cells(b(star f(3)) se(par f(3))) starlevels(* 0.10 ** 0.05 *** 0.01)  order( native_versatility2 suit_versatility  versatility)  drop(_cons) label  ml(none) collabels(none) stats(j N r2  , labels(" " "Observations" "R-squared"   ) fmt(%9.1gc %9.1gc %4.3f %9.2fc)) replace
-} 
-
-
-
-foreach j in 1 2 3 4 6  {
-tab continent_code if continent_code==`j'
- reg    median_totaltime versatility $c3   if continent_code==`j'   
-}
-
-
- reg    median_totaltime  versatility $c4   if  (country!="Bolivia" & country!="Paraguay")
- 
- 
- {
-****************************************************
-/*
-
-
-
-
-
-
-reghdfe  median_totaltime native_versatility2  , absorb(continent)
-reghdfe median_totaltime native_versatility2 numrecipes avg_suitability  al_mn , absorb(continent cl_md)
-reghdfe median_totaltime native_versatility2 numrecipes avg_suitability  al_mn pt_mn ph_mn lat lon, absorb(continent cl_md)
-
-reghdfe  median_spices native_versatility2  , absorb(continent)
-reghdfe median_spices native_versatility2 numrecipes avg_suitability  al_mn , absorb(continent cl_md)
-reghdfe median_spices native_versatility2 numrecipes avg_suitability  al_mn pt_mn ph_mn lat lon, absorb(continent cl_md)
-
-
-
-
-
-// FLFP - time 
-// whole sample
-histogram median_totaltime
-scatter FLFP median_totaltime  
-binscatter FLFP median_totaltime  
-binscatter FLFP median_totaltime, absorb(continent)
-
-
-//cookpad sample 
-scatter FLFP median_totaltime if cookpad==1
-binscatter FLFP median_totaltime if cookpad==1 
-binscatter FLFP median_totaltime if   cookpad==1, absorb(continent)
-
-reghdfe FLFP median_totaltime , absorb(continent)
-reghdfe FLFP median_totaltime if median_totaltime<90, absorb(continent)
-reghdfe FLFP median_totaltime if median_totaltime<90 & cookpad==1, absorb(continent)
-
-// spices 
-scatter FLFP median_spices  
-binscatter FLFP median_spices  
-binscatter FLFP median_spices if cookpad==1 
-binscatter FLFP median_spices if   cookpad==1, absorb(continent)
-
+	forvalue i=6/10{
+	eststo:  reghdfe  w_mean_spices  vers_distCapital_2000_std ${c`i'}   if vers_distCapital_2000 != 0 & LFP_female!=., absorb(region_cat cl_md) vce(robust)
+			qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	 estout using reg_fs_country.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+   postfoot("\hline") replace
 
  
-reghdfe FLFP median_spices numrecipes , absorb(continent)
-reghdfe FLFP median_spices   if   cookpad==1, absorb(continent)
-
-
-
-// First stage 
-// native 
-histogram native_versatility2
-scatter  median_totaltime native_versatility2
-binscatter   median_totaltime native_versatility2
-binscatter   median_totaltime native_versatility2 if median_totaltime<90
-binscatter  median_totaltime native_versatility2 if median_totaltime<90, absorb(continent)
  
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// TABLE	
+/// IV  Panel A.  FLFP, Panel B gap 
+/////////////////////////////////////////////////////////////////////////////////////////////
+ 
+ 
+foreach j in female male gap {
+	
+	eststo clear
+	forvalue i=6/10{
+	eststo: ivreg2 LFP_`j' (w_mean_spices  = vers_distCapital_2000_std) i.region_cat i.cl_md ${c`i'} if vers_distCapital_2000 != 0, robust partial( i.region_cat i.cl_md)  
+	
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_iv_`j'.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(w_mean_spices) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2 widstat, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}	
+	
+	
+ 
+ 
+ 
+ 
+ 
+ ///////////////// END 
+ 
+	
+	//OLS 
+	forvalue i=6/10{
+		di "******** `i' **************"
+	reghdfe LFP_female w_mean_spices numNative numNativeCIAT ${c`i'}  if vers_distCapital_3000 != 0, absorb(region_cat cl_md) vce(robust)
+	}
+	
+	// reduced form 
+	forvalue i=6/10{
+	eststo: reghdfe LFP_female vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	}
+	
+	// first stage 
+	forvalue i=6/10{
+	 reghdfe  w_mean_spices  vers_distCapital_2000 ${c`i'}   if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	}
+	
+		// native IV (native_spice_vers OK - native_versatility  (specifc 8) )
+		
+	forvalue i=6/10{
+	 reghdfe  w_mean_spices native_versatility   ${c`i'}   if vers_distCapital_2000 != 0 &  LFP_female!=., absorb(region_cat cl_md) vce(robust)
+	}	
+		
+	
+	// IV
+	forvalue i=6/10{
+		di "************ `i' ****************"
+	ivreg2 LFP_female (w_mean_spices  = vers_distCapital_2000) i.region_cat i.cl_md ${c`i'} if vers_distCapital_3000 != 0, robust partial( i.region_cat i.cl_md)
+	}
+	
+	
+forvalue i=6/10{
+		di "************ `i' ****************"
+	ivreg2 LFP_female (w_mean_spices  = native_versatility vers_distCapital_2000) i.region_cat i.cl_md ${c`i'} if vers_distCapital_2000 != 0   , robust partial( i.region_cat i.cl_md) first
+	}
+	
+	
 
-
-reghdfe  median_totaltime native_versatility2  , absorb(continent)
-
-// suit 
-histogram suit_versatility
-scatter  median_totaltime suit_versatility
-binscatter   median_totaltime suit_versatility
-binscatter   median_totaltime suit_versatility if median_totaltime<90
-binscatter  median_totaltime suit_versatility if median_totaltime<90, absorb(continent)
-
-reghdfe  median_totaltime suit_versatility    , absorb(continent)
-reghdfe  median_totaltime suit_versatility if median_totaltime<90  , absorb(continent)
-
-
-// first stage by continent
-egen c=group(continent)
-
-forvalue j=1/6{
-tab continent if c==`j'
-reg   median_totaltime suit_versatility  if c==`j' & median_totaltime<90, robust 
-reg   median_totaltime native_versatility  if c==`j' & median_totaltime<90, robust 
-
-}
-// europa y sur america positivo
-reghdfe   median_totaltime suit_versatility  if c!=3 & c!=6, absorb(continent)
-reghdfe   median_totaltime suit_versatility  if c!=3 & c!=6 & median_totaltime<90, absorb(continent)
-reghdfe   median_totaltime suit_versatility   if c!=3 & c!=6 & median_totaltime<90, absorb(continent)
-reghdfe   median_totaltime native_versatility   if c!=3 & c!=6 & median_totaltime<90, absorb(continent)
-reghdfe   median_totaltime native_versatility   if  c!=6 & median_totaltime<90, absorb(continent) // sur america es el problemático 
-reghdfe   median_totaltime native_versatility   if    median_totaltime<90, absorb(continent)
-
-scatter  median_totaltime suit_versatility  if c==3 
-scatter  median_totaltime native_versatility  if c==3 
-scatter  median_totaltime suit_versatility  if c==6 
-scatter  median_totaltime native_versatility  if c==6  & median_totaltime<90 
-scatter  median_totaltime native_versatility  if c==1  & median_totaltime<90 
-
-
-tab Country if  median_totaltime>=90
-// revisar Cyprus, Estonia, Kazakhastan, Malaysia, Paraguay 
-// agregar número de recetas por país en la base de datos 
-// completar variables con missing ie continent, continent_code
-// agregar subregion: ie. europa del este, europa occidental 
-// revisar suit_native: ordenes de magnitud menor que native  es posible que se estén promediando ceros 
-// incluir en base de datos latitud y longitud del centroide de cada país
-// agregar número de ingredientes nativos por país  
-*/
- }
+	
+	
+	
+	
+	
+	
+	
+// interaction -- Not working
+	// OLS
+	forvalue i=6/10{
+		di "******** `i' **************"
+	reghdfe LFP fem_w_mean_spices w_mean_spices fem_lfp  ${c`i'}   if vers_distCapital_2000 != 0, absorb(region_cat cl_md) vce(robust)
+	}
+	
+	forvalue i=15/15{
+		di "******** `i' **************"
+	reghdfe LFP fem_w_mean_spices w_mean_spices fem_lfp   ${c`i'}   if vers_distCapital_2000 != 0, absorb(adm0) vce(robust)
+	}
+	
+	// reduced form 
+	forvalue i=15/15{
+	 reghdfe LFP fem_vers_distCapital_2000 vers_distCapital_2000 fem_lfp  ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+	}
+	
+forvalue i=15/15{
+	 reghdfe LFP  fem_vers_distCapital_2000 vers_distCapital_2000 fem_lfp  ${c`i'} if vers_distCapital_2000 != 0 , absorb(adm0) vce(robust)
+	}
+	
+ 
+	
+	// IV
+	forvalue i=15/15{
+	ivreg2 LFP  ( fem_w_mean_spices w_mean_spices  = fem_vers_distCapital_2000  vers_distCapital_2000) i.fem_lfp i.region_cat i.cl_md ${c`i'} if vers_distCapital_2000 != 0, robust partial( i.region_cat i.cl_md)
+	}	
+	
+		forvalue i=15/15{
+	ivreg2 LFP  ( fem_w_mean_spices w_mean_spices  = fem_vers_distCapital_2000  vers_distCapital_2000) i.fem_lfp i.Country ${c`i'} if vers_distCapital_2000 != 0, robust partial(i.Country)
+	}	
+	
+	
+// men only estimations 
+	
+forvalue i=11/15{
+		di "******** `i' **************"
+	reghdfe LFP_male w_mean_spices  ${c`i'}   if vers_distCapital_2000 != 0, absorb(region_cat cl_md) vce(robust)
+	}
+	
+	// reduced form 
+	forvalue i=11/15{
+	 reghdfe LFP_male vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	}
+	
+ 
+	
+	// IV
+	forvalue i=11/15{
+	ivreg2 LFP_male (w_mean_spices  = vers_distCapital_2000) i.region_cat i.cl_md ${c`i'} if vers_distCapital_2000 != 0, robust partial( i.region_cat i.cl_md)
+	} 	
+	
