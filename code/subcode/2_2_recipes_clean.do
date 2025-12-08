@@ -510,12 +510,12 @@ replace totaltime = 75 if nameoftherecipe == "Pan o roscas de canela"
 */
 sum totaltime if country == "Bolivia", de
 	
-	br if country == "Colombia"
-	
-	keep if country == "Brazil" | country == "Chile" | country == "Colombia" | country == "Cuba" | ///
-         country == "Ecuador" | country == "Uruguay" | country == "Peru" | country == "Argentina" | ///
-         country == "Costa Rica" | country == "Guatemala" | country == "Honduras" | country == "Nicaragua" | ///
-         country == "Panama" | country == "Paraguay" | country == "El Salvador" | country == "Venezuela" | country == "Bolivia" 
+// 	br if country == "Colombia"
+//	
+// 	keep if country == "Brazil" | country == "Chile" | country == "Colombia" | country == "Cuba" | ///
+//          country == "Ecuador" | country == "Uruguay" | country == "Peru" | country == "Argentina" | ///
+//          country == "Costa Rica" | country == "Guatemala" | country == "Honduras" | country == "Nicaragua" | ///
+//          country == "Panama" | country == "Paraguay" | country == "El Salvador" | country == "Venezuela" | country == "Bolivia" 
 
 /*
 	preserve

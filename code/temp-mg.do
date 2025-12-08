@@ -75,6 +75,8 @@ use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
 	
 	
 	
+	egen precip_bin = cut(precip), at(0(50)250)
+	
 	
 
 	/// women only estimations 
@@ -83,16 +85,22 @@ use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
 	reghdfe LFP_female vers_distCapital_2000 $c1 if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
 	
 	egen vers_distCapital_2000_std=std(vers_distCapital_2000 )	if e(sample)
-	label var vers_distCapital_2000_std  "Flavor versatility"
 	
-	lavel var w_mean_spices  "Average spices"
+	reghdfe LFP_female vers_distCapital_2000 $c1   , absorb(region_cat cl_md) vce(robust)
+	
+	egen vers_distCapital_2000_std2=std(vers_distCapital_2000 )	if e(sample)
+	
+	label var vers_distCapital_2000_std  "Flavor versatility"
+	label var vers_distCapital_2000_std2  "Flavor versatility"
+	
+	label var w_mean_spices  "Average spices"
 	
 		
 	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
 	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
 	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability  trade_distCapital_2000 GDP"
-	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability  trade_distCapital_2000 GDP al_mn  precip ph_mn  temp"
-	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability   trade_distCapital_2000 GDP al_mn precip ph_mn   temp abslat lon rough  landlocked distcr  "
+	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability  trade_distCapital_2000 GDP  i.precip_bin temp   abslat lon  landlocked"
+	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability   trade_distCapital_2000 GDP al_mn  i.precip_bin temp  ph_mn     abslat lon rough  landlocked distcr  "
 	
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +241,156 @@ foreach j in female male gap {
 }	
 	
 	
+ ///////////////////////////////////
+ /// including IV with 0 
+ //////////////////////////////////
  
+ 
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// TABLE	
+/// OLS table Panel A. female, Panel B. male, Panel C gap  
+/////////////////////////////////////////////////////////////////////////////////////////////	
+	
+cd "$tables"
+
+// PANEL A-C 
+
+foreach j in female male gap {
+	
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_`j' w_mean_spices   ${c`i'} , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_ols_`j'_ws.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(w_mean_spices) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}	
+	 
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// TABLE	
+/// Reduced form   Panel A. reduced form FLFP, Panel B gap,  and Panel C.  first stage 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+cd "$tables"
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_female vers_distCapital_2000_std2 ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_rf_fem_country_ws.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std2) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_male vers_distCapital_2000_std2 ${c`i'} , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_rf_male_country_ws.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std2) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+
+	
+	eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe LFP_gap vers_distCapital_2000_std2 ${c`i'} , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_rf_gap_country_ws.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std2) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+	
+	
+	
+	
+// first stage 
+eststo clear
+	forvalue i=6/10{
+	eststo:  reghdfe  w_mean_spices  vers_distCapital_2000_std2 ${c`i'}   if LFP_female!=., absorb(region_cat cl_md) vce(robust)
+			qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	 estout using reg_fs_country_ws.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(vers_distCapital_2000_std2) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+   postfoot("\hline") replace
+
+ 
+ 
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// TABLE	
+/// IV  Panel A.  FLFP, Panel B gap 
+/////////////////////////////////////////////////////////////////////////////////////////////
+ 
+ 
+foreach j in female male gap {
+	
+	eststo clear
+	forvalue i=6/10{
+	eststo: ivreg2 LFP_`j' (w_mean_spices  = vers_distCapital_2000_std2) i.region_cat i.cl_md ${c`i'} , robust partial( i.region_cat i.cl_md)  
+	
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_iv_`j'_ws.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(w_mean_spices) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2 widstat, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}	
+	
+	
+	
+	
+	
+	
+	
+	
  
  
  
