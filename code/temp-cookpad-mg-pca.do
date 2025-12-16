@@ -175,9 +175,10 @@ eststo clear
 	eststo clear
 	forvalue i=6/11{
 	eststo:  ivreg2 lfpr (z_pca_index   = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-	estadd scalar Ffirst=e(rkf)
-		qui sum `e(depvar)' if e(sample)
+			qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
+	estadd scalar Ffirst=e(rkf)
+
 	}
 	 	 
 	 estout using reg_index_iv_`j'_cook.tex, ///
@@ -197,9 +198,10 @@ eststo clear
 	eststo clear
 	forvalue i=6/11{
 	eststo:  ivreg2 lfpr (z_pca_index   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-	estadd scalar Ffirst=e(rkf)
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
+	estadd scalar Ffirst=e(rkf)
+
 	}
 	 	 
 	 estout using reg_index_iv_`j'_cook_robust.tex, ///
