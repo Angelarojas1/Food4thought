@@ -293,6 +293,12 @@
 	*********************************************************
 	
 	* 	The purpose of this dofile is:
+	*		- Create desciptive statistics
+	
+	    do "$code/es_descriptives.do"
+
+	
+	* 	The purpose of this dofile is:
 	*		- Run cookpad regressions
 	*		- Contains OLS, 1stage, RF, IV
 	
@@ -314,6 +320,12 @@
 	*		- The file was created by MG
 		
 		do "$code/temp-mg.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Run individual level regressions
+	*		- The file was created by MG for draft sent on december 8
+		
+		do "$code/temp-cookpad-mg-v2.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions

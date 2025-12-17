@@ -14,6 +14,9 @@
 	* keep country three_letter_country_code weight year numLunCook numLunEat numDinCook numDinEat gender
 	gen covid=(ym>=722)
 	
+	*-- Rename employment variables
+	ren (emp_ftemp emp_ftemp_pop emp_lfpr emp_work_hours) (ft p2p lfpr hours)
+	
 	* merge with cuisine data
 	rename three_letter_country_code adm0
 	merge m:1 country using "$recipes/complexity_recipe.dta" 
@@ -26,10 +29,24 @@
 	keep if gdp_merge != 2
 	drop gdp_merge 
 	
+	*-  Create the log of GDP
+	gen log_gdp = ln(GDP)
+	drop GDP
+	rename log_gdp GDP 
+	
 	*-- Native Versatility measure
 	merge m:1 adm0 using "$versatility/native_versatility_m_c.dta", gen(final_versatility_merge)	
 	keep if final_versatility_merge == 3
 	
+	*-- Versatily measures that include distance
+	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta",  ///
+				keep(3) nogen
+		
+	foreach var of varlist trade* vers* {
+    local label : subinstr local var "_" " " , all
+    label variable `var' "`label'"
+	}
+		
 	*-- Geographical controls
 	merge m:1 adm0 using "${versatility}/geographical.dta"
 	keep if _merge == 3
@@ -56,6 +73,23 @@
 	
 	drop _merge
 	
+	*-- Create Principal Component Index 
+	*- Standarized
+	foreach v of varlist w_mean_spices median_totaltime median_ingredients {
+		sum `v'
+		gen z_`v' = (`v' - r(mean)) / r(sd)
+	}
+
+	* PCA with standarized variables
+	pca z_w_mean_spices z_median_totaltime z_median_ingredients
+	
+	predict pca_index if e(sample), score
+	
+	sum  pca_index 
+	gen z_pca_index  = ( pca_index  - r(mean)) / r(sd)
+	
+	encode region, gen(region_cat)
+	
 	label var country "Country" 
 	label var Country "Encoded country" 
 	label var median_totaltime "Median total time" 
@@ -77,7 +111,31 @@
 	label var suit_spice_vers "Native spice versatility 2 weighted by suitability" 
 	label var avg_suitability "Mean Suitability" 
 	label var staple_suitability "Mean saple suitability"
-
+	label var pca_index "PCA Index"
+	label var z_pca_index "Cuisine complexity"
+	
+	*-- Create other outcomes for regressions
+	egen precip_bin = cut(precip), at(0(50)250)
+	egen meals=rowtotal(numDinCook numLunCook)
+	gen partjob=cond(hours==1 | hours==2,1,0) if hours!=0. & hours!=98
+	gen spousecook=cond(wp19962==1 | wp19970==1,1,cond(wp19962==2 | wp19970==2,0,.)) 
+	gen nonsingle=cond(wp1223==2|wp1223==8,1,0) if (wp1223!=6 & wp1223!=7 & wp1223!=.)  
+	
+	// other employment outcomes 
+	// fulltime work condition on lfp 
+	gen fullemployee=cond(emp_2010==1,1,0) if emp_2010!=. & emp_2010!=6 
+	gen fulltime=cond(emp_2010<=2,1,0) if emp_2010!=. & emp_2010!=6 
+	
+	// share lunches and 
+	gen pmeals=(numLunCook+numDinCook)/(numLunEat+numDinEat)
+	replace pmeals=1 if pmeals>1 & pmeals!=.
+	
+	egen cont_cat=group(continent)
+	gen lmedian_time=log(median_totaltime)
+	gen lmean_time=log(w_mean_totaltime)
+	lab var lmean_time "Log. average cooking time"
+	lab var staple_suitability  "Mean Staple Suitability"
+	
 	save "$cookpad/cookpad_adm0.dta", replace
 	
 	*=========================================================
