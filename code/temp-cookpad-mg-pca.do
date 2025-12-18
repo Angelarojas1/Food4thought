@@ -63,6 +63,7 @@ global s5 "nonsingle==0"
 	**#  		      PCA Index                *
 	*------------------------------------------*
 
+	*-------- OLS --------*
 
  cd "$tables"
 	forvalue j=0/3 {
@@ -85,8 +86,8 @@ global s5 "nonsingle==0"
     replace
 }	
 
- 
- 
+	*-------- IV --------*
+  
 	forvalue j=0/3 {
 	
 	eststo clear
@@ -108,6 +109,7 @@ global s5 "nonsingle==0"
     replace
 }		
 
+	*-------- First Stage --------*
  
 	forvalue j=0/3 {
 	
@@ -132,14 +134,16 @@ global s5 "nonsingle==0"
 
 ivreg2 lfpr (c.w_mean_spices#i.fem  w_mean_spices= c.vers_distCapital_2000_std#i.fem vers_distCapital_2000_std) $c8 i.region_cat i.cl_md i.ym    if vers_distCapital_2000 != 0 & covid == 0  , partial(i.region_cat i.cl_md i.ym  ) cluster(adm0) first
 	
- 
-
 ivreg2 lfpr (w_mean_spices  = vers_distCapital_2000_std) $c8        i.precip_bin temp abslat lon  landlocked rough  landlocked distcr i.region_cat     i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & fem==1, partial(i.region_cat i.cl_md i.ym) cluster(adm0) first
 
 precip  temp 
-	al_mn  precip ph_mn  temp abslat lon rough  landlocked distcr  
+	al_mn  precip ph_mn  temp abslat lon rough  landlocked distcr 
 	
-	*-------- FLFP --------*
+	*------------------------------------------*
+	**#   Standarized PCA Index                *
+	*------------------------------------------*
+
+	*-------- OLS --------*
  
 	 cd "$tables"
 	forvalue j=0/3 {
@@ -189,10 +193,7 @@ eststo clear
 }
  
  
- 
-	*------------------------------------------*
-	**#  		       IV           *
-	*------------------------------------------*
+	*-------- IV --------*
 
 	
 	forvalue j=0/3 {
@@ -240,14 +241,7 @@ eststo clear
     replace
 }		
 
-
- 
-
-
- 	*------------------------------------------*
-	**#  		       first stage            *
-	*------------------------------------------*
-
+	*-------- First Stage --------*
 	
 	forvalue j=0/3 {
 	
@@ -270,7 +264,6 @@ eststo clear
 }		
 
 
-
 	forvalue j=0/3 {
 	
 	eststo clear
@@ -291,22 +284,16 @@ eststo clear
     replace
 }		
 
-
-
-
-
 	
-
-/////////////////////////
-///// other outcomes/////
-/////////////////////////
+	********************************************
+	*				Other Outcomes             *
+	********************************************
 
 	*------------------------------------------*
-	**#  		        OLS                    *
+	**#   Standarized PCA Index                *
 	*------------------------------------------*
-	
-	 
- 
+
+	*-------- OLS --------*
 	 
 	foreach var in partjob  fulltime fullemployee meals spousecook pmeals  {
 	 
@@ -384,12 +371,7 @@ eststo clear
 	}
 }
 
-
-
- 
-	*------------------------------------------*
-	**#  		       IV           *
-	*------------------------------------------*
+	*-------- IV --------*
 
 	foreach var in partjob  fulltime fullemployee spousecook meals pmeals   {
 	forvalue j=0/3 {
@@ -419,13 +401,11 @@ eststo clear
 *spousecook meals
 
 
-//////////////////////////////
-////// total time ///////////
-/////////////////////////////
+	*------------------------------------------*
+	**#             Total time                 *
+	*------------------------------------------*
 
-
-
-	*-------- FLFP --------*
+	*-------- OLS --------*
  
 	 cd "$tables"
 	forvalue j=0/3 {
@@ -448,7 +428,7 @@ eststo clear
     replace
 }	
 
- 
+	*-------- IV --------*
  
 	forvalue j=0/3 {
 	
@@ -471,6 +451,7 @@ eststo clear
     replace
 }		
 
+	*-------- First Stage --------*
 
 	forvalue j=0/3 {
 	
