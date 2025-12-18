@@ -17,6 +17,10 @@
 	merge 1:m country using "${codedata}/merge/lfplong2019.dta", gen(lfp_merge)
 	
 	keep if lfp_merge != 2
+	
+	gen LFP_female = LFP if fem_lfp == 1
+	gen LFP_male   = LFP if fem_lfp == 0
+	
 	drop continent_code lfp_merge two_letter_country_code 
 	encode continent_name, gen(continent_code)
 	
@@ -25,6 +29,16 @@
 	
 	keep if gdp_merge != 2
 	drop gdp_merge 
+	
+	gen log_gdp = ln(GDP)
+	drop GDP
+	rename log_gdp GDP 
+	
+	*-- Population data
+	merge m:1 country using "${pop}/populationlong2019.dta", gen(pop_merge)
+	
+	keep if pop_merge != 2
+	drop pop_merge 
 	
 	*-- Native Versatility measure
 	merge m:1 adm0 using "$versatility/final_versatility_m_c.dta", gen(final_versatility_merge)	
@@ -56,6 +70,28 @@
 	
 	drop continent _merge
 	
+	*-- Merge database to distance measures
+	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)
+		
+	foreach var of varlist trade* vers* {
+    local label : subinstr local var "_" " " , all
+    label variable `var' "`label'"
+	}
+	
+	*-- Create Principal Component Index 
+	*- Standarized
+	foreach v of varlist w_mean_spices median_totaltime median_ingredients {
+		sum `v'
+		gen z_`v' = (`v' - r(mean)) / r(sd)
+	}
+
+	* PCA with standarized variables
+	pca z_w_mean_spices z_median_totaltime z_median_ingredients
+
+	predict pca_index if e(sample), score
+	
+	label var pca_index "PCA Index"
+	
 	*-- Create old and new world variable
 	gen oldworld = inlist(continent_name, "Africa", "Asia", "Europe")
 	rename continent_name continent
@@ -86,6 +122,10 @@
 	label var cookpad "Cookpad (Dummy)" 
 	label var staple_suitability "Mean saple suitability"
 	label var oldworld "Country is from Old World"
+	label var population "Population"
+	
+	*-- Encode variables 
+	encode region, gen(region_cat)
 	
 	save "$versatility/first_stage_native_m_c.dta", replace
 	

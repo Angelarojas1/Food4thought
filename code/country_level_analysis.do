@@ -18,41 +18,14 @@
 	* Region FE
 	********************************************
 	
-global gnr "C:\Users\mgafargo\Dropbox\food4thought\analysis23"
-global codedata "$gnr\data\coded\"
-global versatility "$codedata\iv_versatility\"
+// global gnr "C:\Users\mgafargo\Dropbox\food4thought\analysis23"
+// global codedata "$gnr\data\coded\"
+// global versatility "$codedata\iv_versatility\"
 
 
-
-	use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
+	use "$codedata\versatility\first_stage_native_m_c.dta", clear
 	
-	gen log_gdp = ln(GDP)
-	drop GDP
-	rename log_gdp GDP 
-	
-	*--- Merge database to distance measures
-	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)
-		
-	foreach var of varlist trade* vers* {
-    local label : subinstr local var "_" " " , all
-    label variable `var' "`label'"
-	}
-	
-	*-- Create Principal Component Index 
-	*- Standarized
-	foreach v of varlist w_mean_spices median_totaltime median_ingredients {
-		sum `v'
-		gen z_`v' = (`v' - r(mean)) / r(sd)
-	}
-
-	* PCA con las variables estandarizadas
-	pca z_w_mean_spices z_median_totaltime z_median_ingredients
-
-	predict pca_index if e(sample), score
-	
-	label var pca_index "PCA Index"
-	
-
+	*-- Set controls
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability al_mn"
 	global c3 "numrecipes avg_suitability al_mn GDP"
@@ -282,27 +255,9 @@ global versatility "$codedata\iv_versatility\"
 	* Region and climate FE
 	********************************************
 
-	use "$codedata\iv_versatility\first_stage_dataset_native_m_c.dta", clear
+	use "$codedata\versatility\first_stage_native_m_c.dta", clear
 
-	gen log_gdp = ln(GDP)
-	drop GDP
-	rename log_gdp GDP 
-	
-	*--- Merge database to distance measures
-	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)	
-	
-	*-- Create Principal Component Index 
-	*- Standarized
-	foreach v of varlist w_mean_spices median_totaltime median_ingredients {
-		sum `v'
-		gen z_`v' = (`v' - r(mean)) / r(sd)
-	}
-
-	* PCA con las variables estandarizadas
-	pca z_w_mean_spices z_median_totaltime z_median_ingredients
-
-	predict pca_index if e(sample), score
-		
+	*-- Set controls
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability al_mn"
 	global c3 "numrecipes avg_suitability al_mn GDP"
@@ -321,10 +276,6 @@ global versatility "$codedata\iv_versatility\"
 	global c14 "numrecipes avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon GDP"
 	global c15"numrecipes  avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
 	
-	encode region, gen(region_cat)
-
-	gen LFP_female = LFP if fem_lfp == 1
-	gen LFP_male   = LFP if fem_lfp == 0
 
 	* creating the LFP gap at the country-level
 	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices vers_distCapital_2000 vers_distCapital_3000 trade_distCapital_2000 trade_distCapital_3000 (first) continent region_cat cl_md pca_index, by(adm0)

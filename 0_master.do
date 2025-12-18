@@ -46,6 +46,7 @@
 	global versatility          "$codedata/iv_versatility"
 	global cookpad              "$codedata/cookpad"
 	global fao_suit             "$codedata/FAO_suitability"
+	global pop                  "$codedata/population"
 
 	
 	* Output sub-folder globals
@@ -134,6 +135,15 @@
 	
 		do "$code/gdp_clean.do" 
 	
+	* ***************************************************** *
+	*             Population Data Coding				    *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean population data
+
+		do "$code/population_clean.do" 
+		
 	* ***************************************************** *
 	*                 Distance Data Coding                  *
 	* ***************************************************** *	

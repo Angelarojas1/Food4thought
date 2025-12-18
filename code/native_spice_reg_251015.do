@@ -14,20 +14,13 @@
 
 **# Regresions in 20251027 file. 
 
-	use "$codedata\iv_versatility\first_stage_native_m_c.dta", clear
-	gen log_gdp = ln(GDP)
-	drop GDP
-	rename log_gdp GDP 
+	use "$versatility/first_stage_native_m_c.dta", clear
+
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability  al_mn"
 	global c3 "numrecipes avg_suitability  al_mn GDP"
 	global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
 	global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
-
-	encode region, gen(region_cat)
-
-	gen LFP_female = LFP if fem_lfp == 1
-	gen LFP_male   = LFP if fem_lfp == 0
 
 	* creating the LFP gap at the country-level
 	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices native_spice_vers native_spice_vers2 suit_spice_vers (first) continent region_cat cl_md , by(adm0)
@@ -201,13 +194,7 @@
 
 
 		
-	use "$codedata\iv_versatility\first_stage_native_m_c.dta", clear
-	gen log_gdp = ln(GDP)
-	drop GDP
-	rename log_gdp GDP 
-	
-	*--- Merge database to distance measures
-	merge m:1 adm0 using "$versatility/native_versatility_m_c_dist_all.dta", keep(3)
+	use "$versatility/first_stage_native_m_c.dta", clear
 	
 	global c1 "numrecipes"
 	global c2 "numrecipes avg_suitability  al_mn"
@@ -215,10 +202,6 @@
 	global c4 "numrecipes avg_suitability  al_mn precip ph_mn abslat lon GDP"
 	global c5 "numrecipes  avg_suitability  al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
 
-	encode region, gen(region_cat)
-
-	gen LFP_female = LFP if fem_lfp == 1
-	gen LFP_male   = LFP if fem_lfp == 0
 
 	* creating the LFP gap at the country-level
 	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices vers_distCapital_2000 vers_distCapital_3000 (first) continent region_cat cl_md, by(adm0)

@@ -29,7 +29,7 @@
 reshape long year, i(countryname countrycode) j(y)
 
 	* rename variables
-	rename year pop
+	rename year population
 	rename y year
 	rename countryname country
 	rename countrycode adm0
@@ -51,7 +51,7 @@ reshape long year, i(countryname countrycode) j(y)
 	replace country = "Venezuela" if country == "Venezuela, RB"
 	
 	* Drop missings
-	drop if pop == .
+	drop if population == .
 	
 	* Drop observations different to country 
 	drop if strpos(country,"African")>0
@@ -74,14 +74,14 @@ reshape long year, i(countryname countrycode) j(y)
 	drop if strpos(country,"West Bank")>0
 	
 	* Format population data
-	format %16.0g pop
+	format %16.0g population
 	
-	** keep the most recent year
-	keep if year == 2019 | year == 2023
+	** keep for 2019
+	keep if year == 2019 
 	unique country
 	note: There are `r(sum)' countries in population data.
 	
 	** save dataset
-save "${pop}/populationlong2019_2023.dta", replace
+save "${pop}/populationlong2019.dta", replace
 note
    
