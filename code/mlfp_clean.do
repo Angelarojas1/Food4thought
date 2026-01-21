@@ -91,6 +91,8 @@ drop if strpos(country, "World") > 0
 replace adm0 = indicatorname if length(adm0) > 3 
 replace adm0 = indicatorname  if adm0 == " RB"
 
+save "${mlfp}/MLFPlong.dta", replace
+
 ** keep the most recent year
 keep if year == 2019
 isid country

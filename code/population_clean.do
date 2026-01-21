@@ -76,6 +76,8 @@ reshape long year, i(countryname countrycode) j(y)
 	* Format population data
 	format %16.0g population
 	
+	save "${pop}/populationlong.dta", replace
+	
 	** keep for 2019
 	keep if year == 2019 
 	unique country

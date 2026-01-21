@@ -147,6 +147,33 @@
 		do "$code/population_clean.do" 
 		
 	* ***************************************************** *
+	*                  CPI Data Coding	    			    *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean consumer price index
+
+		do "$code/cpi_clean.do" 
+		
+	* ***************************************************** *
+	*               Exchange rate Data Coding	    		*
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean Exchange rate local currency – USD
+
+		do "$code/exchange_rate_clean.do" 
+		
+	* ***************************************************** *
+	*              Appliances price Data Coding	    		*
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean appliances price index for US and EU
+
+		do "$code/price_index_clean.do" 
+		
+	* ***************************************************** *
 	*                 Distance Data Coding                  *
 	* ***************************************************** *	
 		

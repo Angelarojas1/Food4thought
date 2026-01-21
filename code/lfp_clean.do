@@ -38,3 +38,33 @@
    drop sex
 
    save "${codedata}/merge/lfplong2019.dta", replace
+   
+   
+   *-------- Time series --------*
+   
+    *-- Import FLFP data 
+   use "${flfp}/FLFPlong.dta",clear
+   
+   *-- Merge with MLFP data
+   merge 1:1 adm0 year using "${mlfp}/MLFPlong.dta"
+   
+   *-- Keep countries in both datasets
+   keep if _merge == 3
+   
+   *-- Keep variables of interest 
+   drop indicatorname _merge
+   
+   rename FLFP LFP_F
+   rename MLFP LFP_M
+   reshape long LFP_, i(country adm0 year) j(sex, string)
+   rename LFP_ LFP
+   
+   drop if missing(LFP)
+   
+   *-- Encode indicator variable
+   gen fem_lfp = (sex == "F")
+   label define femlbl 0 "Male" 1 "Female"
+   label values fem_lfp femlbl
+   drop sex
+
+   save "${codedata}/merge/lfplong.dta", replace
