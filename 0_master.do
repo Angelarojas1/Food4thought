@@ -70,6 +70,8 @@
 	* ssc install winsor4
 	* ssc install dataex
 	* ssc install geoinpoly
+	* ssc install kountry
+	* ssc install winsor4
 	
 	** Section to create all the folders I need in data/coded folder
 	* mkdir

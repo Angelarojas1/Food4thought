@@ -113,6 +113,9 @@
 	label var staple_suitability "Mean saple suitability"
 	label var pca_index "PCA Index"
 	label var z_pca_index "Cuisine complexity"
+	label var pca_recipe "PCA Index - recipe"
+	label var z_pca_recipe "Cuisine complexity - recipe"
+
 	
 	*-- Create other outcomes for regressions
 	egen precip_bin = cut(precip), at(0(50)250)
