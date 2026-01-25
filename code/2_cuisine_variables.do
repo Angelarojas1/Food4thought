@@ -43,17 +43,17 @@
 	* Winsorize time variable and create dataset
 
 	* Min Max Mean by Country
-	bys Country: egen min_totaltime = min(totaltime_corr)
-	bys Country: egen max_totaltime = max(totaltime_corr)
-	bys Country: egen mean_totaltime = mean(totaltime_corr)
-	bys Country: egen median_totaltime = median(totaltime_corr)
+	bys Country: egen min_totaltime = min(totaltime_orig)
+	bys Country: egen max_totaltime = max(totaltime_orig)
+	bys Country: egen mean_totaltime = mean(totaltime_orig)
+	bys Country: egen median_totaltime = median(totaltime_orig)
 	bys Country: egen mean_spices = mean(numberofspices)
 	bys Country: egen median_spices = median(numberofspices)
 	bys Country: egen median_ingredients = median(numberofingredients)
 	bys Country: egen mean_ingredients = mean(numberofingredients)
 	
 	* winsorize
-	winsor4 totaltime_corr, method(winsor) outlier(tail) level(1) group(Country) newvar(TotalTime)
+	winsor4 totaltime_orig, method(winsor) outlier(tail) level(1) group(Country) newvar(TotalTime)
 	winsor4 numberofspices, method(winsor) outlier(tail) level(1) group(Country) newvar(w_numberofspices)
 	bys Country: egen w_mean_totaltime = mean(TotalTime)
 	bys Country: egen w_mean_spices = mean(w_numberofspices)
@@ -65,13 +65,13 @@
 	
 	*-- Create Principal Component Index 
 	*- Standarized
-	foreach v of varlist w_numberofspices totaltime_corr numberofingredients {
+	foreach v of varlist w_numberofspices totaltime_orig numberofingredients {
 		sum `v'
 		gen z_`v' = (`v' - r(mean)) / r(sd)
 	}
 
 	* PCA with standarized variables
-	pca z_w_numberofspices z_totaltime_corr z_numberofingredients
+	pca z_w_numberofspices z_totaltime_orig z_numberofingredients
 	
 	predict pca if e(sample), score
 	
@@ -99,7 +99,7 @@
 
 	** collapse to country level, multiple percentiles
 	gen cnt = 1
-	collapse (p10)time_p10 = totaltime_corr (p25)time_p25 = totaltime_corr (median)time_median = totaltime_corr (p75)time_p75 = totaltime_corr  (p90)time_p90 = totaltime_corr  (mean)time_mean = totaltime_corr  ///
+	collapse (p10)time_p10 = totaltime_orig (p25)time_p25 = totaltime_orig (median)time_median = totaltime_orig (p75)time_p75 = totaltime_orig  (p90)time_p90 = totaltime_orig  (mean)time_mean = totaltime_orig  ///
 (p10)ingredients_p10 = numberofingredients (p25)ingredients_p25 = numberofingredients (median)ingredients_median = numberofingredients (p75)ingredients_p75 = numberofingredients  (p90)ingredients_p90 = numberofingredients (mean)ingredients_mean = numberofingredients ///
 (p10)spices_p10 = numberofspices (p25)spices_p25 = numberofspices (median)spices_median = numberofspices (p75)spices_p75 = numberofspices  (p90)spices_p90 = numberofspices (mean)spices_mean = numberofspices ///
 (sum)num_recipes = cnt (first)continent_name two_letter_country_code adm0 , by(country)

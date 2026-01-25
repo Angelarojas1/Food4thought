@@ -58,7 +58,7 @@
 	strpos(cooktime,"H")>0 | strpos(cooktime,"~")>0
 	destring cook , replace
 
-	replace totaltime_corr = prep + cook if totaltime_corr == 0 | totaltime_corr == .
+	replace totaltime_orig = prep + cook if totaltime_orig == 0 | totaltime_orig == .
 	
 	* Drop recipes with zeros in number of ingredients
 	drop if numberofingredients==0 // 41 observations deleted
@@ -67,7 +67,7 @@
 	sort country
 	bysort nameoftherecipe country: gen numrecipe = _n
 	
-	bysort country: egen welose1 = count(nameoftherecipe) if totaltime_corr == 0 | totaltime_corr ==.
+	bysort country: egen welose1 = count(nameoftherecipe) if totaltime_orig == 0 | totaltime_orig ==.
 	bysort country: egen welose2 = count(nameoftherecipe) if numberofingredients == 0
 	bysort country: egen totalrecipe = total(numrecipe)
 	egen welose = rowtotal(welose1 welose2)
@@ -81,14 +81,14 @@
 	drop welose* percent totalrecipe
 	
 	* Drop recipes with zeros in time 
-	drop if totaltime_corr==0 | missing(totaltime_corr) // 7001 observations deleted
+	drop if totaltime_orig==0 | missing(totaltime_orig) // 7001 observations deleted
 	
 	** drop recipes that the total time are higher than 99%
-	bys country: egen p99 = pctile(totaltime_corr), p(99)
-	drop if totaltime_corr > p99 // 553
+	bys country: egen p99 = pctile(totaltime_orig), p(99)
+	drop if totaltime_orig > p99 // 553
 	note: `r(N_drop)' recipes are dropped because of higher than 99%.
 	
 	** drop recipes that the total time are lower than 1%
-	egen p1 = pctile(totaltime_corr), p(1)
-	drop if totaltime_corr < p1 // 302
+	egen p1 = pctile(totaltime_orig), p(1)
+	drop if totaltime_orig < p1 // 302
 	note: `r(N_drop)' recipes are dropped because of lower than 1%.
