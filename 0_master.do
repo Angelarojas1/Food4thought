@@ -367,11 +367,17 @@
 		do "$code/temp-cookpad-mg-v2.do"
 		
 	* 	The purpose of this dofile is:
+	*		- Run individual level regressions using PCA index
+	*		- The file was created by MG for draft sent on december 8
+		
+		do "$code/temp-cookpad-mg-pca.do"
+		
+	* 	The purpose of this dofile is:
 	*		- Run country level regressions
 	*		- The file was created by Steve
 	*		- Focus on regression using native spices versatility 
 		
-		dp "$code/native_spice_reg_251015.do"
+		do "$code/native_spice_reg_251015.do"
 		
 	* ***************************************************** *
 	*                        Graphs                         *
@@ -385,5 +391,12 @@
 	*		- Creates plots: winsorized variables, outliers, mexico vs Colombia
 	
 		* do "$code/30_time_outliers.do" // in archive folder
+		
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Creates heat maps for FLFP, MLFP and gap.
+	
+		 do "$code/heat_maps_lfp.do" // in archive folder
 	
 	
