@@ -136,6 +136,7 @@
 	egen cont_cat=group(continent)
 	gen lmedian_time=log(median_totaltime)
 	gen lmean_time=log(w_mean_totaltime)
+	lab var lmedian_time "Log. median cooking time"
 	lab var lmean_time "Log. average cooking time"
 	lab var staple_suitability  "Mean Staple Suitability"
 	

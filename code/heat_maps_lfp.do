@@ -11,6 +11,7 @@ Last modified:
 Description:
 This code created heat maps for LFP variables: Female, male and the gap.
 ------------------------------------------------------------------------ */
+
 grmap, activate
 cd "$rawdata/world_admin_shp"
 
@@ -43,22 +44,33 @@ cd "$rawdata/world_admin_shp"
 	rename *, lower
 	
 *--- Create gap variable
-	gen gap = mlfp - flfp // 30 missings, countries we don't have information for
-		
-*--- Create maps
+	gen gap = flfp - mlfp // 30 missings, countries we don't have information for
+
+	format flfp mlfp gap %12.0f
 	
+*--------------------*
+*    Create maps     *
+*--------------------*
+
 	*- FLFP
-	grmap flfp, fcolor(Reds) clnumber(9)
+	grmap flfp, clnumber(9) clmethod(custom) ///
+	fcolor(Reds) ///
+	clbreaks(6 10 20 30 40 50 60 70 80 84) ///
+	ndpattern(dot) ndfcolor(gs15) 
 	
 	graph export "$figures/flpf_heat_map.pdf", replace
-	
+
 	*- MLFP
-	grmap mlfp, clnumber(9)
+	grmap mlfp, clnumber(9) clmethod(custom) ///
+	clbreaks(24 40 50 60 65 70 75 80 90 95) ///
+	ndpattern(dot) ndfcolor(gs15)
 	
 	graph export "$figures/mlpf_heat_map.pdf", replace
 
 	*- GAP
-	grmap gap, fcolor(Greys) clnumber(9)
+	grmap gap, fcolor(Greys2) clnumber(9) clmethod(custom) ///
+	clbreaks(-60 -50 -40 -30 -20 -10 0 10 20 30) ///
+	ndpattern(dot) ndfcolor(gs16)
 	
 	graph export "$figures/gaplpf_heat_map.pdf", replace
 

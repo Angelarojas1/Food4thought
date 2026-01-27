@@ -398,5 +398,12 @@
 	*		- Creates heat maps for FLFP, MLFP and gap.
 	
 		 do "$code/heat_maps_lfp.do" // in archive folder
+		 
+		* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Creates line graphs for FLFP, MLFP and gap vs cuisine variables
+	
+		 do "$code/graphs_lfp_cuisine.do" // in archive folder
 	
 	
