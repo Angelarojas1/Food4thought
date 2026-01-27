@@ -55,15 +55,15 @@ cd "$rawdata/world_admin_shp"
 	*- FLFP
 	grmap flfp, clnumber(9) clmethod(custom) ///
 	fcolor(Reds) ///
-	clbreaks(6 10 20 30 40 50 60 70 80 84) ///
-	ndpattern(dot) ndfcolor(gs15) 
+	clbreaks(6 10 20 30 40 50 60 70 84) ///
+	ndfcolor(gs15) 
 	
 	graph export "$figures/flpf_heat_map.pdf", replace
 
 	*- MLFP
 	grmap mlfp, clnumber(9) clmethod(custom) ///
-	clbreaks(24 40 50 60 65 70 75 80 90 95) ///
-	ndpattern(dot) ndfcolor(gs15)
+	clbreaks(24 40 50 60 65 70 75 80 96) ///
+	ndfcolor(gs15)
 	
 	graph export "$figures/mlpf_heat_map.pdf", replace
 

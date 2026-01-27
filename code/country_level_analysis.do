@@ -23,7 +23,7 @@
 // global versatility "$codedata\iv_versatility\"
 
 
-	use "$codedata\versatility\first_stage_native_m_c.dta", clear
+	use "$codedata\iv_versatility\first_stage_native_m_c.dta", clear
 	
 	*-- Set controls
 	global c1 "numrecipes"
