@@ -13,6 +13,7 @@ This code created line for LFP variables: Female, male and the gap vs
 cuisine variables (time, ingredients, spices)
 ------------------------------------------------------------------------ */
 
+*--- Identify countries used in the regressions
 	use "$cookpad/cookpad_adm0.dta", replace
 	
 	*--- Create globals with the different controls

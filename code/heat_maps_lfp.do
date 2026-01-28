@@ -51,26 +51,56 @@ cd "$rawdata/world_admin_shp"
 *--------------------*
 *    Create maps     *
 *--------------------*
-
+	
 	*- FLFP
-	grmap flfp, clnumber(9) clmethod(custom) ///
-	fcolor(Reds) ///
+	grmap flfp, clmethod(custom) ///
 	clbreaks(6 10 20 30 40 50 60 70 84) ///
-	ndfcolor(gs15) 
+	fcolor( ///
+		white ///
+		"254 232 200" ///
+		"253 187 132" ///
+		"251 106 74" ///
+		"215 35 35" ///   
+		"165 15 21" ///   
+		"103 0 13" /// 
+		"70 0 10" /// 
+	) ///
+	ndfcolor(gs14)
 	
 	graph export "$figures/flpf_heat_map.pdf", replace
 
 	*- MLFP
 	grmap mlfp, clnumber(9) clmethod(custom) ///
 	clbreaks(24 40 50 60 65 70 75 80 96) ///
-	ndfcolor(gs15)
+	fcolor( ///
+		white ///
+		"225 235 250" ///  
+		"158 202 225" /// 
+		"107 174 214" /// 
+		"49 130 189" ///  
+		"8 81 156" ///     
+		"8 48 107" ///      
+		"5 30 80" ///
+	) ///
+	ndfcolor(gs14)
 	
 	graph export "$figures/mlpf_heat_map.pdf", replace
 
 	*- GAP
-	grmap gap, fcolor(Greys2) clnumber(9) clmethod(custom) ///
+	grmap gap, clnumber(9) clmethod(custom) ///
 	clbreaks(-60 -50 -40 -30 -20 -10 0 10 20 30) ///
-	ndpattern(dot) ndfcolor(gs16)
+	fcolor( ///
+		"127 39 4" ///  
+		"166 54 3" /// 
+		"217 72 1" ///
+		"253 141 60" /// 	
+		"253 208 162" ///    	
+		"254 230 206" ///      
+		"217 239 139" ///
+		"102 189 99" ///
+		"0 104 55" ///
+	) ///
+	ndfcolor(gs14)
 	
 	graph export "$figures/gaplpf_heat_map.pdf", replace
 
