@@ -13,6 +13,22 @@ This code created line for LFP variables: Female, male and the gap vs
 cuisine variables (time, ingredients, spices)
 ------------------------------------------------------------------------ */
 
+	use "$cookpad/cookpad_adm0.dta", replace
+	
+	*--- Create globals with the different controls
+		
+	global c1 "numrecipes"
+	
+	*--- Create standarized distance variables
+	qui: reghdfe lfpr  w_mean_spices  $c1 if vers_distCapital_2000 != 0 & covid == 0 , absorb(region_cat cl_md ym) cluster(adm0)
+	
+	keep if e(sample)
+	keep country
+	duplicates drop
+	
+	tempfile sample
+	save `sample'
+
 *--- Import cuisine variables database
 	
 	use "$recipes/complexity_recipe.dta", clear
@@ -23,6 +39,7 @@ cuisine variables (time, ingredients, spices)
 *--. Merge with MLFP 
 	merge 1:1 country using "${mlfp}/MLFPlong2019.dta"
 	drop if _merge == 2
+	drop _merge
 	
 	rename Country country_encode
 	rename *, lower
@@ -30,14 +47,17 @@ cuisine variables (time, ingredients, spices)
 *--- Create gap variable
 	gen gap = mlfp - flfp // 7 missings, countries we don't have both values for
 	
-*--- Create line graphs
+	*- Merge with sample to keep only countries in regression exercises
+	merge 1:1 country using `sample'
+	
+*--- Create graphs
 		
 	*- Time variable
 	gen lmedian_time=log(median_totaltime)
 	gen lmean_time=log(w_mean_totaltime)
 	lab var lmean_time "Log. average cooking time"
 
-	binscatter flfp mlfp gap lmedian_time, ///
+	binscatter flfp mlfp gap lmedian_time if _merge == 3, ///
 	lcolor(maroon navy gray) ///
 	mcolor(maroon navy gray) ///
 	xtitle("Log. Median cooking time") ///
@@ -51,7 +71,7 @@ cuisine variables (time, ingredients, spices)
 	
 	*- Spices variable
 
-	binscatter flfp mlfp gap w_mean_spices, ///
+	binscatter flfp mlfp gap w_mean_spices if _merge == 3, ///
 	lcolor(maroon navy gray) ///
 	mcolor(maroon navy gray) ///
 	xtitle("Average spices") ///
@@ -65,7 +85,7 @@ cuisine variables (time, ingredients, spices)
 
 	*- Ingredients variable
 
-	binscatter flfp mlfp gap mean_ingredients, ///
+	binscatter flfp mlfp gap mean_ingredients if _merge == 3, ///
 	lcolor(maroon navy gray) ///
 	mcolor(maroon navy gray) ///
 	xtitle("Average ingredients") ///
