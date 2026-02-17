@@ -97,7 +97,7 @@
 	label var median_ingredients "Median Ingredients" 
 	label var mean_ingredients "Mean ingredients" 
 	label var w_mean_totaltime "Winsorized mean total time" 
-	label var w_mean_spices "Winsorized mean spices" 
+	label var w_mean_spices "Average spices" 
 	label var numrecipes "Number of recipes" 
 	label var year "LFP year" 
 	label var GDP "Gross Domestic Product"
@@ -114,7 +114,7 @@
 	label var pca_index "PCA Index"
 	label var z_pca_index "Cuisine complexity"
 	label var pca_recipe "PCA Index - recipe"
-	label var z_pca_recipe "Cuisine complexity - recipe"
+	label var z_pca_recipe "Cuisine complexity"
 
 	
 	*-- Create other outcomes for regressions

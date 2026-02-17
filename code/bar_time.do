@@ -26,4 +26,6 @@ This code creates bar graph for cooking time around the world
 	legend(order(1 "Female" 2 "Male" ) position(6) region(lcolor(black)) col(3)) ///
 	graphregion(color(white)) bgcolor(white)
 	
+	note: average daily time
+	
 	graph export "${figures}/bar_cook_time.pdf", replace

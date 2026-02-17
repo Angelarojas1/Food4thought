@@ -23,19 +23,19 @@
 	* Winsorize time variable and create dataset
 
 	* Min Max Mean by Country
-	bys Country: egen min_totaltime = min(totaltime)
-	bys Country: egen max_totaltime = max(totaltime)
-	bys Country: egen mean_totaltime = mean(totaltime)
-	bys Country: egen median_totaltime = median(totaltime)
+	bys Country: egen min_totaltime = min(totaltime_orig)
+	bys Country: egen max_totaltime = max(totaltime_orig)
+	bys Country: egen mean_totaltime = mean(totaltime_orig)
+	bys Country: egen median_totaltime = median(totaltime_orig)
 	bys Country: egen mean_spices = mean(numberofspices)
 	bys Country: egen median_spices = median(numberofspices)
 	bys Country: egen median_ingredients = median(numberofingredients)
 	bys Country: egen mean_ingredients = mean(numberofingredients)
 	
 	* winsorize
-	winsor4 totaltime, method(winsor) outlier(tail) level(1) group(Country) newvar(TotalTime)
+	winsor4 totaltime_orig, method(winsor) outlier(tail) level(1) group(Country) newvar(totaltime)
 	winsor4 numberofspices, method(winsor) outlier(tail) level(1) group(Country) newvar(w_numberofspices)
-	bys Country: egen w_mean_totaltime = mean(TotalTime)
+	bys Country: egen w_mean_totaltime = mean(totaltime)
 	bys Country: egen w_mean_spices = mean(w_numberofspices)
 	
 	* Count number of recipes

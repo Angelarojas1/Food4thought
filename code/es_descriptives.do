@@ -15,13 +15,13 @@ eststo clear
 	quietly levelsof adm0, local(countries)
 	local N_countries : word count `countries'
 
-	estpost summarize z_pca_index TotalTime numberofingredients numberofspices , detail
+	estpost summarize z_pca_index totaltime_orig numberofingredients numberofspices , detail
 
 	estadd scalar countries = `N_countries'
 	estadd scalar observations = `N'
 	
 	label var z_pca_index "Cuisine Complexity Index"
-	label var totaltime   "Cooking time"
+	label var totaltime_orig  "Cooking time"
 	label var numberofingredients "Number of ingredients"
 	label var numberofspices "Number of spices"
 	
@@ -41,26 +41,6 @@ eststo clear
 clear all
 
 	use "$cookpad/cookpad_adm0.dta", replace
-	
-	*-- Rename variables
-	ren (emp_ftemp emp_ftemp_pop emp_lfpr emp_work_hours) (ft p2p lfpr hours)
-		
-	egen meals=rowtotal(numDinCook numLunCook)
-	
-	gen partjob=cond(hours==1 | hours==2,1,0) if hours!=0. & hours!=98
-	
-	gen spousecook=cond(wp19962==1 | wp19970==1,1,cond(wp19962==2 | wp19970==2,0,.)) 
-	
-	gen nonsingle=cond(wp1223==2|wp1223==8,1,0) if (wp1223!=6 & wp1223!=7 & wp1223!=.)  
-	
-	// other employment outcomes 
-	// fulltime work condition on lfp 
-	gen fullemployee=cond(emp_2010==1,1,0) if emp_2010!=. & emp_2010!=6 
-	gen fulltime=cond(emp_2010<=2,1,0) if emp_2010!=. & emp_2010!=6 
-	
-	// share lunches and 
-	gen pmeals=(numLunCook+numDinCook)/(numLunEat+numDinEat)
-	replace pmeals=1 if pmeals>1 & pmeals!=.
 	
 	*--- Vars for stats
 	eststo clear

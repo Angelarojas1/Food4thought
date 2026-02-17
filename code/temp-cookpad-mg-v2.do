@@ -89,15 +89,12 @@ global s5 "nonsingle==0"
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep(w_mean_spices) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N , labels("Mean dep. var." "Observations") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }	
 
-  
-// reghdfe lfpr median_totaltime $c11 if  vers_distCapital_2000 != 0 & covid == 0 & $s2, absorb(region_cat cl_md ym) cluster(adm0)
-  
-  
+
 	forvalue j=4/5 {
 	eststo clear
 		forvalue i=6/11{
@@ -117,12 +114,10 @@ global s5 "nonsingle==0"
 		keep(w_mean_spices 1.fem 1.fem#c.w_mean_spices) ///
 		varlabels("1.fem#c.w_mean_spices" "Female × Average spices" "1.fem" "Female") ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }
- 
-// reghdfe lfpr i.fem c.median_totaltime#1.fem   if vers_distCapital_2000 != 0 & covid == 0 & $s4, absorb(adm0 ) cluster(adm0)
  
  
 	*------------------------------------------*
@@ -134,10 +129,11 @@ global s5 "nonsingle==0"
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo:  ivreg2 lfpr (w_mean_spices  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-	estadd scalar Ffirst=e(rkf)
+	eststo m`i':  ivreg2 lfpr (w_mean_spices  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
+		local m = r(mean)
+	estadd scalar Ffirst=e(rkf)
+	estadd scalar Mean = `m': m`i'
 	}
 	 	 
 	 estout using reg_iv_`j'_cook.tex, ///
@@ -146,10 +142,10 @@ global s5 "nonsingle==0"
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep(w_mean_spices ) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
-}		
+}	
 
 
 	forvalue j=0/3 {
@@ -198,11 +194,10 @@ ivreg2 lfpr (pca_index = suit_versatility vers_distCapital_2000_std) $c10 i.regi
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep( vers_distCapital_2000_std ) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2 , labels("Mean dep. var." "Observations" "R-squared"  ) fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F , labels("Mean dep. var." "Observations" "F-statistic" ) fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
-}		
-
+}	
 
 
 	forvalue j=0/3 {
@@ -235,30 +230,7 @@ ivreg2 lfpr (pca_index = suit_versatility vers_distCapital_2000_std) $c10 i.regi
 	*------------------------------------------*
 	
 	 	 
-	*foreach var in partjob  fulltime fullemployee meals spousecook  {
-	foreach var in	pmeals {
-	forvalue j=0/3 {
-	eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe `var' w_mean_spices   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'} , absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	 
-	 estout using r`var'_ols_`j'_cook.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(w_mean_spices) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}	
-	}
-	 
-	 
-foreach var in fulltime fullemployee  meals { //partjob  
+	foreach var in fulltime fullemployee { //partjob  
 	*foreach var in meals pmeals {
 	forvalue j=4/5 {
 eststo clear
@@ -279,14 +251,13 @@ eststo clear
 		keep(w_mean_spices 1.fem 1.fem#c.w_mean_spices ) ///
 		varlabels("1.fem#c.w_mean_spices" "Female × Average spices" "1.fem" "Female") ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 	}
 }
-	 
- 	 
-foreach var in spousecook { // meals 
+
+foreach var in spousecook meals { 
 	forvalue j=4/4 {
 eststo clear
 	forvalue i=6/11{
@@ -306,25 +277,27 @@ eststo clear
 		keep(w_mean_spices 1.fem 1.fem#c.w_mean_spices ) ///
 		varlabels("1.fem#c.w_mean_spices" "Female × Average spices" "1.fem" "Female") ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 	}
+}
 }
 
 	*------------------------------------------*
 	**#  		         IV                    *
 	*------------------------------------------*
 
-	foreach var in partjob  fulltime fullemployee spousecook meals pmeals   {
-	forvalue j=0/3 {
+	foreach var in fulltime fullemployee  {
+	forvalue j=1/2 {
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo:  ivreg2  `var'  (w_mean_spices  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-	estadd scalar Ffirst=e(rkf)
+	eststo m`i':  ivreg2  `var'  (w_mean_spices  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
+		local m = r(mean)
+	estadd scalar Ffirst=e(rkf)
+	estadd scalar Mean = `m': m`i'
 	}
 	 	 
 	 estout using r`var'_iv_`j'_cook.tex, ///
@@ -333,13 +306,37 @@ eststo clear
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep(w_mean_spices ) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }		
 
 }
 
+	foreach var in spousecook meals  {
+	forvalue j=2/3 {
+	
+	eststo clear
+	forvalue i=6/11{
+	eststo m`i':  ivreg2  `var'  (w_mean_spices  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		local m = r(mean)
+	estadd scalar Ffirst=e(rkf)
+	estadd scalar Mean = `m': m`i'
+	}
+	 	 
+	 estout using r`var'_iv_`j'_cook.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(w_mean_spices ) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}		
+
+}
 
 	*------------------------------------------*
 	**#             Total time                 *
@@ -351,7 +348,6 @@ eststo clear
 	
 	*-------- LFP --------*
  
-	 cd "$tables"
 	forvalue j=0/3 {
 	
 	eststo clear
@@ -367,15 +363,12 @@ eststo clear
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep(lmedian_time) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N , labels("Mean dep. var." "Observations") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }	
 
-  
-// reghdfe lfpr median_totaltime $c11 if  vers_distCapital_2000 != 0 & covid == 0 & $s2, absorb(region_cat cl_md ym) cluster(adm0)
-  
-  
+
 	forvalue j=4/5 {
 	eststo clear
 		forvalue i=6/11{
@@ -395,13 +388,10 @@ eststo clear
 		keep(lmedian_time 1.fem 1.fem#c.lmedian_time) ///
 		varlabels("1.fem#c.lmedian_time" "Female × Cooking time" "1.fem" "Female") ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
-}
- 
-// reghdfe lfpr i.fem c.median_totaltime#1.fem   if vers_distCapital_2000 != 0 & covid == 0 & $s4, absorb(adm0 ) cluster(adm0)
- 
+} 
  
 	*------------------------------------------*
 	**#  		       IV                      *
@@ -412,10 +402,11 @@ eststo clear
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo:  ivreg2 lfpr (lmedian_time  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-	estadd scalar Ffirst=e(rkf)
+	eststo m`i':  ivreg2 lfpr (lmedian_time  = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
+		local m = r(mean)
+	estadd scalar Ffirst=e(rkf)
+	estadd scalar Mean = `m': m`i'
 	}
 	 	 
 	 estout using reg_time_iv_`j'_cook.tex, ///
@@ -424,7 +415,7 @@ eststo clear
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep(lmedian_time) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }		
@@ -457,25 +448,26 @@ eststo clear
 	*------------------------------------------*
 
 	
-// 	forvalue j=0/3 {
-//	
-// 	eststo clear
-// 	forvalue i=6/11{
-// 	eststo:  reghdfe  lmedian_time   vers_distCapital_2000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
-// 		qui sum `e(depvar)' if e(sample)
-// 		estadd scalar Mean = r(mean)
-// 	}
-//	 	 
-// 	 estout using reg_time_fs_`j'_cook.tex, ///
-// 		style(tex) ///
-// 		cells(b(star f(3)) se(par f(3))) ///
-// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep( vers_distCapital_2000_std ) ///
-// 		label ml(none) collabels(none) ///
-// 		stats(Mean N r2 , labels("Mean dep. var." "Observations" "R-squared"  ) fmt(%9.3f %9.1gc %4.3f)) ///
-// 		postfoot("\hline") ///
-//     replace
-// }		
+	forvalue j=0/3 {
+	
+	eststo clear
+	forvalue i=6/11{
+	eststo:  reghdfe  lmedian_time   vers_distCapital_2000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_time_fs_`j'_cook.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep( vers_distCapital_2000_std ) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N F , labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}	
+	
 //
 //
 //
@@ -509,31 +501,8 @@ eststo clear
 	*------------------------------------------*
 	
 	 	 
-	*foreach var in partjob  fulltime fullemployee meals spousecook  {
-	foreach var in	pmeals {
-	forvalue j=0/3 {
-	eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe `var' lmedian_time  ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'} , absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	 
-	 estout using r`var'_time_ols_`j'_cook.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(lmedian_time) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}	
-	}
-	 
-	 
-foreach var in fulltime fullemployee meals { // partjob 
-*	foreach var in meals pmeals {
+	foreach var in fulltime fullemployee { //partjob  
+	*foreach var in meals pmeals {
 	forvalue j=4/5 {
 eststo clear
 	forvalue i=6/11{
@@ -553,13 +522,12 @@ eststo clear
 		keep(lmedian_time 1.fem 1.fem#c.lmedian_time ) ///
 		varlabels("1.fem#c.lmedian_time" "Female × Cooking time" "1.fem" "Female") ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 	}
 }
-	 
- 	 
+
 foreach var in meals spousecook  {
 	forvalue j=4/4 {
 eststo clear
@@ -580,11 +548,12 @@ eststo clear
 		keep(lmedian_time 1.fem 1.fem#c.lmedian_time ) ///
 		varlabels("1.fem#c.lmedian_time" "Female × Cooking time" "1.fem" "Female") ///
 		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 	}
 }
+
 
 	*------------------------------------------*
 	**#  		         IV                    *

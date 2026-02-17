@@ -72,6 +72,8 @@
 	* ssc install geoinpoly
 	* ssc install kountry
 	* ssc install winsor4
+	* ssc install shp2dta
+	* ssc install spmap
 	
 	** Section to create all the folders I need in data/coded folder
 	* mkdir
@@ -412,6 +414,6 @@
 	*		- Creates bar graph for cooking time around the world
 	*		- Uses Time Use Survey data
 	
-		 do "$code/bar_time.do" // in archive folder
+		 do "$code/bar_cook_time.do" // in archive folder
 	
 	
