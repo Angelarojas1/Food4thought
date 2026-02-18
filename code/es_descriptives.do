@@ -126,3 +126,98 @@ foreach v of local vars {
 	fmt(%9.0f %9.0f) ///
     labels("Countries" "Observations")) ///
     label append
+	
+*****************************************************
+*            Cookpad database robust			    *
+*****************************************************
+clear all
+
+	use "$cookpad/cookpad_adm0.dta", replace
+	
+	keep if age >= 24 & age <= 55
+	
+	*--- Vars for stats
+	eststo clear
+
+	local vars fem lfpr fulltime fullemployee meals spousecook
+	
+	quietly levelsof adm0, local(countries)
+	local N_countries : word count `countries'
+		
+foreach v of local vars {
+    
+    * Female
+    estpost summarize `v' if fem == 1
+    eststo F_`v'
+    count if fem == 1
+    estadd scalar N_obs = r(N)
+    estadd scalar countries = `N_countries'
+    
+    * Male
+    estpost summarize `v' if fem == 0
+    eststo M_`v'
+    count if fem == 0
+    estadd scalar N_obs = r(N)
+    estadd scalar countries = `N_countries'
+    
+    * Total
+    estpost summarize `v'
+    eststo T_`v'
+    count
+    estadd scalar N_obs = r(N)
+    estadd scalar countries = `N_countries'
+}
+
+	
+	label var fem "Female"
+	label var lfpr "Labor Force Participation"
+	label var fulltime "Employed full-time"
+	label var fullemployee "Employed full-time for employer"
+	label var meals "Number of meals cooked"
+	label var spousecook "Spouse cooked"
+		
+	esttab T_fem F_fem M_fem ///
+	using "$tables/descriptive_gender_24_55.tex", ///
+    cells("mean(fmt(2)) sd(fmt(2))") ///
+    collabels(, none ) noline ///
+    nonumber noobs nomtitle fragment ///
+    label replace 
+	
+	esttab T_lfpr F_lfpr M_lfpr ///
+	using "$tables/descriptive_gender_24_55.tex", ///
+    cells("mean(fmt(2)) sd(fmt(2))") ///
+    collabels(, none ) ///
+    nonumber noobs nomtitle fragment noline ///
+    label append
+
+	esttab T_fulltime F_fulltime M_fulltime ///
+	using "$tables/descriptive_gender_24_55.tex", ///
+    cells("mean(fmt(2)) sd(fmt(2))") ///
+    collabels(, none ) ///
+    nonumber noobs nomtitle fragment noline  ///
+    label append
+	
+	esttab T_fullemployee F_fullemployee M_fullemployee ///
+	using "$tables/descriptive_gender_24_55.tex", ///
+    cells("mean(fmt(2)) sd(fmt(2))") ///
+    collabels(, none ) ///
+    nonumber noobs nomtitle fragment noline ///
+    label append
+	
+	esttab T_meals F_meals M_meals ///
+	using "$tables/descriptive_gender_24_55.tex", ///
+    cells("mean(fmt(2)) sd(fmt(2))") ///
+    collabels(, none ) ///
+    nonumber noobs nomtitle fragment noline ///
+    label append 
+	
+	esttab T_spousecook F_spousecook M_spousecook ///
+	using "$tables/descriptive_gender_24_55.tex", ///
+    cells("mean(fmt(2)) sd(fmt(2))") ///
+    collabels(, none ) ///
+    nonumber noobs nomtitle fragment noline ///
+	stats(countries N_obs, ///
+	fmt(%9.0f %9.0f) ///
+    labels("Countries" "Observations")) ///
+    label append
+

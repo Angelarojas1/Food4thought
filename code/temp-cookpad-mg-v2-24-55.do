@@ -22,6 +22,8 @@ created for NBER. Date: Dec 8, 2025
 	
 	use "$cookpad/cookpad_adm0.dta", replace
 	
+	keep if age >= 24 | age <= 55
+	
 	*--- Create globals with the different controls
 	
 	global hhcontr " i.income_5 hhsize i.wp1233recoded i.wp3117  " 
@@ -83,7 +85,7 @@ global s5 "nonsingle==0"
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_ols_`j'_cook.tex, ///
+	 estout using reg_ols_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -107,7 +109,7 @@ global s5 "nonsingle==0"
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using reg_ols_gap_`j'_cook.tex, ///
+	 estout using reg_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -136,7 +138,7 @@ global s5 "nonsingle==0"
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using reg_iv_`j'_cook.tex, ///
+	 estout using reg_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -159,7 +161,7 @@ global s5 "nonsingle==0"
 // 	estadd scalar Mean = `m': m`i'
 // 	}
 //	 	 
-// 	 estout using reg_iv_`j'_cook_robust.tex, ///
+// 	 estout using reg_iv_`j'_cook_robust_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -185,7 +187,7 @@ global s5 "nonsingle==0"
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_fs_`j'_cook.tex, ///
+	 estout using reg_fs_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -206,7 +208,7 @@ global s5 "nonsingle==0"
 // 		estadd scalar Mean = r(mean)
 // 	}
 //	 	 
-// 	 estout using reg_fs_`j'_cook_robust.tex, ///
+// 	 estout using reg_fs_`j'_cook_robust_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -241,7 +243,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using r`var'_ols_gap_`j'_cook.tex, ///
+	 estout using r`var'_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -267,7 +269,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using r`var'_ols_gap_`j'_cook.tex, ///
+	 estout using r`var'_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -297,7 +299,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using r`var'_iv_`j'_cook.tex, ///
+	 estout using r`var'_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -322,7 +324,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using r`var'_iv_`j'_cook.tex, ///
+	 estout using r`var'_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -354,7 +356,7 @@ eststo clear
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_time_ols_`j'_cook.tex, ///
+	 estout using reg_time_ols_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -378,7 +380,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using reg_time_ols_gap_`j'_cook.tex, ///
+	 estout using reg_time_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -406,7 +408,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using reg_time_iv_`j'_cook.tex, ///
+	 estout using reg_time_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -428,7 +430,7 @@ eststo clear
 // 		estadd scalar Mean = r(mean)
 // 	}
 //	 	 
-// 	 estout using reg_time_iv_`j'_cook_robust.tex, ///
+// 	 estout using reg_time_iv_`j'_cook_robust_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -454,7 +456,7 @@ eststo clear
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_time_fs_`j'_cook.tex, ///
+	 estout using reg_time_fs_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -477,7 +479,7 @@ eststo clear
 // 		estadd scalar Mean = r(mean)
 // 	}
 //	 	 
-// 	 estout using reg_time_fs_`j'_cook_robust.tex, ///
+// 	 estout using reg_time_fs_`j'_cook_robust_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -512,7 +514,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using r`var'_time_ols_gap_`j'_cook.tex, ///
+	 estout using r`var'_time_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -538,7 +540,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using r`var'_time_ols_gap_`j'_cook.tex, ///
+	 estout using r`var'_time_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -568,7 +570,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using r`var'_time_iv_`j'_cook.tex, ///
+	 estout using r`var'_time_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -593,7 +595,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using r`var'_time_iv_`j'_cook.tex, ///
+	 estout using r`var'_time_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -627,7 +629,7 @@ eststo clear
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_ing_ols_`j'_cook.tex, ///
+	 estout using reg_ing_ols_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -652,7 +654,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using reg_ing_ols_gap_`j'_cook.tex, ///
+	 estout using reg_ing_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -678,7 +680,7 @@ eststo clear
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_ing_fs_`j'_cook.tex, ///
+	 estout using reg_ing_fs_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -705,7 +707,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using reg_ing_iv_`j'_cook.tex, ///
+	 estout using reg_ing_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -727,7 +729,7 @@ eststo clear
 // 		estadd scalar Mean = r(mean)
 // 	}
 //	 	 
-// 	 estout using reg_ing_iv_`j'_cook_robust.tex, ///
+// 	 estout using reg_ing_iv_`j'_cook_robust_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -753,7 +755,7 @@ eststo clear
 		estadd scalar Mean = r(mean)
 	}
 	 	 
-	 estout using reg_ing_fs_`j'_cook.tex, ///
+	 estout using reg_ing_fs_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -775,7 +777,7 @@ eststo clear
 // 		estadd scalar Mean = r(mean)
 // 	}
 //	 	 
-// 	 estout using reg_fs_`j'_cook_robust.tex, ///
+// 	 estout using reg_fs_`j'_cook_robust_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -811,7 +813,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using r`var'_ing_ols_gap_`j'_cook.tex, ///
+	 estout using r`var'_ing_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -837,7 +839,7 @@ eststo clear
 		qui sum `e(depvar)' if e(sample)
 		estadd scalar Mean = r(mean)
 		
-	 estout using r`var'_ing_ols_gap_`j'_cook.tex, ///
+	 estout using r`var'_ing_ols_gap_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -866,7 +868,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using r`var'_ing_iv_`j'_cook.tex, ///
+	 estout using r`var'_ing_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -891,7 +893,7 @@ eststo clear
 	estadd scalar Mean = `m': m`i'
 	}
 	 	 
-	 estout using r`var'_ing_iv_`j'_cook.tex, ///
+	 estout using r`var'_ing_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -903,3 +905,4 @@ eststo clear
 }		
 
 }
+

@@ -358,6 +358,13 @@
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions
+	*		- The file was created by Steve
+	*		- Focus on regression using native spices versatility 
+		
+		do "$code/native_spice_reg_251015.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Run country level regressions
 	*		- The file was created by MG
 		
 		do "$code/temp-mg.do"
@@ -375,11 +382,20 @@
 		do "$code/temp-cookpad-mg-pca.do"
 		
 	* 	The purpose of this dofile is:
-	*		- Run country level regressions
-	*		- The file was created by Steve
-	*		- Focus on regression using native spices versatility 
+	*		- Run country level regressions about appliances
+	*		- The file was created by MG 
 		
-		do "$code/native_spice_reg_251015.do"
+		do "$code/reg-appliances-mg.do"
+		
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Run robust exercise
+	*		- Subsample 24-55 years
+	
+		do "$code/temp-cookpad-mg-v2-24-55.do"
+		do "$code/temp-cookpad-mg-pca-24-55.do"
+		
 		
 	* ***************************************************** *
 	*                        Graphs                         *
@@ -399,14 +415,14 @@
 	*	The purpose of this dofile is:
 	*		- Creates heat maps for FLFP, MLFP and gap.
 	
-		 do "$code/heat_maps_lfp.do" // in archive folder
+		 do "$code/heat_maps_lfp.do" 
 		 
 	* ***************************************************** *
 	
 	*	The purpose of this dofile is:
 	*		- Creates line graphs for FLFP, MLFP and gap vs cuisine variables
 	
-		 do "$code/graphs_lfp_cuisine.do" // in archive folder
+		 do "$code/graphs_lfp_cuisine.do" 
 		 
 	* ***************************************************** *
 	
@@ -414,6 +430,6 @@
 	*		- Creates bar graph for cooking time around the world
 	*		- Uses Time Use Survey data
 	
-		 do "$code/bar_cook_time.do" // in archive folder
+		 do "$code/bar_time.do"
 	
 	

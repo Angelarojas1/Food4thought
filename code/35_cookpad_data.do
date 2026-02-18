@@ -15,7 +15,7 @@
 	gen covid=(ym>=722)
 	
 	*-- Rename employment variables
-	ren (emp_ftemp emp_ftemp_pop emp_lfpr emp_work_hours) (ft p2p lfpr hours)
+	ren (emp_ftemp emp_ftemp_pop emp_lfpr emp_work_hours wp1220) (ft p2p lfpr hours age)
 	
 	* merge with cuisine data
 	rename three_letter_country_code adm0
