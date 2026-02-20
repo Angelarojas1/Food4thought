@@ -293,6 +293,12 @@
 	*		- Generate only native versatility measures. 
 
 		do "$code/34_new_versatility_only_native_m_c.do"
+		
+	* 	The purpose of this dofile is:
+	*		- Generate only imported versatility measures. 
+	*       - Includes distance
+
+		do "$code/34_import_versatility.do"
 	
 	* 	The purpose of this dofile is:
 	*		- Generate versatility by country
@@ -330,44 +336,47 @@
 		do "$code/37_FirstStage_versatility_dataset.do"
 		
 	*********************************************************
-	*					Versatility Analysis
+	*					Descriptives 
 	*********************************************************
 	
 	* 	The purpose of this dofile is:
 	*		- Create desciptive statistics
 	
 	    do "$code/es_descriptives.do"
-
+		
+	*********************************************************
+	*					Estimations
+	*********************************************************
 	
 	* 	The purpose of this dofile is:
 	*		- Run cookpad regressions
 	*		- Contains OLS, 1stage, RF, IV
 	
-		do "$code/36_cookpad_analysis.do"
+	*	do "$code/36_cookpad_analysis.do" // OLD
 
 	* 	The purpose of this dofile is:
 	*		- Run cookpad regressions
 	*		- The file was created by MG
 	
-		do "$code/es-cookpad-mg.do"
+	*	do "$code/es-cookpad-mg.do" // OLD
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions
 		
-		do "$code/country_level_analysis.do"
+	*	do "$code/country_level_analysis.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions
 	*		- The file was created by Steve
 	*		- Focus on regression using native spices versatility 
 		
-		do "$code/native_spice_reg_251015.do"
+	*	do "$code/native_spice_reg_251015.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions
 	*		- The file was created by MG
 		
-		do "$code/temp-mg.do"
+	*	do "$code/temp-mg.do" // OLD
 		
 	* 	The purpose of this dofile is:
 	*		- Run individual level regressions
@@ -387,7 +396,20 @@
 		
 		do "$code/reg-appliances-mg.do"
 		
-	* ***************************************************** *
+	*********************************************************
+	*					Fertility
+	*********************************************************
+	
+	*	The purpose of this dofile is:
+	*		- Run exercise to explore fertility / childcare area
+	*		- Y variable: Number of children
+	
+		do "$code/temp-cookpad-mg-v2-fertility.do"
+		do "$code/temp-cookpad-mg-pca-fertility.do"
+		
+	*********************************************************
+	*					Robustness 
+	*********************************************************
 	
 	*	The purpose of this dofile is:
 	*		- Run robust exercise

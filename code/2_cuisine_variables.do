@@ -40,6 +40,8 @@
 	** Clean recipes information
 	do "$code/subcode/2_2_recipes_clean.do"
 	
+	duplicates drop nameoftherecipe country, force
+	
 	* Winsorize time variable and create dataset
 
 	* Min Max Mean by Country
@@ -57,6 +59,15 @@
 	winsor4 numberofspices, method(winsor) outlier(tail) level(1) group(Country) newvar(w_numberofspices)
 	bys Country: egen w_mean_totaltime = mean(TotalTime)
 	bys Country: egen w_mean_spices = mean(w_numberofspices)
+	
+	* Organize time variable
+	sum median_totaltime, de
+	bys country: gen outlier = cond(median_totaltime>=80,1,0)
+
+	sum totaltime_orig if outlier == 1, de
+	tab median_totaltime if outlier == 1
+	tab country if outlier == 1
+	br nameoftherecipe country if outlier == 1 & totaltime_orig >= 480
 	
 	* Count number of recipes
 	gen one = 1

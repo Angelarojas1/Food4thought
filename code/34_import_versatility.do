@@ -15,53 +15,6 @@ use "$versatility/native_versatility_m_c.dta",  clear
 	keep if _merge == 3
 	drop _merge
 	
-	/*
-	
-	*- Paste lat and lon information
-	preserve 
-	use "${versatility}/distance_capital.dta", clear
-	keep adm0 lat lon
-	duplicates drop
-	tempfile coordinates
-	save `coordinates'
-	restore
-	
-	* Calculating weights
-	merge m:1 adm0 using `coordinates'
-	keep if _merge == 3 // drop countries that are not in data
-	
-	*-----------------------------*
-	*     Native versatility      *
-	*-----------------------------*
-	
-	* native versatility
-	bys adm0: egen native_versatility = mean(common) if only_native == 1
-	sort adm0 native
-	bys adm0 (native_versatility): replace native_versatility = native_versatility[_n-1] if missing(native_versatility)
-	
-	// Some countries don't have native versatility because they only have 1
-	// native ingredient.
-	*replace native_versatility = 0 if native_versatility == .
-	
-	* native versatility 2
-	bys adm0: egen native_versatility2 = mean(common) 
-	sort adm0 native
-		
-	*-----------------------------------*
-	*     Native versatility - SPICES   *
-	*-----------------------------------*
-	
-	* native versatility
-	bys adm0: egen native_spice_vers = mean(common) if only_native == 1 & spice == 1
-	sort adm0 native
-	bys adm0 (native_spice_vers): replace native_spice_vers = native_spice_vers[_n-1] if missing(native_spice_vers)
-
-	* native versatility 2
-	bys adm0: egen native_spice_vers2 = mean(common) if spice == 1
-	sort adm0 native
-	bys adm0 (native_spice_vers2): replace native_spice_vers2 = native_spice_vers2[_n-1] if missing(native_spice_vers2)
-	
-	*/
 	
 	* ===================================================== *
 	*  Distance-weighted native spice versatility     *
@@ -91,7 +44,9 @@ use "$versatility/native_versatility_m_c.dta",  clear
 	*-------------------------------------------------------*
 	* 2. Load distance matrix                               *
 	*-------------------------------------------------------*
-	use "${versatility}/distance_tradecosts_capitals.dta", clear
+	*use "${versatility}/distance_tradecosts_capitals.dta", clear
+	use "${versatility}/distance_capital.dta", clear
+	
 	* Should contain: adm0 nativeadm0 dist1 dist2 dist3
 	tempfile distances
 	save `distances', replace
@@ -141,8 +96,10 @@ use "$versatility/native_versatility_m_c.dta",  clear
 		
 		* Compute minimum distances per adm0–ingredient
 		bys adm0: egen min_distCapital = min(distance)
-		bys adm0: egen min_distPreColumb = min(lc_dist_preColumb)
-		bys adm0: egen min_distPostColumb = min(lc_dist_postColumb)
+		bys adm0: egen min_distPreColumb = min(distance)
+		bys adm0: egen min_distPostColumb = min(distance)
+		*bys adm0: egen min_distPreColumb = min(lc_dist_preColumb)
+		*bys adm0: egen min_distPostColumb = min(lc_dist_postColumb)
 		keep adm0 ingredient2 min_distCapital min_distPreColumb min_distPostColumb
 		duplicates drop
 
@@ -191,8 +148,23 @@ use "$versatility/native_versatility_m_c.dta",  clear
 		}
 	}
 
+	
+	
+	* ------------------------------------------------------ *
+	*  Assign 0 to adm0 without any native spices
+	* ------------------------------------------------------ *
+	bys adm0: egen has_native_spice = max(native == 1 & spice == 1)
+	foreach var of varlist vers_dist* trade_dist* {
+		replace `var' = 0 if has_native_spice == 0
+	}
+	drop has_native_spice
+	
 	keep adm0 vers_dist* trade_dist*
 	duplicates drop
+	
+	foreach var of varlist vers_dist* trade_dist* {
+		replace `var' = 0 if missing(`var')
+	}
 	
 	*-------------------------------------------------------*
 	* 8. Save output                                        *

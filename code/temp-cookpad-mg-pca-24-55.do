@@ -24,7 +24,7 @@ created for NBER. Date: Dec 8, 2025
 	
 	use "$cookpad/cookpad_adm0.dta", replace
 	
-	keep if age >= 24 | age <= 55
+	keep if age >= 24 & age <= 55
 	
 	global hhcontr " i.income_5 hhsize i.wp1233recoded i.wp3117  " 
 	
@@ -372,11 +372,11 @@ eststo clear
 	*-------- IV --------*
 
 	foreach var in fulltime fullemployee {
-	*forvalue j= 0 {
+	forvalue j= 0/3 {
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo m`i':  ivreg2  `var'  (z_pca_recipe = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s3}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+	eststo m`i':  ivreg2  `var'  (z_pca_recipe = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
 		local m = r(mean)
 	estadd scalar Ffirst=e(rkf)
@@ -384,7 +384,7 @@ eststo clear
 
 	}
 	 	 
-	 estout using r`var'_index_iv_3_cook_24_55.tex, ///
+	 estout using r`var'_index_iv_`j'_cook_24_55.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
@@ -394,8 +394,8 @@ eststo clear
 		postfoot("\hline") ///
     replace
 }		
-
 }
+
 
 	foreach var in spousecook meals {
 	forvalue j=2/3 {

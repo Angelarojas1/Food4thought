@@ -92,3 +92,5 @@
 	egen p1 = pctile(totaltime_orig), p(1)
 	drop if totaltime_orig < p1 // 302
 	note: `r(N_drop)' recipes are dropped because of lower than 1%.
+	
+	duplicates drop nameoftherecipe country, force 

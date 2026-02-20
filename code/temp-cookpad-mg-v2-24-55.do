@@ -22,7 +22,7 @@ created for NBER. Date: Dec 8, 2025
 	
 	use "$cookpad/cookpad_adm0.dta", replace
 	
-	keep if age >= 24 | age <= 55
+	keep if age >= 24 & age <= 55
 	
 	*--- Create globals with the different controls
 	
@@ -281,14 +281,14 @@ eststo clear
     replace
 	}
 }
-}
+
 
 	*------------------------------------------*
 	**#  		         IV                    *
 	*------------------------------------------*
 
 	foreach var in fulltime fullemployee  {
-	forvalue j=1/2 {
+	forvalue j=0/3 {
 	
 	eststo clear
 	forvalue i=6/11{
