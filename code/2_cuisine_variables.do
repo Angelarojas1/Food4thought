@@ -39,11 +39,14 @@
 
 	** Clean recipes information
 	do "$code/subcode/2_2_recipes_clean.do"
-	
-	duplicates drop nameoftherecipe country, force
-	
+		
 	* Winsorize time variable and create dataset
 
+	* Drop if recipes with time > than 720 minutes
+	unique country
+	*drop if totaltime_orig > 720
+	unique country
+	
 	* Min Max Mean by Country
 	bys Country: egen min_totaltime = min(totaltime_orig)
 	bys Country: egen max_totaltime = max(totaltime_orig)
@@ -61,13 +64,28 @@
 	bys Country: egen w_mean_spices = mean(w_numberofspices)
 	
 	* Organize time variable
-	sum median_totaltime, de
-	bys country: gen outlier = cond(median_totaltime>=80,1,0)
-
-	sum totaltime_orig if outlier == 1, de
-	tab median_totaltime if outlier == 1
-	tab country if outlier == 1
-	br nameoftherecipe country if outlier == 1 & totaltime_orig >= 480
+// 	sum median_totaltime, de
+// 	bys country: gen outlier = cond(median_totaltime>=80,1,0)
+//	
+// 	tab country if outlier == 1
+//
+// 	sum totaltime_orig if country == "Paraguay"
+//	
+// 	tab totaltime_orig if country == "Cyprus"
+// 	tab totaltime_orig if country == "Estonia"
+// 	tab totaltime_orig if country == "Kazakhstan"
+// 	tab totaltime_orig if country == "Malaysia"
+// 	tab totaltime_orig if country == "Paraguay"
+// 	tab totaltime_orig if country == "Senegal"
+//	
+// 	foreach c in Cyprus Estonia Kazakhstan Malaysia Paraguay Senegal {
+// 	preserve
+// 		keep if country == "`c'"
+// 		contract totaltime_orig
+// 		export excel using "${tables}/totaltime_by_country.xlsx", ///
+// 			sheet("`c'") firstrow(variables) sheetreplace
+// 	restore
+// 	}
 	
 	* Count number of recipes
 	gen one = 1
@@ -105,8 +123,18 @@
 	keep w_mean_totaltime w_mean_spices Country country mean_ingredients median_spices median_ingredients median_totaltime numrecipes z_pca_recipe pca_recipe
 	duplicates drop 
 	save "$recipes/complexity_recipe.dta", replace
+	
 	restore
-
+	
+	*-- Export for graph
+		
+	preserve
+	keep w_mean_totaltime w_mean_spices Country country mean_ingredients median_spices median_ingredients median_totaltime numrecipes z_pca_recipe pca_recipe adm0
+	rename adm0 ISO_A3
+	
+	duplicates drop 
+	export delimited using "$recipes/complexity_recipe.csv", replace
+	restore
 
 	** collapse to country level, multiple percentiles
 	gen cnt = 1

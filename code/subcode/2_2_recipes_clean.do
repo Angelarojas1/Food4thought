@@ -60,6 +60,8 @@
 
 	replace totaltime_orig = prep + cook if totaltime_orig == 0 | totaltime_orig == .
 	
+	replace totaltime_orig = 45 if strpos(cooktime,"Trahana")>0
+	
 	* Drop recipes with zeros in number of ingredients
 	drop if numberofingredients==0 // 41 observations deleted
 	

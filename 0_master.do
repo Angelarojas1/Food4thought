@@ -75,6 +75,10 @@
 	* ssc install shp2dta
 	* ssc install spmap
 	
+	net install nwcommands-ado, from("${code}/ado/nwcommands-master")
+	findit nwcommands
+
+	
 	** Section to create all the folders I need in data/coded folder
 	* mkdir
 	
@@ -237,6 +241,15 @@
 	*       - Creates common flavor (between 2 and 3 ingredients) files.
 
 		do "$code/7_common_flavor.do"
+		
+	* ***************************************************** *
+	*               Time use survey Coding                  *
+	* ***************************************************** *	
+		
+	* 	The purpose of this dofile is:
+	*		- Clean time use survey data
+
+		do "$code/14_time_use_survey.do"	
 
 	* ***************************************************** *
 	*              		 IV Data Coding             	    *
@@ -453,5 +466,13 @@
 	*		- Uses Time Use Survey data
 	
 		 do "$code/bar_time.do"
+		 
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Creates network graph between spices and other ingredients
+	*		- Uses FlavorDB data
+	
+		 do "$code/network_graph.do"
 	
 	
