@@ -466,13 +466,6 @@
 	*		- Uses Time Use Survey data
 	
 		 do "$code/bar_time.do"
-		 
-	* ***************************************************** *
-	
-	*	The purpose of this dofile is:
-	*		- Creates network graph between spices and other ingredients
-	*		- Uses FlavorDB data
-	
-		 do "$code/network_graph.do"
+
 	
 	
