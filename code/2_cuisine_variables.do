@@ -119,6 +119,13 @@
 	*hist z_pca, normal
 	sum z_pca, detail
 	
+// 	br Country z_w_numberofspices z_totaltime_orig z_numberofingredients z_pca_recipe
+// 	sum z_pca_recipe z_w_numberofspices z_totaltime_orig z_numberofingredients
+// 	sum z_pca_recipe z_w_numberofspices z_totaltime_orig z_numberofingredients if Country == 24
+//	
+// 	sum w_numberofspices totaltime_orig numberofingredients 
+// 	sum w_numberofspices totaltime_orig numberofingredients if Country == 24
+	
 	preserve
 	keep w_mean_totaltime w_mean_spices Country country mean_ingredients median_spices median_ingredients median_totaltime numrecipes z_pca_recipe pca_recipe
 	duplicates drop 

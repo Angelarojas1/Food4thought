@@ -41,6 +41,6 @@
 	replace adm0 = "SRB" if adm0 == "YUG" //Serbia
 	replace adm0 = "ROU" if adm0 == "ROM" //Romania
 
-	keep adm0 precip temp abslat rough landlocked distcr 
+	keep adm0 precip temp abslat rough landlocked distcr coltime
 	
 	save "${versatility}/galor_controls.dta", replace

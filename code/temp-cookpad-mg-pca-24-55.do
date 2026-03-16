@@ -62,17 +62,17 @@ global s5 "nonsingle==0" // Single
  
 
 	*------------------------------------------*
-	**#  		      PCA Index                *
+	**#   Standarized PCA Index                *
 	*------------------------------------------*
 
 	*-------- OLS --------*
-
-//  cd "$tables"
+ 
+ 	 cd "$tables"
 // 	forvalue j=0/3 {
 //	
 // 	eststo clear
 // 	forvalue i=6/11{
-// 	eststo:  reghdfe lfpr pca_recipe  ${c`i'} if  vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
+// 	eststo:  reghdfe lfpr z_pca_recipe    ${c`i'} if  vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
 // 		qui sum `e(depvar)' if e(sample)
 // 		estadd scalar Mean = r(mean)
 // 	}
@@ -81,116 +81,38 @@ global s5 "nonsingle==0" // Single
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep(pca_recipe  ) ///
+// 		keep(z_pca_recipe ) ///
 // 		label ml(none) collabels(none) ///
 // 		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
 // 		postfoot("\hline") ///
 //     replace
 // }	
 //
-// 	*-------- IV --------*
-//  
-// 	forvalue j=0/3 {
-//	
-// 	eststo clear
+// 
+// 	forvalue j=4/5 {
+// eststo clear
 // 	forvalue i=6/11{
-// 	eststo:  ivreg2 lfpr (pca_recipe  = vers_distCapital_2000_std ) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-// 	estadd scalar Ffirst=e(rkf)
+// 	eststo:  reghdfe lfpr c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
 // 		qui sum `e(depvar)' if e(sample)
 // 		estadd scalar Mean = r(mean)
 // 	}
-//	 	 
-// 	 estout using reg_index_iv_`j'_cook_24_55.tex, ///
-// 		style(tex) ///
-// 		cells(b(star f(3)) se(par f(3))) ///
-// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep(pca_recipe ) ///
-// 		label ml(none) collabels(none) ///
-// 		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-// 		postfoot("\hline") ///
-//     replace
-// }		
-//
-// 	*-------- First Stage --------*
-// 
-// 	forvalue j=0/3 {
-//	
-// 	eststo clear
-// 	forvalue i=6/11{
-// 	eststo:  reghdfe pca_recipe  vers_distCapital_2000_std    ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+//	 	
+// 	eststo:  reghdfe lfpr i.fem c.z_pca_recipe#1.fem $hhcontr    if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
 // 		qui sum `e(depvar)' if e(sample)
 // 		estadd scalar Mean = r(mean)
-// 	}
-//	 	 
-// 	 estout using reg_index_fs_`j'_cook_24_55.tex, ///
+//		
+// 	 estout using reg_index_ols_gap_`j'_cook_24_55.tex, ///
 // 		style(tex) ///
 // 		cells(b(star f(3)) se(par f(3))) ///
 // 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep( vers_distCapital_2000_std   ) ///
+// 		keep(z_pca_recipe 1.fem 1.fem#c.z_pca_recipe) ///
+// 		varlabels("c.z_pca_recipe#1.fem " "Female × Cuisine complexity" "1.fem" "Female=1") ///
 // 		label ml(none) collabels(none) ///
-// 		stats(Mean N r2 , labels("Mean dep. var." "Observations" "R-squared"  ) fmt(%9.3f %9.1gc %4.3f)) ///
+// 		stats(Mean N F , labels("Mean dep. var." "Observations" "F-statistic" ) fmt(%9.3f %9.1gc %4.3f)) ///
 // 		postfoot("\hline") ///
 //     replace
-// }		
+// }
 // 
-//
-// ivreg2 lfpr (c.w_mean_spices#i.fem  w_mean_spices= c.vers_distCapital_2000_std#i.fem vers_distCapital_2000_std) $c8 i.region_cat i.cl_md i.ym    if vers_distCapital_2000 != 0 & covid == 0  , partial(i.region_cat i.cl_md i.ym  ) cluster(adm0) first
-//	
-// ivreg2 lfpr (w_mean_spices  = vers_distCapital_2000_std) $c8        i.precip_bin temp abslat lon  landlocked rough  landlocked distcr i.region_cat     i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & fem==1, partial(i.region_cat i.cl_md i.ym) cluster(adm0) first
-//
-//
-	*------------------------------------------*
-	**#   Standarized PCA Index                *
-	*------------------------------------------*
-
-	*-------- OLS --------*
- 
-	 cd "$tables"
-	forvalue j=0/3 {
-	
-	eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe lfpr z_pca_recipe    ${c`i'} if  vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	 
-	 estout using reg_index_ols_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe ) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N r2, labels("Mean dep. var." "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}	
-
- 
-	forvalue j=4/5 {
-eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe lfpr c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	
-	eststo:  reghdfe lfpr i.fem c.z_pca_recipe#1.fem $hhcontr    if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-		
-	 estout using reg_index_ols_gap_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe 1.fem 1.fem#c.z_pca_recipe) ///
-		varlabels("c.z_pca_recipe#1.fem " "Female × Cuisine complexity" "1.fem" "Female=1") ///
-		label ml(none) collabels(none) ///
-		stats(Mean N F , labels("Mean dep. var." "Observations" "F-statistic" ) fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}
- 
  
 	*-------- IV --------*
 	
@@ -216,71 +138,71 @@ eststo clear
 		postfoot("\hline") ///
     replace
 }	
-
-	forvalue j=0/3 {
-	
-	eststo clear
-	forvalue i=6/11{
-	eststo:  ivreg2 lfpr (z_pca_recipe   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	estadd scalar Ffirst=e(rkf)
-
-	}
-	 	 
-	 estout using reg_index_iv_`j'_cook_robust_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe  ) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}		
+//
+// 	forvalue j=0/3 {
+//	
+// 	eststo clear
+// 	forvalue i=6/11{
+// 	eststo:  ivreg2 lfpr (z_pca_recipe   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	estadd scalar Ffirst=e(rkf)
+//
+// 	}
+//	 	 
+// 	 estout using reg_index_iv_`j'_cook_robust_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep(z_pca_recipe  ) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// }		
 
 	*-------- First Stage --------*
-	
-	forvalue j=0/3 {
-	
-	eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe z_pca_recipe  vers_distCapital_2000_std    ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	 
-	 estout using reg_index_fs_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep( vers_distCapital_2000_std   ) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}		
+//	
+// 	forvalue j=0/3 {
+//	
+// 	eststo clear
+// 	forvalue i=6/11{
+// 	eststo:  reghdfe z_pca_recipe  vers_distCapital_2000_std    ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//	 	 
+// 	 estout using reg_index_fs_`j'_cook_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep( vers_distCapital_2000_std   ) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// }		
 
 
-	forvalue j=0/3 {
-	
-	eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe  z_pca_recipe    vers_distCapital_3000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	 
-	 estout using reg_index_fs_`j'_cook_robust_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep( vers_distCapital_3000_std ) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N r2 , labels("Mean dep. var." "Observations" "R-squared"  ) fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}		
+// 	forvalue j=0/3 {
+//	
+// 	eststo clear
+// 	forvalue i=6/11{
+// 	eststo:  reghdfe  z_pca_recipe    vers_distCapital_3000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//	 	 
+// 	 estout using reg_index_fs_`j'_cook_robust_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep( vers_distCapital_3000_std ) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N r2 , labels("Mean dep. var." "Observations" "R-squared"  ) fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// }		
 
 	
 	********************************************
@@ -316,58 +238,58 @@ eststo clear
 // 	}
 //	 
 	 
-	foreach var in fulltime fullemployee {
-	forvalue j=4/5 {
-eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe `var' c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	
-	eststo:  reghdfe `var' i.fem c.z_pca_recipe#1.fem  $hhcontr   if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-		
-	 estout using r`var'_index_ols_gap_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe  1.fem 1.fem#c.z_pca_recipe  ) ///
-		varlabels("1.fem#c.z_pca_recipe " "Female × Cuisine complexity" "1.fem" "Female=1") ///
-		label ml(none) collabels(none) ///
-		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-	}
-}
-	 
- 	 
-foreach var in meals spousecook  {
-	forvalue j=4/4 {
-eststo clear
-	forvalue i=6/11{
-	eststo:  reghdfe `var' c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-	}
-	 	
-	eststo:  reghdfe `var' i.fem c.z_pca_recipe#1.fem  $hhcontr   if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
-		
-	 estout using r`var'_index_ols_gap_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe  1.fem 1.fem#c.z_pca_recipe ) ///
-		varlabels("1.fem#c.z_pca_recipe" "Female × Cuisine complexity" "1.fem" "Female=1") ///
-		label ml(none) collabels(none) ///
-		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-	}
-}
+// 	foreach var in fulltime fullemployee {
+// 	forvalue j=4/5 {
+// eststo clear
+// 	forvalue i=6/11{
+// 	eststo:  reghdfe `var' c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//	 	
+// 	eststo:  reghdfe `var' i.fem c.z_pca_recipe#1.fem  $hhcontr   if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+//		
+// 	 estout using r`var'_index_ols_gap_`j'_cook_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep(z_pca_recipe  1.fem 1.fem#c.z_pca_recipe  ) ///
+// 		varlabels("1.fem#c.z_pca_recipe " "Female × Cuisine complexity" "1.fem" "Female=1") ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// 	}
+// }
+//	 
+// 	 
+// foreach var in meals spousecook  {
+// 	forvalue j=4/4 {
+// eststo clear
+// 	forvalue i=6/11{
+// 	eststo:  reghdfe `var' c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//	 	
+// 	eststo:  reghdfe `var' i.fem c.z_pca_recipe#1.fem  $hhcontr   if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+//		
+// 	 estout using r`var'_index_ols_gap_`j'_cook_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep(z_pca_recipe  1.fem 1.fem#c.z_pca_recipe ) ///
+// 		varlabels("1.fem#c.z_pca_recipe" "Female × Cuisine complexity" "1.fem" "Female=1") ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// 	}
+// }
 
 	*-------- IV --------*
 
@@ -397,30 +319,30 @@ eststo clear
 }
 
 
-	foreach var in spousecook meals {
-	forvalue j=2/3 {
-	
-	eststo clear
-	forvalue i=6/11{
-	eststo m`i':  ivreg2  `var'  (z_pca_recipe = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		local m = r(mean)
-	estadd scalar Ffirst=e(rkf)
-	estadd scalar Mean = `m': m`i'
-	}
-	 	 
-	 estout using r`var'_index_iv_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}		
-
-}
-
+// 	foreach var in spousecook meals {
+// 	forvalue j=2/3 {
+//	
+// 	eststo clear
+// 	forvalue i=6/11{
+// 	eststo m`i':  ivreg2  `var'  (z_pca_recipe = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		local m = r(mean)
+// 	estadd scalar Ffirst=e(rkf)
+// 	estadd scalar Mean = `m': m`i'
+// 	}
+//	 	 
+// 	 estout using r`var'_index_iv_`j'_cook_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep(z_pca_recipe) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// }		
+//
+// }
+//
 
 *spousecook meals

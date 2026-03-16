@@ -392,22 +392,22 @@
 	*	do "$code/temp-mg.do" // OLD
 		
 	* 	The purpose of this dofile is:
-	*		- Run individual level regressions
-	*		- The file was created by MG for draft sent on december 8
-		
-		do "$code/temp-cookpad-mg-v2.do"
-		
-	* 	The purpose of this dofile is:
 	*		- Run individual level regressions using PCA index
 	*		- The file was created by MG for draft sent on december 8
 		
 		do "$code/temp-cookpad-mg-pca.do"
 		
 	* 	The purpose of this dofile is:
+	*		- Run individual level regressions
+	*		- The file was created by MG for draft sent on december 8
+		
+		do "$code/temp-cookpad-mg-v2.do"
+		
+	* 	The purpose of this dofile is:
 	*		- Run country level regressions about appliances
 	*		- The file was created by MG 
 		
-		do "$code/reg-appliances-mg.do"
+	*	do "$code/reg-appliances-mg.do"
 		
 	*********************************************************
 	*					Fertility
@@ -417,8 +417,8 @@
 	*		- Run exercise to explore fertility / childcare area
 	*		- Y variable: Number of children
 	
-		do "$code/temp-cookpad-mg-v2-fertility.do"
-		do "$code/temp-cookpad-mg-pca-fertility.do"
+	*	do "$code/temp-cookpad-mg-v2-fertility.do"
+	*	do "$code/temp-cookpad-mg-pca-fertility.do"
 		
 	*********************************************************
 	*					Robustness 
@@ -428,7 +428,7 @@
 	*		- Run robust exercise
 	*		- Subsample 24-55 years
 	
-		do "$code/temp-cookpad-mg-v2-24-55.do"
+		*do "$code/temp-cookpad-mg-v2-24-55.do"
 		do "$code/temp-cookpad-mg-pca-24-55.do"
 		
 		
