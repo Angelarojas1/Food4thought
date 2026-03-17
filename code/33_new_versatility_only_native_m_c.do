@@ -41,9 +41,9 @@
 	drop keep
 
 	*- Organize abovecutoff
-	save "$versatility/native_versatility_m_c.dta", replace
+	save "$versatility/native_versatility_m_c1.dta", replace
 	
-	use "$versatility/native_versatility_m_c.dta",  clear
+	use "$versatility/native_versatility_m_c1.dta",  clear
 	
 	ren (ingredient1 ingredient) (ingredient ingredient2)
 	

@@ -129,12 +129,12 @@
 	
 	*- Get native countries using lat and lon information
 	
-	*net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
+	net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
 	
-	replace lon = "" if lon == "NA"	
-	replace lat = "" if lat == "NA"
-	
-	destring lat lon, replace dpcomma
+// 	replace lon = "" if lon == "NA"	
+// 	replace lat = "" if lat == "NA"
+//	
+// 	destring lat lon, replace dpcomma
 	
 	geoinpoly lat lon using "geo2xy_world_coor.dta"
 	
@@ -374,6 +374,68 @@
 	drop _merge
 	
 	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
+
+	
+	* For countries without native spices add spices of closest country
+	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+	
+	preserve
+	keep if spice == 1
+	rename adm0 nativeadm0
+	tempfile spice
+	save `spice'
+	restore
+	
+	preserve
+	keep if spice == 1
+	rename adm0 nativeadm0
+	keep nativeadm0
+	duplicates drop
+	tempfile info
+	save `info'
+	restore
+	
+	collapse (mean) spice , by(country adm0)
+	keep if spice == 0
+	drop spice
+	
+	preserve 
+	keep adm0
+	rename adm0 nativeadm0
+	duplicates drop
+	tempfile no_spice
+	save `no_spice'
+	restore
+	
+	merge 1:m adm0 using "${versatility}/distance_capital.dta", keep(3) nogen
+	
+	merge m:1 nativeadm0 using `no_spice', keep(1) nogen
+	merge m:1 nativeadm0 using `info', keep(3) nogen
+	
+    sort adm0 distance 
+	bys adm0 (distance): keep if _n == 1
+	
+	joinby nativeadm0 using `spice'
+	
+	keep ingredient country region continent adm0 CIAT numNative spice
+	
+	tempfile added_spice
+	save `added_spice'
+	
+	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+	
+	bys adm0: egen spice_total = sum(spice)
+	drop if spice_total == 0
+	drop spice_total
+	
+	append using `added_spice'
+	
+	save "${versatility}/Milla_CIAT_ing_origin_add.dta", replace
+	
+	
+		
+	
+	
 	
 	
 	

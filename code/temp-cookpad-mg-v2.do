@@ -31,9 +31,9 @@ created for NBER. Date: Dec 8, 2025
 	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
 	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
 	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000 GDP"
-	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability trade_distCapital_2000 GDP  i.precip_bin temp   abslat lon  landlocked"
-	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime trade_distCapital_2000 GDP al_mn  i.precip_bin temp  ph_mn     abslat lon rough  landlocked distcr  "
-		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime   trade_distCapital_2000 GDP al_mn  i.precip_bin temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
+	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability trade_distCapital_2000 GDP  precip temp   abslat lon  landlocked"
+	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  "
+		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime   trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
 	
 	
 	*--- Create standarized distance variables

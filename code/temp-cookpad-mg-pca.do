@@ -29,9 +29,9 @@ created for NBER. Date: Dec 8, 2025
 	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
 	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
 	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000 GDP"
-	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability trade_distCapital_2000 GDP  i.precip_bin temp   abslat lon  landlocked"
-	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime trade_distCapital_2000 GDP al_mn  i.precip_bin temp  ph_mn     abslat lon rough  landlocked distcr  "
-		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime   trade_distCapital_2000 GDP al_mn  i.precip_bin temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
+	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability trade_distCapital_2000 GDP  precip temp   abslat lon  landlocked"
+	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  "
+		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime   trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
 	
 	
 	*--- Create standarized distance variables	
@@ -66,53 +66,53 @@ global s5 "nonsingle==0" // Single
 	*keep if continent == "Europe"
 
 	*-------- OLS --------*
-// 
-// 	 cd "$tables"
-// 	forvalue j=0/3 {
-//	
-// 	eststo clear
-// 	forvalue i=6/11{
-// 	eststo:  reghdfe lfpr z_pca_recipe  ${c`i'} if  vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
-// 		qui sum `e(depvar)' if e(sample)
-// 		estadd scalar Mean = r(mean)
-// 	}
-//	 	 
-// 	 estout using reg_index_ols_`j'_cook.tex, ///
-// 		style(tex) ///
-// 		cells(b(star f(3)) se(par f(3))) ///
-// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep(z_pca_recipe ) ///
-// 		label ml(none) collabels(none) ///
-// 		stats(Mean N, labels("Mean dep. var." "Observations") fmt(%9.3f %9.1gc %4.3f)) ///
-// 		postfoot("\hline") ///
-//     replace
-// }	
-//
-// 
-//
-// 	forvalue j=4/5 {
-// eststo clear
-// 	forvalue i=6/11{
-// 	eststo:  reghdfe lfpr c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
-// 		qui sum `e(depvar)' if e(sample)
-// 		estadd scalar Mean = r(mean)
-// 	}
-//	 	
-// 	eststo:  reghdfe lfpr i.fem c.z_pca_recipe#1.fem $hhcontr    if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
-// 		qui sum `e(depvar)' if e(sample)
-// 		estadd scalar Mean = r(mean)
-//		
-// 	 estout using reg_index_ols_gap_`j'_cook.tex, ///
-// 		style(tex) ///
-// 		cells(b(star f(3)) se(par f(3))) ///
-// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep(z_pca_recipe 1.fem 1.fem#c.z_pca_recipe) ///
-// 		varlabels("c.z_pca_recipe#1.fem " "Female × Cuisine complexity" "1.fem" "Female=1") ///
-// 		label ml(none) collabels(none) ///
-// 		stats(Mean N F , labels("Mean dep. var." "Observations" "F-statistic" ) fmt(%9.3f %9.1gc %4.3f)) ///
-// 		postfoot("\hline") ///
-//     replace
-// }
+
+	 cd "$tables"
+	forvalue j=0/3 {
+	
+	eststo clear
+	forvalue i=6/11{
+	eststo:  reghdfe lfpr z_pca_recipe  ${c`i'} if  vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_index_ols_`j'_cook.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(z_pca_recipe ) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N, labels("Mean dep. var." "Observations") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}	
+
+
+
+	forvalue j=4/5 {
+eststo clear
+	forvalue i=6/11{
+	eststo:  reghdfe lfpr c.z_pca_recipe##i.fem   ${c`i'} if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(region_cat cl_md ym) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	
+	eststo:  reghdfe lfpr i.fem c.z_pca_recipe#1.fem $hhcontr    if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, absorb(adm0 ) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+		
+	 estout using reg_index_ols_gap_`j'_cook.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(z_pca_recipe 1.fem 1.fem#c.z_pca_recipe) ///
+		varlabels("c.z_pca_recipe#1.fem " "Female × Cuisine complexity" "1.fem" "Female=1") ///
+		label ml(none) collabels(none) ///
+		stats(Mean N F , labels("Mean dep. var." "Observations" "F-statistic" ) fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}
 
  
  
@@ -318,7 +318,7 @@ global s5 "nonsingle==0" // Single
 		postfoot("\hline") ///
     replace
 }		
-
+}
 
 	foreach var in spousecook meals {
 	forvalue j=0/3 {
@@ -345,5 +345,4 @@ global s5 "nonsingle==0" // Single
 
 }
 
-	}
 *spousecook meals

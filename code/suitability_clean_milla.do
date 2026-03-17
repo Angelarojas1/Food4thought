@@ -10,7 +10,7 @@
 	**** Milla + CIAT + Suitability ****
 	************************************
 	
-	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+	use "${versatility}/Milla_CIAT_ing_origin_add.dta", clear
 	keep adm0 country
 	duplicates drop
 	tempfile adm0
@@ -47,7 +47,7 @@
 	save `rest', replace
 	restore
 	
-	merge 1:1 adm0 ingredient using "${versatility}/Milla_CIAT_ing_origin.dta"
+	merge 1:1 adm0 ingredient using "${versatility}/Milla_CIAT_ing_origin_add.dta"
 	
 	drop if _merge == 1
 	rename _merge _merge1
@@ -75,7 +75,7 @@
 	unique adm0
 	unique country
 			
-	assert `r(sum)' == 184 
+	assert `r(sum)' == 183
 	// we have 159 countries with suitability information
 	
 	save "${versatility}/milla_ciat_ing_suit.dta", replace 
@@ -91,7 +91,7 @@
 	save "${versatility}/median_suitability_m_c.dta", replace
 		
 	*** limit to suitability data of all ingredients that are from Milla data  ***
-	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+	use "${versatility}/Milla_CIAT_ing_origin_add.dta", clear
 	
 	* Keep country names information
 	preserve

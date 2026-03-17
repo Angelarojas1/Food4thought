@@ -6,7 +6,7 @@
 *			Distance-weighted import versatility instrument using spices only
 * **************************************************************************** *
 
-use "$versatility/native_versatility_m_c.dta",  clear
+use "$versatility/native_versatility_m_c1.dta",  clear
 	
 	ren (ingredient1 ingredient) (ingredient ingredient2)
 	

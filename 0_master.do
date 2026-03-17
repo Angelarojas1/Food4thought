@@ -305,7 +305,7 @@
 	* 	The purpose of this dofile is:
 	*		- Generate only native versatility measures. 
 
-		do "$code/34_new_versatility_only_native_m_c.do"
+		do "$code/33_new_versatility_only_native_m_c.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Generate only imported versatility measures. 
