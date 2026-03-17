@@ -141,27 +141,28 @@ eststo clear
     replace
 }	
 
-// 	forvalue j=0/3 {
-//	
-// 	eststo clear
-// 	forvalue i=6/11{
-// 	eststo:  ivreg2 lfpr (z_pca_recipe   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-// 		qui sum `e(depvar)' if e(sample)
-// 		estadd scalar Mean = r(mean)
-// 	estadd scalar Ffirst=e(rkf)
-//
-// 	}
-//	 	 
-// 	 estout using reg_index_iv_`j'_cook_robust.tex, ///
-// 		style(tex) ///
-// 		cells(b(star f(3)) se(par f(3))) ///
-// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep(z_pca_recipe  ) ///
-// 		label ml(none) collabels(none) ///
-// 		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-// 		postfoot("\hline") ///
-//     replace
-// }		
+	forvalue j=0/3 {
+	
+	eststo clear
+	forvalue i=6/11{
+	eststo m`i':ivreg2 lfpr (z_pca_recipe   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+		qui sum lfpr if e(sample)
+		local m = r(mean)
+		estadd scalar Ffirst=e(rkf)
+	estadd scalar Mean = `m': m`i'
+
+	}
+	 	 
+	 estout using reg_index_iv_`j'_cook_robust.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep(z_pca_recipe  ) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}		
 
 	*-------- First Stage --------*
 	
@@ -186,25 +187,25 @@ eststo clear
 }		
 
 
-// 	forvalue j=0/3 {
-//	
-// 	eststo clear
-// 	forvalue i=6/11{
-// 	eststo:  reghdfe  z_pca_recipe    vers_distCapital_3000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
-// 		qui sum `e(depvar)' if e(sample)
-// 		estadd scalar Mean = r(mean)
-// 	}
-//	 	 
-// 	 estout using reg_index_fs_`j'_cook_robust.tex, ///
-// 		style(tex) ///
-// 		cells(b(star f(3)) se(par f(3))) ///
-// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-// 		keep( vers_distCapital_3000_std ) ///
-// 		label ml(none) collabels(none) ///
-// 		stats(Mean N r2 , labels("Mean dep. var." "Observations" "R-squared"  ) fmt(%9.3f %9.1gc %4.3f)) ///
-// 		postfoot("\hline") ///
-//     replace
-// }		
+	forvalue j=0/3 {
+	
+	eststo clear
+	forvalue i=6/11{
+	eststo:  reghdfe  z_pca_recipe    vers_distCapital_3000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	 	 
+	 estout using reg_index_fs_`j'_cook_robust.tex, ///
+		style(tex) ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		keep( vers_distCapital_3000_std ) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		postfoot("\hline") ///
+    replace
+}		
 
 	
 	********************************************
