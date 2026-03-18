@@ -379,13 +379,16 @@
 	* For countries without native spices add spices of closest country
 	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
 	
+	*- Keep countries and their native spices
 	preserve
 	keep if spice == 1
 	rename adm0 nativeadm0
+	drop region continent
 	tempfile spice
 	save `spice'
 	restore
 	
+	*- Keep names of countries that have native spices
 	preserve
 	keep if spice == 1
 	rename adm0 nativeadm0
@@ -395,10 +398,12 @@
 	save `info'
 	restore
 	
+	*- Identify countries without native spices
 	collapse (mean) spice , by(country adm0)
 	keep if spice == 0
 	drop spice
 	
+	*- Keep names of the countries without native spices
 	preserve 
 	keep adm0
 	rename adm0 nativeadm0
@@ -407,36 +412,38 @@
 	save `no_spice'
 	restore
 	
+	*- Merge with others countries and the distance
 	merge 1:m adm0 using "${versatility}/distance_capital.dta", keep(3) nogen
 	
+	*- Merge with countries without native spices so these are not being considered
 	merge m:1 nativeadm0 using `no_spice', keep(1) nogen
+	
+	*- Merge with countries that do have native spices
 	merge m:1 nativeadm0 using `info', keep(3) nogen
 	
+	*- Keep only closest country
     sort adm0 distance 
 	bys adm0 (distance): keep if _n == 1
 	
+	*- Add the native spices of the closest country
 	joinby nativeadm0 using `spice'
 	
-	keep ingredient country region continent adm0 CIAT numNative spice
+	keep ingredient country adm0 CIAT numNative spice 
 	
 	tempfile added_spice
 	save `added_spice'
 	
 	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
 	
-	bys adm0: egen spice_total = sum(spice)
-	drop if spice_total == 0
-	drop spice_total
-	
 	append using `added_spice'
+	
+	sort adm0 continent region
+	by adm0: replace continent = continent[_n+1] if missing(continent) 
+	by adm0: replace continent = continent[_N] if missing(continent)
+	by adm0: replace region = region[_n+1] if missing(region) 
+	by adm0: replace region = region[_N] if missing(region)
 	
 	save "${versatility}/Milla_CIAT_ing_origin_add.dta", replace
 	
-	
-		
-	
-	
-	
-	
-	
+
 	

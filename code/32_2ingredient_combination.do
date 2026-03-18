@@ -8,38 +8,38 @@
 
 	* ***************************************************** *
 	
-	local x "p50"
-	
-	* imported data
-	import delimited "${versatility}/imported/imported_`x'_v2.csv", clear 
-
-	* keep variables
-	keep adm0 ingredient suitability country ifnative
-	duplicates drop adm0 ingredient suitability, force
-	
-	preserve
-	keep if country == "zzz"
-	tempfile bycountry
-	save `bycountry', emptyok
-	restore
-	
-	
-	* Generating every combination of ingredients
-	levelsof adm0, local(country)
-	* initialize the output data
-	foreach c of local country {
-		preserve
-	keep if adm0 == "`c'"
-
-	gen ingredient2 = ingredient
-	fillin ingredient ingredient2
-	replace adm0 = "`c'" if adm0 == ""
-	append using `bycountry', force
-	save `bycountry', replace
-	restore
-	}
-	use `bycountry', replace
-	save "${versatility}/2ingredient.dta", replace
+// 	local x "p50"
+//	
+// 	* imported data
+// 	import delimited "${versatility}/imported/imported_`x'_v2.csv", clear 
+//
+// 	* keep variables
+// 	keep adm0 ingredient suitability country ifnative
+// 	duplicates drop adm0 ingredient suitability, force
+//	
+// 	preserve
+// 	keep if country == "zzz"
+// 	tempfile bycountry
+// 	save `bycountry', emptyok
+// 	restore
+//	
+//	
+// 	* Generating every combination of ingredients
+// 	levelsof adm0, local(country)
+// 	* initialize the output data
+// 	foreach c of local country {
+// 		preserve
+// 	keep if adm0 == "`c'"
+//
+// 	gen ingredient2 = ingredient
+// 	fillin ingredient ingredient2
+// 	replace adm0 = "`c'" if adm0 == ""
+// 	append using `bycountry', force
+// 	save `bycountry', replace
+// 	restore
+// 	}
+// 	use `bycountry', replace
+// 	save "${versatility}/2ingredient.dta", replace
 	
 	***************************************
 	* For Milla database + CIAT only native
@@ -57,7 +57,7 @@
 	
 	*- Keep only ingredients in common flavor data
 	merge m:1 ingredient using `ing'
-	keep if _merge == 3 // we lose 13 countries
+	keep if _merge == 3 // we lose 11 countries
 	
 	* keep variables
 	keep adm0 ingredient country

@@ -75,7 +75,7 @@
 	unique adm0
 	unique country
 			
-	assert `r(sum)' == 183
+	assert `r(sum)' == 184
 	// we have 159 countries with suitability information
 	
 	save "${versatility}/milla_ciat_ing_suit.dta", replace 
