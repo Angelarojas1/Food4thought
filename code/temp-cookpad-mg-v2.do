@@ -24,16 +24,15 @@ created for NBER. Date: Dec 8, 2025
 	
 	*--- Create globals with the different controls
 	
-	global hhcontr " i.income_5 hhsize i.wp1233recoded i.wp3117  " 
-	
+	global hhcontr " i.income_5 hhsize i.wp3117 " 
 	global c1 "numrecipes"
-	
-	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
-	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
-	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000 GDP"
-	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability trade_distCapital_2000 GDP  precip temp   abslat lon  landlocked"
-	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  "
-		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime   trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
+
+	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000 age"
+	global c7 "$c6  avg_suitability staple_suitability"
+	global c8 "$c7 GDP"
+	global c9 "$c8 i.precip_bin temp   abslat lon  landlocked coltime"
+	global c10 "$c9  al_mn  ph_mn     rough  distcr  "
+	global c11 "$c10  $hhcontr"
 	
 	
 	*--- Create standarized distance variables

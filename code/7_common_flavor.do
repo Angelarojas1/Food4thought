@@ -204,7 +204,7 @@ end
 **** Between 2 ingredients as a group ****
 
 ** import data
- use  "${versatility}/Milla_CIAT_ing_origin_add.dta", clear
+ use  "${versatility}/Milla_CIAT_ing_origin.dta", clear
  keep ingredient
  duplicates drop
  sort ingredient

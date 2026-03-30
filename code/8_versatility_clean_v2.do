@@ -103,12 +103,14 @@
  drop if flag == 1 & CIAT == 1 // we drop this ingredients because we won't be 
 							  // able to identify if it is native based on suitability
  drop _merge
- 
+
  gen aboveCutoff = (suitability > p50) & (!missing(suitability)) & CIAT == 1
 
- keep if aboveCutoff == 1 | CIAT == 0
+*keep if inlist(country, "Aruba", "Bahamas", "Barbados", "Dominica", "Kosovo", "Maldives", "Turkmenistan")
 
-	** save to csv file
+ keep if aboveCutoff == 1 | CIAT == 0
+ 
+ 	** save to csv file
 	outsheet using "${versatility}/native/native_p50_m_c.csv", replace
 	
 	drop numNative

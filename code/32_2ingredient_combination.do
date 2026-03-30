@@ -57,6 +57,7 @@
 	
 	*- Keep only ingredients in common flavor data
 	merge m:1 ingredient using `ing'
+	*keep if inlist(country, "Gibraltar", "Isle of Man", "Oman", "Puerto Rico", "Qatar", "Saudi Arabia", "Somalia", "United Arab Emirates")
 	keep if _merge == 3 // we lose 11 countries
 	
 	* keep variables

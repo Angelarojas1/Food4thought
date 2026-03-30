@@ -26,15 +26,15 @@ created for NBER. Date: Dec 8, 2025
 	
 	keep if age >= 24 & age <= 55
 	
-	global hhcontr " i.income_5 hhsize i.wp1233recoded i.wp3117  " 
-	
-	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
-	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
-	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability  trade_distCapital_2000 GDP"
-	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability  trade_distCapital_2000 GDP  precip temp   abslat lon  landlocked"
-	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability   trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  "
-		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability   trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
-	
+	global hhcontr " i.income_5 hhsize i.wp3117 " 
+	global c1 "numrecipes"
+
+	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000 age"
+	global c7 "$c6  avg_suitability staple_suitability"
+	global c8 "$c7 GDP"
+	global c9 "$c8 i.precip_bin temp   abslat lon  landlocked coltime"
+	global c10 "$c9  al_mn  ph_mn     rough  distcr  "
+	global c11 "$c10  $hhcontr"
 	
 	*--- Create standarized distance variables	
 	reghdfe lfpr  w_mean_spices    $c1 if vers_distCapital_2000 != 0 & covid == 0 , absorb(region_cat cl_md ym) cluster(adm0)
@@ -292,31 +292,31 @@ global s5 "nonsingle==0" // Single
 // }
 
 	*-------- IV --------*
-
-	foreach var in fulltime fullemployee {
-	forvalue j= 0/3 {
-	
-	eststo clear
-	forvalue i=6/11{
-	eststo m`i':  ivreg2  `var'  (z_pca_recipe = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-		qui sum `e(depvar)' if e(sample)
-		local m = r(mean)
-	estadd scalar Ffirst=e(rkf)
-	estadd scalar Mean = `m': m`i'
-
-	}
-	 	 
-	 estout using r`var'_index_iv_`j'_cook_24_55.tex, ///
-		style(tex) ///
-		cells(b(star f(3)) se(par f(3))) ///
-		starlevels(* 0.10 ** 0.05 *** 0.01) ///
-		keep(z_pca_recipe) ///
-		label ml(none) collabels(none) ///
-		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
-		postfoot("\hline") ///
-    replace
-}		
-}
+//
+// 	foreach var in fulltime fullemployee {
+// 	forvalue j= 0/3 {
+//	
+// 	eststo clear
+// 	forvalue i=6/11{
+// 	eststo m`i':  ivreg2  `var'  (z_pca_recipe = vers_distCapital_2000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0 & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		local m = r(mean)
+// 	estadd scalar Ffirst=e(rkf)
+// 	estadd scalar Mean = `m': m`i'
+//
+// 	}
+//	 	 
+// 	 estout using r`var'_index_iv_`j'_cook_24_55.tex, ///
+// 		style(tex) ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		keep(z_pca_recipe) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+// 		postfoot("\hline") ///
+//     replace
+// }		
+// }
 
 
 // 	foreach var in spousecook meals {

@@ -14,11 +14,6 @@ use "$versatility/native_versatility_m_c1.dta",  clear
 	merge m:1 ingredient ingredient2 using "${versatility}/common_flavor_clean_m_c.dta"
 	keep if _merge == 3
 	drop _merge
-	
-	
-	* ===================================================== *
-	*  Distance-weighted native spice versatility     *
-	* ===================================================== *
 
 	* ===================================================== *
 	*  Distance-weighted native spice versatility (3 distances)
@@ -157,6 +152,8 @@ use "$versatility/native_versatility_m_c1.dta",  clear
 	foreach var of varlist vers_dist* trade_dist* {
 		replace `var' = 0 if has_native_spice == 0
 	}
+	
+	
 	drop has_native_spice
 	
 	keep adm0 vers_dist* trade_dist*
