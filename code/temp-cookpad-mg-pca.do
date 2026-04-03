@@ -24,14 +24,15 @@ created for NBER. Date: Dec 8, 2025
 	
 	use "$cookpad/cookpad_adm0.dta", replace
 	
-	global hhcontr " i.income_5 hhsize i.wp1233recoded i.wp3117  " 
-	
-	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000"
-	global c7 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000"
-	global c8 "numrecipes numNative numNativeCIAT avg_suitability staple_suitability trade_distCapital_2000 GDP"
-	global c9 "numrecipes numNative numNativeCIAT avg_suitability  staple_suitability trade_distCapital_2000 GDP  precip temp   abslat lon  landlocked"
-	global c10 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  "
-		global c11 "numrecipes numNative numNativeCIAT  avg_suitability staple_suitability coltime   trade_distCapital_2000 GDP al_mn  precip temp  ph_mn     abslat lon rough  landlocked distcr  $hhcontr"
+	global hhcontr " i.income_5 hhsize i.wp3117 " 
+	global c1 "numrecipes"
+
+	global c6 "numrecipes numNative numNativeCIAT trade_distCapital_2000 age"
+	global c7 "$c6  avg_suitability staple_suitability"
+	global c8 "$c7 GDP"
+	global c9 "$c8 i.precip_bin temp   abslat lon  landlocked coltime"
+	global c10 "$c9  al_mn  ph_mn     rough  distcr  "
+	global c11 "$c10  $hhcontr"
 	
 	
 	*--- Create standarized distance variables	
@@ -57,7 +58,8 @@ global s2 "fem==1 & nonsingle==1"
 global s3 "fem==0 & nonsingle==1"
 global s4 "nonsingle==1" // Married or cohabitting
 global s5 "nonsingle==0" // Single
- 
+ cd "$tables"
+
 
 	*------------------------------------------*
 	**#   Standarized PCA Index                *
@@ -66,6 +68,14 @@ global s5 "nonsingle==0" // Single
 	*keep if continent == "Europe"
 
 	*-------- OLS --------*
+	/*
+ reghdfe lfpr z_pca_recipe  i.wp7572 $c10 if  vers_distCapital_2000 != 0 & covid == 0  , absorb(region_cat cl_md ym) cluster(adm0)
+ gen aux=1 if e(sample)
+  *fullemployee
+  reghdfe lfpr z_pca_recipe   $c11 if  vers_distCapital_2000 != 0 & covid == 0 & $s2, absorb(region_cat cl_md ym) cluster(adm0)
+  
+ 	 ivreg2 fulltime (z_pca_recipe   = vers_distCapital_2000_std)   $c10  i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & $s2 , partial(i.region_cat i.cl_md i.ym) cluster(adm0) first
+*/
 
 	 cd "$tables"
 	forvalue j=0/3 {
@@ -117,7 +127,15 @@ eststo clear
  
  
 	*-------- IV --------*
-	
+	/*
+	 ivreg2 lfpr (z_pca_recipe   = vers_distCapital_2000_std) $c10  i.region_cat i.cl_md i.ym if vers_distCapital_2000 != 0 & covid == 0  & $s2, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+	 
+	 sum z_pca_recipe  if e(sample)
+	 sum lfpr if e(sample)
+	 
+	 di -.2813187* .4870436   
+	 di -.2813187* .4870436 / .5430791 
+	 */
 	forvalue j=0/3 {
 	
 	eststo clear
@@ -145,11 +163,10 @@ eststo clear
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo m`i':ivreg2 lfpr (z_pca_recipe   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
-		qui sum lfpr if e(sample)
-		local m = r(mean)
-		estadd scalar Ffirst=e(rkf)
-	estadd scalar Mean = `m': m`i'
+	eststo:  ivreg2 lfpr (z_pca_recipe   = vers_distCapital_3000_std) ${c`i'} i.region_cat i.cl_md i.ym if vers_distCapital_3000 != 0 & covid == 0  & ${s`j'}, partial(i.region_cat i.cl_md i.ym) cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	estadd scalar Ffirst=e(rkf)
 
 	}
 	 	 
@@ -159,7 +176,7 @@ eststo clear
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep(z_pca_recipe  ) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N r2 Ffirst, labels("Mean dep. var." "Observations" "R-squared"  "First stage F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }		
@@ -170,18 +187,21 @@ eststo clear
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo:  reghdfe z_pca_recipe  vers_distCapital_2000_std    ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+	eststo m`i':  reghdfe z_pca_recipe  vers_distCapital_2000_std    ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
+		local m = r(mean)
+		test vers_distCapital_2000_std 
+		estadd scalar Ffirst = r(F)
+		estadd scalar Mean = `m': m`i'
 	}
-	 	 
+	
 	 estout using reg_index_fs_`j'_cook.tex, ///
 		style(tex) ///
 		cells(b(star f(3)) se(par f(3))) ///
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep( vers_distCapital_2000_std   ) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }		
@@ -191,9 +211,12 @@ eststo clear
 	
 	eststo clear
 	forvalue i=6/11{
-	eststo:  reghdfe  z_pca_recipe    vers_distCapital_3000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
+	eststo m`i':   reghdfe  z_pca_recipe    vers_distCapital_3000_std  ${c`i'}   if vers_distCapital_2000 != 0 & covid == 0  & ${s`j'} & lfpr!=.,  absorb(region_cat cl_md ym) cluster(adm0)
 		qui sum `e(depvar)' if e(sample)
-		estadd scalar Mean = r(mean)
+		local m = r(mean)
+		test vers_distCapital_3000_std 
+		estadd scalar Ffirst = r(F)
+		estadd scalar Mean = `m': m`i'
 	}
 	 	 
 	 estout using reg_index_fs_`j'_cook_robust.tex, ///
@@ -202,7 +225,7 @@ eststo clear
 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
 		keep( vers_distCapital_3000_std ) ///
 		label ml(none) collabels(none) ///
-		stats(Mean N F, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
+		stats(Mean N Ffirst, labels("Mean dep. var." "Observations" "F-statistic") fmt(%9.3f %9.1gc %4.3f)) ///
 		postfoot("\hline") ///
     replace
 }		
@@ -322,6 +345,7 @@ eststo clear
 }
 
 	foreach var in spousecook meals {
+		
 	forvalue j=0/3 {
 	
 	eststo clear

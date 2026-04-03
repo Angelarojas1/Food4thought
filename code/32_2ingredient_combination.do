@@ -69,12 +69,14 @@
 	duplicates drop 
 	gen ingredient2 = ingredient
 	fillin ingredient ingredient2
+	drop if ingredient == ingredient2
 	tempfile ingredients
 	save `ingredients', replace
 	restore
 	
 	* Generating every combination 
-	duplicates drop adm0 country, force
+	keep adm0 // country
+	duplicates drop //adm0 country , force
 	tempfile countries
 	save `countries'
 
@@ -88,13 +90,13 @@
 	foreach c of local adm0s {
 		preserve
 		keep if adm0 == "`c'"
-		local ctry = country[1]  
+		*local ctry = country[1]  
 		restore
 	
 		preserve
 		use `ingredients', clear
 		gen adm0 = "`c'"
-		gen country = "`ctry'"
+	*	gen country = "`ctry'"
 		append using `bycountry'
 		save `bycountry', replace
 		restore

@@ -5,7 +5,6 @@
    *
    * Input: https://github.com/rubenmilla/Crop_Origins_Phylo?tab=readme-ov-file
    * ******************************************************************** *
-	clear 
 	
    *- Import dataset
 	import delimited using "${rawdata}\Crop_Origins_Phylo-master\Crop_Origins_Phylo_v_live\crop_origins_v_live\crop_origins_live_db.csv", clear
@@ -129,12 +128,12 @@
 	
 	*- Get native countries using lat and lon information
 	
-	net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
+	*net get geo2xy, from("http://fmwww.bc.edu/repec/bocode/g")
 	
-// 	replace lon = "" if lon == "NA"	
-// 	replace lat = "" if lat == "NA"
-//	
-// 	destring lat lon, replace dpcomma
+	replace lon = "" if lon == "NA"	
+	replace lat = "" if lat == "NA"
+	
+	destring lat lon, replace dpcomma
 	
 	geoinpoly lat lon using "geo2xy_world_coor.dta"
 	
@@ -171,7 +170,7 @@
 	rename (geounit iso_a3 region_un) (country iso3 region)
 	
 	*- Organize ISO code
-	bys country: replace iso3 = iso3[_N]
+	bys country (iso3): replace iso3 = iso3[_N]
 	tab country if iso3 == ""
 	
 	replace iso3 = "CPV" if country == "Cabo Verde"
@@ -189,6 +188,8 @@
 	duplicates drop
 	bysort country: gen keep = (_n == _N)
 	drop if keep == 0 
+	drop keep
+	isid country
 	tempfile country
 	save `country'
 	restore
@@ -203,13 +204,19 @@
 	restore
 	
 	keep ingredient country iso3 continent region
+	sort country
+	bys country (continent): replace continent = continent[_N] 
+	bys country (region): replace region = region[_N] 
+	bysort country ingredient: gen keep = (_n == _N)
+	drop if keep == 0 
+	drop keep
 	tempfile ing_country
 	save `ing_country'
 		
 	*- For countries without native ingredients use region
 	import excel "${rawdata}\Crop_Origins_Phylo-master\ecoregion_country.xlsx", sheet("Sheet1") firstrow clear
 	
-	keep ECO_NAME G200_REGIO eco_code iso3 name continent region
+	keep ECO_NAME eco_code iso3 name continent region
 	duplicates drop 
 	rename name country
 	
@@ -249,7 +256,8 @@
 	joinby eco_code using `ing_eco'
 	
 	*unique country if _merge == 3
-	keep eco_code country ingredient iso3 continent region
+	keep country ingredient iso3 continent region
+	duplicates drop
 	
 	*- Get native ingredients for countries that didn't have this information 	
 	merge m:1 country using `country'
@@ -337,9 +345,8 @@
 
 	tab country if continent == "North America"
 	
-	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
-	
-	
+	save "${versatility}/Milla_CIAT_ing.dta", replace
+		
 	*---- Merge with spice indicator ----*
 	import excel "${rawdata}\roster_spices\roster_spices_edited.xlsx", sheet("Spices") firstrow clear
 	
@@ -366,7 +373,7 @@
 	rename Spice ingredient
 	
 	*-- Merge with crop origin data
-	merge 1:m ingredient using "${versatility}/Milla_CIAT_ing_origin.dta"
+	merge 1:m ingredient using "${versatility}/Milla_CIAT_ing.dta"
 	
 	gen spice = (_merge == 3)
 	
@@ -375,7 +382,8 @@
 	
 	save "${versatility}/Milla_CIAT_ing_origin.dta", replace
 
-	
+**********************************************************************************	
+/*
 	* For countries without native spices add spices of closest country
 	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
 	
@@ -445,5 +453,85 @@
 	
 	save "${versatility}/Milla_CIAT_ing_origin_add.dta", replace
 	
-
+*********************************************************************************
 	
+	* Add spice from closest country making sure the spice is in the compound data
+// 	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+//	
+// 	merge m:1 ingredient using "$precodedata\flavor_profile\CIAT\ing_list.dta", gen(flavordb)	
+//	
+// 	*- Keep countries and their native spices
+// 	preserve
+// 	keep if spice == 1 & flavordb == 3
+// 	rename adm0 nativeadm0
+// 	drop region continent
+// 	tempfile spice
+// 	save `spice'
+// 	restore
+//	
+// 	*- Keep names of countries that have native spices
+// 	preserve
+// 	keep if spice == 1 & flavordb == 3
+// 	rename adm0 nativeadm0
+// 	keep nativeadm0
+// 	duplicates drop
+// 	tempfile info
+// 	save `info'
+// 	restore
+//	
+// 	*- Identify countries without native spices
+// 	bys adm0: egen spices2 = sum(spice) if spice == 1 & flavordb == 3
+// 	replace spices2 = 0 if missing(spices2)
+// 	collapse (mean) spices2 , by(country adm0)
+// 	keep if spices2 == 0
+// 	drop spices2
+//	
+// 	*- Keep names of the countries without native spices
+// 	preserve 
+// 	keep adm0
+// 	rename adm0 nativeadm0
+// 	duplicates drop
+// 	tempfile no_spice
+// 	save `no_spice'
+// 	restore
+//	
+// 	*- Merge with others countries and the distance
+// 	merge 1:m adm0 using "${versatility}/distance_capital.dta", keep(3) nogen
+//	
+// 	*- Merge with countries without native spices so these are not being considered
+// 	merge m:1 nativeadm0 using `no_spice', keep(1) nogen
+//	
+// 	*- Merge with countries that do have native spices
+// 	merge m:1 nativeadm0 using `info', keep(3) nogen
+//	
+// 	*- Keep only closest country
+//     sort adm0 distance 
+// 	bys adm0 (distance): keep if _n == 1
+//	
+// 	*- Add the native spices of the closest country
+// 	joinby nativeadm0 using `spice'
+//	
+// 	keep ingredient country adm0 CIAT numNative spice 
+//	
+// 	tempfile added_spice
+// 	save `added_spice'
+//	
+// 	use "${versatility}/Milla_CIAT_ing_origin.dta", clear
+//	
+// 	append using `added_spice'
+//	
+// 	sort adm0 continent region
+// 	by adm0: replace continent = continent[_n+1] if missing(continent) 
+// 	by adm0: replace continent = continent[_N] if missing(continent)
+// 	by adm0: replace region = region[_n+1] if missing(region) 
+// 	by adm0: replace region = region[_N] if missing(region)
+//	
+// // keep if ///
+// // inlist(country, "Albania", "Argentina", "Burundi", "Chile", "Colombia", "Cuba") | ///
+// // inlist(country, "Dominican Republic", "Ecuador", "Guatemala", "Honduras", "Haiti", "Jamaica") | ///
+// // inlist(country, "Kenya", "South Korea", "Kuwait", "Sri Lanka", "Morocco", "Montenegro") | ///
+// // inlist(country, "Panama", "Peru", "North Korea", "Portugal", "Paraguay", "Singapore") | ///
+// // inlist(country, "Uruguay")
+//	
+// 	save "${versatility}/Milla_CIAT_ing_origin_flavor.dta", replace
+//

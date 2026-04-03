@@ -30,7 +30,7 @@
 	replace country = "Russia" if country == "Russian Federation"
 	replace country = "Syria" if country == "Syrian Arab Republic"
 	
-	merge m:1 adm0 country using `adm0'
+	merge m:1 adm0 using `adm0'
 	bys adm0 (country): replace country = country[_N] 
 	drop if _merge == 2
 	
@@ -75,7 +75,7 @@
 	unique adm0
 	unique country
 			
-	assert `r(sum)' == 184
+	assert `r(sum)' == 193
 	// we have 159 countries with suitability information
 	
 	save "${versatility}/milla_ciat_ing_suit.dta", replace 

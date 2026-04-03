@@ -127,6 +127,11 @@
 	native_spice_vers native_spice_vers2 suit_spice_vers avg_suitability 
 	duplicates drop 
 	
+	sort adm0 country
+	bysort adm0 : gen keep = (_n == _N)
+	drop if keep == 0 
+	drop keep 
+	
 	order adm0 country region continent numNative numNativeCIAT numSpice /// 
 	avg_suitability  lat lon ///
 	native_versatility native_versatility2 suit_versatility ///

@@ -140,7 +140,8 @@ import excel "${rawdata}/CIAT/region_ingredients.xlsx", sheet("Sheet1") firstrow
  assert inlist(tag, 0, 1, 2)
  list if tag > 0
  drop tag
- duplicates drop country nativeIng, force
+ sort country nativeIng
+ by country nativeIng: keep if _n == 1
  isid country nativeIng
  
  tempfile working
