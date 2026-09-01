@@ -21,6 +21,12 @@
 	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
 	}
 	
+	if "`c(username)'" == "wb617321" { // Angela - WB
+	cd "C:\Users\wb617321\Documents\Food4thought"
+	global projectfolder "C:\Users\wb617321\Dropbox\food4thought\analysis23"
+	global github "C:\Users\wb617321\Documents\Food4thought"
+	}
+	
 	if "c(username)" == "mgafargo" { // Margarita 
 	cd "C:\Users\mgafargo\Dropbox\food4thought\analysis23\"
 	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought/analysis23"
