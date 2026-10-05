@@ -1,0 +1,744 @@
+   * ******************************************************************** *
+   *                                                                      *
+   *        Cuisine Complexity and Female Labor Force Participation	      *
+   *              This dofile runs reduced form estimation	        	  *
+   *																	  *
+   * ******************************************************************** *
+
+   ** IDS VAR:          adm0        // Uniquely identifies countries 
+   ** NOTES:
+   ** WRITTEN BY:       Angela Rojas
+   ** Created: 			20251004
+   ** EDITTED BY:       
+   ** Last date modified: 
+   
+
+	********************************************
+**#	* 		Regressions - interactions	 	   *
+	* Region FE
+	********************************************
+	
+ global gnr "C:\Users\stell\Dropbox\food4thought\analysis23"
+ global codedata "$gnr\data\coded\"
+ global versatility "$codedata\iv_versatility\"
+
+
+	use "$codedata\iv_versatility\first_stage_native_m_c.dta", clear
+	
+	*-- Set controls
+	global c1 "numrecipes"
+	global c2 "numrecipes avg_suitability al_mn"
+	global c3 "numrecipes avg_suitability al_mn GDP"
+	global c4 "numrecipes avg_suitability al_mn precip ph_mn abslat lon GDP"
+	global c5 "numrecipes avg_suitability al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+	global c6 "numrecipes"
+	global c7 "numrecipes avg_suitability trade_distCapital_2000 al_mn"
+	global c8 "numrecipes avg_suitability trade_distCapital_2000 al_mn GDP"
+	global c9 "numrecipes avg_suitability trade_distCapital_2000 al_mn precip ph_mn abslat lon GDP"
+	global c10 "numrecipes  avg_suitability trade_distCapital_2000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+	global c11 "numrecipes"
+	global c12 "numrecipes avg_suitability trade_distCapital_3000 al_mn"
+	global c13 "numrecipes avg_suitability trade_distCapital_3000 al_mn GDP"
+	global c14 "numrecipes avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon GDP"
+	global c15"numrecipes  avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+
+	*encode region, gen(region_cat)
+ 
+	
+ 
+	
+	 cd "$gnr/outputs/Figures"
+	
+	
+	foreach var in median_totaltime median_spices median_ingredients pca_index {
+
+    * Female
+    quietly regress LFP_female `var' [aw=population] if median_totaltime<80 & median_ingredients>5
+    local b_fem  : display %5.3f _b[`var']
+    local se_fem : display %5.3f _se[`var']
+
+    quietly summarize `var' if median_totaltime<80 & median_ingredients>5
+    local xmin = r(min)
+    local xmax = r(max)
+
+    quietly summarize LFP_female if median_totaltime<80 & median_ingredients>5
+    local ymin = r(min)
+    local ymax = r(max)
+
+    local xtext_f = `xmin' + 0.78*(`xmax' - `xmin')
+    local ytext_f = `ymax' - 0.08*(`ymax' - `ymin')
+
+    twoway ///
+        (scatter LFP_female `var' if median_totaltime<80 & median_ingredients>5 [aw=population]) ///
+        (lfit LFP_female `var' if median_totaltime<80 & median_ingredients>5 [aw=population]), ///
+        ytitle("Labor Force Participation") ///
+        subtitle("Female") ///
+        note("Note: Dot size proportional to population. Source: World Bank") ///
+        legend(off) ///
+        text(`ytext_f' `xtext_f' "Coef. = `b_fem'" "             (`se_fem')", ///
+            box margin(small) place(e) justification(left) fcolor(white) lcolor(black)) name(`var'_fem, replace)
+
+    graph export `var'_fem.png, replace
+
+    * Male
+    quietly regress LFP_male `var' [aw=population] if median_totaltime<80 & median_ingredients>5
+    local b_mal  : display %5.3f _b[`var']
+    local se_mal : display %5.3f _se[`var']
+
+    quietly summarize LFP_male if median_totaltime<80 & median_ingredients>5
+    local ymin = r(min)
+    local ymax = r(max)
+
+    local xtext_m = `xmin' + 0.78*(`xmax' - `xmin')
+    local ytext_m = `ymax' - 0.08*(`ymax' - `ymin')
+
+    twoway ///
+        (scatter LFP_male `var' if median_totaltime<80 & median_ingredients>5 [aw=population]) ///
+        (lfit LFP_male `var' if median_totaltime<80 & median_ingredients>5 [aw=population]), ///
+        ytitle("Labor Force Participation") ///
+        subtitle("Male") ///
+        note("Note: Dot size proportional to population. Source: World Bank") ///
+        legend(off) ///
+        text(`ytext_m' `xtext_m' "Coef. = `b_mal'" "          (`se_mal')", ///
+            box margin(small) place(e) justification(left) fcolor(white) lcolor(black)) name(`var'_mal, replace)
+
+    graph export `var'_mal.png, replace
+}
+	
+	
+	
+	
+// 	foreach var in median_totaltime  median_spices median_ingredients  pca_index {
+//		
+// 		twoway (scatter LFP_female  `var'  if median_totaltime<80 &  median_ingredients>5 [w=population])(lfit  LFP_female  `var'  [w=population] if median_totaltime<80 &  median_ingredients>5)  , legend(position(6) col(2))  ytitle("Labor Force Paricipation") subtitle("Female") note("Note: Dot size proportional to population. Source: World Bank") legend(off)
+// 		graph export `var'_fem.png, replace
+//		
+// 		twoway (scatter LFP_male  `var'  if median_totaltime<80 &  median_ingredients>5 [w=population])(lfit  LFP_male `var' [w=population] if median_totaltime<80 &  median_ingredients>5), legend(position(6) col(2))  ytitle("Labor Force Paricipation") subtitle("Male") note("Note: Dot size proportional to population. Source: World Bank") legend(off)
+// 		graph export `var'_mal.png, replace
+//		
+// 	}
+//	
+//	
+
+	
+	/*
+	
+	eststo clear
+	 forvalue i=1/5{ 
+	eststo: reghdfe pca_index i.fem_lfp##c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe pca_index i.fem_lfp##c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10{ 
+	eststo: reghdfe pca_index i.fem_lfp##c.vers_distCapital_2000 ${c`i'} i.fem_lfp#c.trade_distCapital_2000 if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15{ 
+	eststo: reghdfe pca_index i.fem_lfp##c.vers_distCapital_3000 ${c`i'} i.fem_lfp#c.trade_distCapital_3000 if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 
+	estout using reg-fs-pca-gap.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order( 1.fem_lfp#c.vers_distCapital_2000 vers_distCapital_2000  1.fem_lfp#c.vers_distCapital_3000 vers_distCapital_3000) ///
+		drop(_cons 0.fem*) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+
+	*-------- OLS --------*
+	
+	 cd "$tables"
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP i.fem_lfp##c.pca_index ${c`i'}, absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 
+	estout using reg-ols-gap-pca.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem_lfp#c.pca_index pca_index) ///
+		drop(_cons 0.fem*) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+
+// 	 cd "$tables"
+// 	eststo clear
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP i.fem_lfp##c.median_totaltime ${c`i'}, absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	 forvalue i=1/5{ 
+// 	eststo: reghdfe LFP i.fem_lfp##c.w_mean_spices ${c`i'}, absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	 forvalue i=1/5{ 
+// 	eststo: reghdfe LFP i.fem_lfp##c.median_ingredients ${c`i'}, absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+//	 
+// 	estout using reg-ols-gap.tex, ///
+// 		style(tex) ///
+// 		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+// 		postfoot("\bottomrule" "\end{tabular}") ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		order(1.fem_lfp#c.median_totaltime median_totaltime 1.fem_lfp#c.w_mean_spices w_mean_spices 1.fem_lfp#c.median_ingredients median_ingredients) ///
+// 		drop(_cons 0.fem*) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+//     replace
+
+
+	*-------- Reduced Form --------*
+
+	eststo clear
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP i.fem_lfp##c.native_spice_vers ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP i.fem_lfp##c.native_spice_vers2 ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe LFP i.fem_lfp##c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=1/5{ 
+	eststo: reghdfe LFP i.fem_lfp##c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=7/10{ 
+	eststo: reghdfe LFP i.fem_lfp##c.vers_distCapital_2000 ${c`i'} i.fem_lfp#c.trade_distCapital_2000 if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 forvalue i=12/15{ 
+	eststo: reghdfe LFP i.fem_lfp##c.vers_distCapital_3000 ${c`i'} i.fem_lfp#c.trade_distCapital_3000 if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	 
+	estout using reg-rf-gap.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order( 1.fem_lfp#c.vers_distCapital_2000 vers_distCapital_2000  1.fem_lfp#c.vers_distCapital_3000 vers_distCapital_3000) ///
+		drop(_cons 0.fem*) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+	
+	*-------- IV --------*
+	
+	eststo clear
+
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP (w_mean_spices i.fem_lfp#c.w_mean_spices = i.fem_lfp#c.native_spice_vers native_spice_vers) fem_lfp ${c`i'} ///
+// 		i.region_cat i.cl_md , robust cluster(adm0) 
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP (w_mean_spices i.fem_lfp#c.w_mean_spices = i.fem_lfp#c.native_spice_vers2 native_spice_vers2) fem_lfp ${c`i'} ///
+// 		i.region_cat i.cl_md , robust cluster(adm0)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+
+	forvalue i=1/5 { 
+		eststo: ivreg2 LFP (pca_index i.fem_lfp#c.pca_index = i.fem_lfp#c.vers_distCapital_2000 vers_distCapital_2000) fem_lfp ${c`i'}  ///
+		i.region_cat i.cl_md if vers_distCapital_2000 != 0 , robust cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	forvalue i=1/5 { 
+		eststo: ivreg2 LFP (pca_index i.fem_lfp#c.pca_index = i.fem_lfp#c.vers_distCapital_3000 vers_distCapital_3000) fem_lfp ${c`i'}  ///
+		i.region_cat i.cl_md if vers_distCapital_3000 != 0 , robust cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	forvalue i=7/10 { 
+		eststo: ivreg2 LFP (pca_index i.fem_lfp#c.pca_index = i.fem_lfp#c.vers_distCapital_2000 vers_distCapital_2000) fem_lfp ${c`i'} i.fem_lfp#c.trade_distCapital_2000 ///
+		i.region_cat i.cl_md if vers_distCapital_2000 != 0 , robust cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	
+	forvalue i=12/15 { 
+		eststo: ivreg2 LFP (pca_index i.fem_lfp#c.pca_index = i.fem_lfp#c.vers_distCapital_3000 vers_distCapital_3000) fem_lfp ${c`i'} i.fem_lfp#c.trade_distCapital_3000 ///
+		i.region_cat i.cl_md if vers_distCapital_3000 != 0 , robust cluster(adm0)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	cd "${tables}"
+
+	* Export table with F-stat
+	estout using reg_gap_pca_IV.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(1.fem_lfp#c.pca_index pca_index) ///
+		drop(_cons 0.fem* *.region_cat *.cl_md) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2 widstat, ///
+			  labels("Mean LFP" "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
+
+	********************************************
+**#	*   		     Regressions 	 	       *
+	* No interactions
+	* Y = FLFP / MLFP
+	* Use GDP as a control
+	* Region and climate FE
+	********************************************
+
+	use "$codedata\versatility\first_stage_native_m_c.dta", clear
+
+	*-- Set controls
+	global c1 "numrecipes"
+	global c2 "numrecipes avg_suitability al_mn"
+	global c3 "numrecipes avg_suitability al_mn GDP"
+	global c4 "numrecipes avg_suitability al_mn precip ph_mn abslat lon GDP"
+	global c5 "numrecipes avg_suitability al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+	global c6 "numrecipes"
+	global c7 "numrecipes avg_suitability trade_distCapital_2000 al_mn"
+	global c8 "numrecipes avg_suitability trade_distCapital_2000 al_mn GDP"
+	global c9 "numrecipes avg_suitability trade_distCapital_2000 al_mn precip ph_mn abslat lon GDP"
+	global c10 "numrecipes  avg_suitability trade_distCapital_2000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+	global c11 "numrecipes"
+	global c12 "numrecipes avg_suitability trade_distCapital_3000 al_mn"
+	global c13 "numrecipes avg_suitability trade_distCapital_3000 al_mn GDP"
+	global c14 "numrecipes avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon GDP"
+	global c15"numrecipes  avg_suitability trade_distCapital_3000 al_mn precip ph_mn abslat lon rough temp landlocked distcr staple_suitability GDP"
+	
+
+	* creating the LFP gap at the country-level
+	collapse (mean) $c5 LFP_male LFP_female median_spices w_mean_spices vers_distCapital_2000 vers_distCapital_3000 trade_distCapital_2000 trade_distCapital_3000 (first) continent region_cat cl_md pca_index, by(adm0)
+
+	gen LFP_gap = LFP_female-LFP_male
+
+	* relabel everything
+	foreach v of varlist * {
+		local lbl : variable label `v'
+
+		* Clean up symbols
+		local lblclean : subinstr local lbl "_" " ", all
+		local lblclean : subinstr local lblclean "(" "", all
+		local lblclean : subinstr local lblclean ")" "", all
+
+		* Remove "mean " if it occurs at the beginning (within first 5 characters)
+		if strpos(lower(substr("`lblclean'", 1, 5)), "mean") {
+			local lblclean = substr("`lblclean'", 6, .)
+		}
+
+		label variable `v' "`lblclean'"
+	}
+	
+		label var pca_index "PCA Index"
+	
+		*--- FIRST STAGE
+
+ 	eststo clear
+
+	forvalue i=1/5{ 
+	eststo: reghdfe pca_index c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe pca_index c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=7/10{ 
+	eststo: reghdfe pca_index c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=12/15{ 
+	eststo: reghdfe pca_index c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_fs_pca_dist.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		replace
+
+	*-------------------------------------------*
+**#	*                 FLFP                      *
+	*-------------------------------------------*
+	
+	*--- OLS
+
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_female c.pca_index ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_flfp_pca_OLS.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(pca_index) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+// 	*--- OLS
+//
+// 	eststo clear
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_female c.median_totaltime ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_female c.w_mean_spices ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_female c.median_ingredients ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+//
+// 	 cd "$tables"
+//	 
+// 	estout using reg_flfp_OLS.tex, ///
+// 		style(tex) ///
+// 		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+// 		postfoot("\bottomrule" "\end{tabular}") ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		order(median_totaltime w_mean_spices median_ingredients) ///
+// 		drop(_cons) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+//     replace
+
+
+	*--- REDUCED FORM
+
+ 	eststo clear
+// 		forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_female c.native_spice_vers ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_female c.native_spice_vers2 ${c`i'}, absorb(region_cat cl_md) vce(robust)
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_female c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_female c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=7/10{ 
+	eststo: reghdfe LFP_female c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=12/15{ 
+	eststo: reghdfe LFP_female c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0 , absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_flfp_RF_dist.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		replace
+		
+		
+	* IV REGRESSIONS FOR vers_distCapital_2000, vers_distCapital_3000
+
+	eststo clear
+
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP_female (w_mean_spices = native_spice_vers) ${c`i'} i.region_cat i.cl_md, robust first
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP_female (w_mean_spices = native_spice_vers2) ${c`i'} i.region_cat i.cl_md, robust first
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+	forvalue i=1/5 { 
+		eststo: ivreg2 LFP_female (pca_index = vers_distCapital_2000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_2000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	forvalue i=1/5 { 
+		eststo: ivreg2 LFP_female (pca_index = vers_distCapital_3000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_3000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+	forvalue i=7/10 { 
+		eststo: ivreg2 LFP_female (pca_index = vers_distCapital_2000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_2000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	forvalue i=12/15 { 
+		eststo: ivreg2 LFP_female (pca_index = vers_distCapital_3000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_3000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	cd "${tables}"
+
+	* Export table with F-stat
+	estout using reg_flfp_IV_pca_dist.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(pca_index) ///
+		drop(_cons *.region_cat *.cl_md) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2 widstat, ///
+			  labels("Mean LFP" "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace
+
+	*-------------------------------------------*
+**#	*                 MLFP                      *
+	*-------------------------------------------*
+	
+	*--- OLS
+
+	eststo clear
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_male c.pca_index ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+	qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_mlfp_pca_OLS.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(pca_index) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+    replace
+
+	*--- OLS
+
+// 	eststo clear
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_male c.median_totaltime ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_male c.w_mean_spices ${c`i'}  , absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_male c.median_ingredients ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 	qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	 }
+//
+// 	 cd "$tables"
+//	 
+// 	estout using reg_mlfp_OLS.tex, ///
+// 		style(tex) ///
+// 		prehead("\begin{tabular}{lccccccccccccccc}" "\toprule") ///
+// 		postfoot("\bottomrule" "\end{tabular}") ///
+// 		cells(b(star f(3)) se(par f(3))) ///
+// 		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+// 		order(median_totaltime w_mean_spices median_ingredients) ///
+// 		drop(_cons) ///
+// 		label ml(none) collabels(none) ///
+// 		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+//     replace
+
+
+	*--- REDUCED FORM
+
+ 	eststo clear
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_male c.native_spice_vers ${c`i'} , absorb(region_cat cl_md) vce(robust)
+// 	 }
+// 	forvalue i=1/5{ 
+// 	eststo: reghdfe LFP_male c.native_spice_vers2 ${c`i'}, absorb(region_cat cl_md) vce(robust)
+// 	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_male c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0, absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=1/5{ 
+	eststo: reghdfe LFP_male c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0, absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=7/10{ 
+	eststo: reghdfe LFP_male c.vers_distCapital_2000 ${c`i'} if vers_distCapital_2000 != 0, absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+	forvalue i=12/15{ 
+	eststo: reghdfe LFP_male c.vers_distCapital_3000 ${c`i'} if vers_distCapital_3000 != 0, absorb(region_cat cl_md) vce(robust)
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	 }
+
+	 cd "$tables"
+	 
+	estout using reg_mlfp_RF.tex, ///
+		style(tex)  ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(vers_distCapital_2000 vers_distCapital_3000) ///
+		drop(_cons) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2, labels("Mean LFP" "Observations" "R-squared") fmt(%9.3f %9.1gc %4.3f)) ///
+		replace
+
+	* IV REGRESSIONS FOR native_spice_vers, native_spice_vers2, native_spice_vers2_dist2
+
+	eststo clear
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP_male (w_mean_spices = native_spice_vers) ${c`i'} i.region_cat i.cl_md, robust first
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+//
+// 	forvalue i=1/5 { 
+// 		eststo: ivreg2 LFP_male (w_mean_spices = native_spice_vers2) ${c`i'} i.region_cat i.cl_md, robust first
+// 		qui sum `e(depvar)' if e(sample)
+// 		estadd scalar Mean = r(mean)
+// 	}
+	forvalue i=1/5{ 
+		eststo: ivreg2 LFP_male (pca_index = vers_distCapital_2000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_2000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	forvalue i=1/5{ 
+		eststo: ivreg2 LFP_male (pca_index = vers_distCapital_3000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_3000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	forvalue i=7/10{ 
+		eststo: ivreg2 LFP_male (pca_index = vers_distCapital_2000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_2000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	forvalue i=12/15{ 
+		eststo: ivreg2 LFP_male (pca_index = vers_distCapital_3000) ${c`i'} i.region_cat i.cl_md if vers_distCapital_3000 != 0, robust first
+		qui sum `e(depvar)' if e(sample)
+		estadd scalar Mean = r(mean)
+	}
+
+	cd "${tables}"
+
+	* Export table including F-stat
+	estout using reg_mlfp_pca_IV.tex, ///
+		style(tex) ///
+		prehead("\begin{tabular}{lcccccccccccccccccc}" "\toprule") ///
+		postfoot("\bottomrule" "\end{tabular}") ///
+		cells(b(star f(3)) se(par f(3))) ///
+		starlevels(* 0.10 ** 0.05 *** 0.01) ///
+		order(pca_index) ///
+		drop(_cons *.region_cat *.cl_md) ///
+		label ml(none) collabels(none) ///
+		stats(Mean N r2 widstat, ///
+			  labels("Mean LFP" "Observations" "R-squared" "First-stage F-stat") ///
+			  fmt(%9.1gc %9.1gc %4.3f %4.2f)) ///
+		replace

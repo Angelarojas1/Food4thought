@@ -62,15 +62,15 @@ import delimited using "${precodedata}/suitability/country-vars-9nov23.csv", cas
  drop _merge
 
  unique adm0
- assert `r(sum)' == 138
+ assert `r(sum)' == 137
 
 * Check if we have information for all countries
  sum al_mn pt_mn ph_mn cl_md 
 
 * Label variables
-label var al_mn "Average altitude (mts)"  // 138 countries
+label var al_mn "Average altitude (mts)"  // 137 countries
 label var pt_mn "Total precipitation in 1999 (mm)" // 137 countries (Tonga)
 label var ph_mn "Average pH" // 124 countries
-label var cl_md "Most common climate zone (KG2)" // 138 countries
+label var cl_md "Most common climate zone (KG2)" // 137 countries
 
 save "${versatility}/geographical.dta", replace

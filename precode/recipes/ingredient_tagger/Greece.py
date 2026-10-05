@@ -30,9 +30,10 @@ from word2number import w2n
 
 
 # import dataset
-data = pd.read_csv("C:/Users/stell/Dropbox/food4thought/analysis23/data/precoded/recipes/initial/Greece.csv")
+data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Greece.csv")
 data.drop(['Unnamed: 0'],axis=1,inplace=True)
 data.head()
+
 
 # In[3]:
 

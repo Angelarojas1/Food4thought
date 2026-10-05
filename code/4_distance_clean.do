@@ -45,7 +45,7 @@
  merge 1:1 adm0 using `adm0'
  tab _merge
  assert inlist(_merge, 1, 2, 3)
- drop if _merge == 1
+ *drop if _merge == 1
  tab adm0 country_r if _merge == 2
  replace country = country_r if missing(country)
  drop country_r _merge
@@ -62,10 +62,41 @@
  
  replace lat = 44.79 if country == "Serbia"
  replace lon = 20.46 if country == "Serbia"
+ 
+  replace lat = 42.67 if country == "Kosovo"
+ replace lon = 21.17 if country == "Kosovo"
+ 
+ replace lat = 47.17 if country == "Liechtenstein"
+ replace lon = 9.51 if country == "Liechtenstein"
+
+ replace lat = 44.44 if country == "Romania"
+ replace lon = 26.10 if country == "Romania"
+ 
+ replace lat = 44.79 if country == "Serbia"
+ replace lon = 20.46 if country == "Serbia"
+ 
+ tempfile orig
+ save `orig'
+
+ * Create missing countries
+ clear
+ input str40 country str3 adm0 float(lat lon)
+ "Democratic Republic of the Congo" "COD" 4.32 15.31
+ "Guam"                            "GUM" 13.44 144.79
+ "Montenegro"                      "MNE" 42.44 19.26
+ "Palestine"                       "PSE" 31.90 35.20
+ "South Sudan"                     "SSD" 4.85 31.58
+ end
+
+ tempfile add
+ save `add'
+
+ use `orig', clear
+ append using `add'
 
  assert !missing(lat) & !missing(lon)
  unique adm0
-* assert `r(N)' == 139
+* assert `r(N)' == 229
 
 ** create every combinations of country
  gen country2 = country
