@@ -12,27 +12,10 @@
    ** WRITTEN BY:       Angela Rojas
    ** EDITTED BY:       
    ** Last date modified: Jan 5, 2026
-   
-   	* Remove duplicates
-	duplicates drop nameoftherecipe country, force // Drop 12,582 observations
+ 
 
-	* Organize to merge
-	gen namelen = length(nameoftherecipe)
-	summ namelen, detail
-
-	gen str193 nameoftherecipe_key = nameoftherecipe
-	drop namelen nameoftherecipe totaltime
-	rename nameoftherecipe_key nameoftherecipe
-
-    * Merge with database fixed by ChatGPT
-	merge 1:m nameoftherecipe country using  ///
-	"$recipes/ChatGPT/recipe_totaltime_validated.dta" , nogen 
-	
-	// Corrected time for 12177 observations of 78006
-	// 15% of the recipes
-	
 	* Drop recipes without a name
-	drop if nameoftherecipe == "" // 52 recipes
+	drop if nameoftherecipe == "" // 53 recipes
 	
 	* Fix variable of number of ingredients 
 	destring numberofingredients_raw, replace
@@ -58,18 +41,16 @@
 	strpos(cooktime,"H")>0 | strpos(cooktime,"~")>0
 	destring cook , replace
 
-	replace totaltime_orig = prep + cook if totaltime_orig == 0 | totaltime_orig == .
-	
-	replace totaltime_orig = 45 if strpos(cooktime,"Trahana")>0
+	replace totaltime = prep + cook if totaltime == 0 | totaltime == .
 	
 	* Drop recipes with zeros in number of ingredients
-	drop if numberofingredients==0 // 41 observations deleted
+	drop if numberofingredients==0 // 40 observations deleted
 	
 	* Drop countries with more than 65% of its recipes without ingredient or time information.
 	sort country
 	bysort nameoftherecipe country: gen numrecipe = _n
 	
-	bysort country: egen welose1 = count(nameoftherecipe) if totaltime_orig == 0 | totaltime_orig ==.
+	bysort country: egen welose1 = count(nameoftherecipe) if totaltime == 0 | totaltime ==.
 	bysort country: egen welose2 = count(nameoftherecipe) if numberofingredients == 0
 	bysort country: egen totalrecipe = total(numrecipe)
 	egen welose = rowtotal(welose1 welose2)
@@ -83,16 +64,16 @@
 	drop welose* percent totalrecipe
 	
 	* Drop recipes with zeros in time 
-	drop if totaltime_orig==0 | missing(totaltime_orig) // 7001 observations deleted
+	drop if totaltime==0 | missing(totaltime) // 7001 observations deleted
 	
 	** drop recipes that the total time are higher than 99%
-	bys country: egen p99 = pctile(totaltime_orig), p(99)
-	drop if totaltime_orig > p99 // 553
+	bys country: egen p99 = pctile(totaltime), p(99)
+	drop if totaltime > p99 // 553
 	note: `r(N_drop)' recipes are dropped because of higher than 99%.
 	
 	** drop recipes that the total time are lower than 1%
-	egen p1 = pctile(totaltime_orig), p(1)
-	drop if totaltime_orig < p1 // 302
+	egen p1 = pctile(totaltime), p(1)
+	drop if totaltime < p1 // 302
 	note: `r(N_drop)' recipes are dropped because of lower than 1%.
 	
 	duplicates drop nameoftherecipe country, force 

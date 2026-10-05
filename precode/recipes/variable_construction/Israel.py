@@ -7,14 +7,16 @@
 
 
 # import packages
-get_ipython().run_line_magic('matplotlib', 'inline')
+try:
+    get_ipython().run_line_magic('matplotlib', 'inline')
+except NameError:
+    pass
 import ast
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import re
-from deep_translator import GoogleTranslator
-from translate import Translator
 
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
@@ -32,8 +34,23 @@ from nltk.stem.wordnet import WordNetLemmatizer
 
 
 # import dataset
-data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/final/Israel.csv")
-data.drop(['Unnamed: 0'],axis=1,inplace=True)
+DATA_DIR = Path(r"C:\Users\stell\Dropbox\food4thought\analysis23\data")
+RECIPE_PATH = DATA_DIR / r"precoded\recipes\intermediate\Israel.csv"
+OUTPUT_PATH = DATA_DIR / r"precoded\recipes\final\Israel.csv"
+SPICE_PATH = DATA_DIR / r"raw\roster_spices\roster_spices_edited.xlsx"
+UNIT_PATH = DATA_DIR / r"raw\unit_data\roster_unit.xlsx"
+UNIT_STANDARD_PATH = DATA_DIR / r"raw\unit_data\Unit standard.xlsx"
+
+data = pd.read_csv(RECIPE_PATH, encoding="utf-8-sig")
+data.drop(['Unnamed: 0'], axis=1, inplace=True, errors="ignore")
+
+# This script starts from intermediate/Israel.csv, where the translated columns
+# already exist. Do not translate again here.
+if 'List of ingredients_Eng' in data.columns:
+    data['List of ingredients'] = data['List of ingredients_Eng']
+
+if 'Category_Eng' in data.columns:
+    data['Category'] = data['Category_Eng']
 
 data.head()
 
@@ -105,36 +122,32 @@ def extractVerb(instruction):
 
 def verbList(instructionLst):
     """
-    input: instruction list in German
+    input: instruction list in English
     output: verb lists
-    
     """
-    
-    # step 1: find sentences with time
-    # initialize the list to store instructions with time
+
+    # step 1: find English sentences with time
     timeInstruction = []
-    
+
     for instruction in instructionLst:
         if isinstance(instruction, dict):
             instruction = instruction['text'].lower()
         else:
             instruction = instruction.lower()
-            
-        for word in ["דקות","שעה (ות","ימים"]:
+
+        for word in ["minute", "minutes", "hour", "hours", "day", "days"]:
             if word in instruction:
                 timeInstruction.append(instruction)
-            
-    # step 1: translate instructions related to time to English
-    translator= Translator(to_lang="en")
-    timeInstructionEng = [translator.translate(i) for i in timeInstruction]
-    
-    
+
+    # The intermediate file already has English instructions. Do not translate here.
+    timeInstructionEng = timeInstruction
+
     # step 2: initialize a list to store verbs
     verbs = []
-    
+
     for instruction in timeInstructionEng:
         verbs.append(extractVerb(instruction))
-        
+
     return verbs
 
 data['verbList'] = data['List of instructions'].apply(lambda x: verbList(x))
@@ -161,7 +174,7 @@ data.head()
 
 
 # extract numbers from time columns
-data['Total time'] = data['Total time'].str.extract('(\d+)')
+data['Total time'] = data['Total time'].astype(str).str.extract('(\d+)')
 # replace those with nan values
 data['Total time'] = data['Total time'].replace(np.nan,0)
 # transfer object type to int type
@@ -223,8 +236,8 @@ data.head()
 # create a list to store all spice
 
 # import spice data
-spice = pd.read_excel("/Users/xixi/Dropbox/food4thought/data/intermediate/roster_spices_edited.xlsx", engine='openpyxl', sheet_name="Spices").dropna(how='all')
-mixes = pd.read_excel("/Users/xixi/Dropbox/food4thought/data/intermediate/roster_spices_edited.xlsx", engine='openpyxl', sheet_name="Mixes").dropna(how='all')
+spice = pd.read_excel(SPICE_PATH, engine='openpyxl', sheet_name="Spices").dropna(how='all')
+mixes = pd.read_excel(SPICE_PATH, engine='openpyxl', sheet_name="Mixes").dropna(how='all')
 
 
 # drop first row as it's empty
@@ -339,7 +352,7 @@ def unitInLst(unitTagger):
     """
     
     # import unit data
-    unitData = pd.read_excel("/Users/xixi/Dropbox/food4thought/material/unit_data/roster_unit.xlsx", engine='openpyxl')
+    unitData = pd.read_excel(UNIT_PATH, engine='openpyxl')
     unit = unitData.dropna(how='all')
 
     # add unit to list
@@ -368,7 +381,7 @@ def sugarAmount(ingredientLstTagger):
     sugarAmount = 0
     
     # import unit measure data
-    unitMeasure = pd.read_excel("/Users/xixi/Dropbox/food4thought/material/unit_data/Unit standard.xlsx", engine='openpyxl')
+    unitMeasure = pd.read_excel(UNIT_STANDARD_PATH, engine='openpyxl')
     unitMeasureDic = dict(unitMeasure.dropna(how='all').values)
         
     for dic in ingredientLstTagger:
@@ -395,7 +408,7 @@ data['sugarAmount in tsp(ingredient tagger)'].describe()
 # In[15]:
 
 
-data.to_csv("/Users/xixi/Dropbox/food4thought/data/final/Israel.csv")
+data.to_csv(OUTPUT_PATH, index=False, encoding="utf-8-sig")
 
 
 # In[ ]:

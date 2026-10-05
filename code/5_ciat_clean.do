@@ -109,14 +109,14 @@ save `category', replace
 * get ingredient-region data from CIAT map **************************
 import excel "${rawdata}/CIAT/region_ingredients.xlsx", sheet("Sheet1") firstrow case(lower) clear
 
+list region_nice ingredients if missing(ingredients)
+drop if missing(ingredients)
+
 ** check
- cap noisily assert _N == 339
+ cap noisily assert _N == 338
  cap noisily assert !missing(region_nice)
  
- drop if missing(region_nice)
  cap noisily isid region_nice ingredients
- list region_nice ingredients if missing(ingredients)
- drop if missing(ingredients)
  
  isid region_nice ingredients
 
@@ -171,14 +171,69 @@ import excel "${rawdata}/CIAT/region_ingredients.xlsx", sheet("Sheet1") firstrow
  keep if _merge == 3
  drop _merge
  
- unique country
+ unique adm0
  note: There are `r(sum)' countries with native ingredients from CIAT map and cuisine data. We don't have native ingredients for IOI region. Thus missing 3 countries here ("Comoros", "Madagascar", "Mauritius").
  
  rename nativeIng ingredient
- isid adm0 ingredient
+ isid country ingredient
  
- unique adm0
- assert `r(sum)' == 136
+ unique country
+ note: There are `r(sum)' countries with native ingredients from CIAT map
+ 
+*- Clean ingredients name so the match the ones in common flavor database
+replace ingredient = "apple"              if ingredient == "apples"
+replace ingredient = "apricot"            if ingredient == "apricots"
+replace ingredient = "banana"            if ingredient == "bananas"
+replace ingredient = "almond"            if ingredient == "almonds"
+replace ingredient = "areca_nut"         if ingredient == "areca nuts"
+replace ingredient = "artichoke"         if ingredient == "artichokes"
+replace ingredient = "avocado"           if ingredient == "avocados"
+replace ingredient = "bambara_bean"      if ingredient == "bambara beans"
+replace ingredient = "blueberry"          if ingredient == "blueberries"
+replace ingredient = "cabbage"           if ingredient == "cabbages"
+replace ingredient = "carrot"            if ingredient == "carrots"
+replace ingredient = "castor_oil"        if ingredient == "castor oil"
+replace ingredient = "cherry"             if ingredient == "cherries"
+replace ingredient = "chickpea"          if ingredient == "chickpeas"
+replace ingredient = "chicory"           if ingredient == "chicory roots"
+replace ingredient = "chillies_peppers"             if ingredient == "chillies&peppers"
+replace ingredient = "cocoa"        if ingredient == "cocoa beans"
+replace ingredient = "cottonseed"    if ingredient == "cottonseed oil"
+replace ingredient = "cranberry"          if ingredient == "cranberries"
+replace ingredient = "cucumber"          if ingredient == "cucumbers"
+replace ingredient = "eggplant"          if ingredient == "eggplants"
+replace ingredient = "beans_redkidneybeans"     if ingredient == "faba beans"
+replace ingredient = "fig"               if ingredient == "figs"
+replace ingredient = "hazelnut"          if ingredient == "hazelnuts"
+replace ingredient = "kola_nut"          if ingredient == "kola nuts"
+replace ingredient = "leek"              if ingredient == "leeks"
+replace ingredient = "flaxseed"              if ingredient == "linseed"
+replace ingredient = "lupine"            if ingredient == "lupins"
+replace ingredient = "macadamianut"     if ingredient == "macadamia nut"
+replace ingredient = "corn"     if ingredient == "maize"
+replace ingredient = "cucumber"   if ingredient == "pepino"
+replace ingredient = "millet"            if ingredient == "millets"
+replace ingredient = "rape_mustard_seed"         if ingredient == "rape&mustard seed" 
+replace ingredient = "mustard_seed"      if ingredient == "mustard seed"
+replace ingredient = "nutmeg"            if ingredient == "nutmeg and mace"
+replace ingredient = "olive"             if ingredient == "olives"
+replace ingredient = "onion"             if ingredient == "onions"
+replace ingredient = "oil_palm"          if ingredient == "palm oil"
+replace ingredient = "pigeonpea"         if ingredient == "pigeonpeas"
+replace ingredient = "pistachio"         if ingredient == "pistachios"
+replace ingredient = "potato"            if ingredient == "potatoes"
+replace ingredient = "pumpkin"           if ingredient == "pumpkins"
+replace ingredient = "rape_mustard_seed"         if ingredient == "rapeseed"
+ replace ingredient = "ryeflour"            if ingredient == "rye"
+replace ingredient = "safflower"    if ingredient == "safflower seed"
+replace ingredient = "sesame"            if ingredient == "seasame"
+replace ingredient = "shea_tree"           if ingredient == "sheanuts"
+replace ingredient = "beetroot"        if ingredient == "sugar beet"
+replace ingredient = "sweetpotato"      if ingredient == "sweet potatoes"
+replace ingredient = "tomato"            if ingredient == "tomatoes"
+replace ingredient = "walnut"            if ingredient == "walnuts"
+replace ingredient = "yam"               if ingredient == "yams"
+
  
 ** save dataset
 save "${versatility}/cuisine_ciat.dta", replace

@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 24 16:36:39 2026
+
+@author: stell
+"""
+
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -8,8 +15,12 @@
 
 #pip install openpyxl
 # import packages
-get_ipython().run_line_magic('matplotlib', 'inline')
+try:
+    get_ipython().run_line_magic('matplotlib', 'inline')
+except NameError:
+    pass
 import ast
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -31,8 +42,15 @@ from nltk.stem.wordnet import WordNetLemmatizer
 
 
 # import dataset
-data = pd.read_csv("/Users/xixi/Dropbox/food4thought/data/intermediate/Iraq.csv")
-data.drop(['Unnamed: 0', 'Unnamed: 0.1'],axis=1,inplace=True)
+DATA_DIR = Path(r"C:\Users\stell\Dropbox\food4thought\analysis23\data")
+RECIPE_PATH = DATA_DIR / r"precoded\recipes\intermediate\Iraq.csv"
+OUTPUT_PATH = DATA_DIR / r"precoded\recipes\final\Iraq.csv"
+SPICE_PATH = DATA_DIR / r"raw\roster_spices\roster_spices_edited.xlsx"
+UNIT_PATH = DATA_DIR / r"raw\unit_data\roster_unit.xlsx"
+UNIT_STANDARD_PATH = DATA_DIR / r"raw\unit_data\Unit standard.xlsx"
+
+data = pd.read_csv(RECIPE_PATH, encoding="utf-8-sig")
+data.drop(['Unnamed: 0', 'Unnamed: 0.1'], axis=1, inplace=True, errors="ignore")
 
 data.head()
 
@@ -56,7 +74,7 @@ data.shape
 
 
 # extract numbers from time columns
-data['Total time'] = data['Total time'].str.extract('(\d+)')
+data['Total time'] = data['Total time'].astype(str).str.extract('(\d+)')
 # replace those with nan values
 data['Total time'] = data['Total time'].replace(np.nan,0)
 # transfer object type to int type
@@ -121,8 +139,8 @@ data.head()
 # create a list to store all spice
 
 # import spice data
-spice = pd.read_excel("/Users/xixi/Dropbox/food4thought/data/intermediate/roster_spices_edited.xlsx", engine='openpyxl', sheet_name="Spices").dropna(how='all')
-mixes = pd.read_excel("/Users/xixi/Dropbox/food4thought/data/intermediate/roster_spices_edited.xlsx", engine='openpyxl', sheet_name="Mixes").dropna(how='all')
+spice = pd.read_excel(SPICE_PATH, engine='openpyxl', sheet_name="Spices").dropna(how='all')
+mixes = pd.read_excel(SPICE_PATH, engine='openpyxl', sheet_name="Mixes").dropna(how='all')
 
 
 # drop first row as it's empty
@@ -237,7 +255,7 @@ def unitInLst(unitTagger):
     """
     
     # import unit data
-    unitData = pd.read_excel("/Users/xixi/Dropbox/food4thought/material/unit_data/roster_unit.xlsx", engine='openpyxl')
+    unitData = pd.read_excel(UNIT_PATH, engine='openpyxl')
     unit = unitData.dropna(how='all')
 
     # add unit to list
@@ -266,7 +284,7 @@ def sugarAmount(ingredientLstTagger):
     sugarAmount = 0
     
     # import unit measure data
-    unitMeasure = pd.read_excel("/Users/xixi/Dropbox/food4thought/material/unit_data/Unit standard.xlsx", engine='openpyxl')
+    unitMeasure = pd.read_excel(UNIT_STANDARD_PATH, engine='openpyxl')
     unitMeasureDic = dict(unitMeasure.dropna(how='all').values)
         
     for dic in ingredientLstTagger:
@@ -293,7 +311,7 @@ data['sugarAmount in tsp(ingredient tagger)'].describe()
 # In[16]:
 
 
-data.to_csv("/Users/xixi/Dropbox/food4thought/data/final/Iraq.csv")
+data.to_csv(OUTPUT_PATH, index=False, encoding="utf-8-sig")
 
 
 # In[ ]:

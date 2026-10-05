@@ -1,3 +1,11 @@
+
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun 22 18:22:18 2026
+
+@author: stell
+"""
+
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -7,11 +15,15 @@
 
 
 # import packages
-get_ipython().system('pip install deep_translator')
-get_ipython().system('pip install fuzzywuzzy')
-get_ipython().system('pip install word2number')
-get_ipython().run_line_magic('matplotlib', 'inline')
+# If a package is missing, install it once in your environment, e.g.:
+# pip install deep_translator fuzzywuzzy word2number
+try:
+    get_ipython().run_line_magic('matplotlib', 'inline')
+except NameError:
+    pass
 import ast
+import time
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -31,15 +43,19 @@ from word2number import w2n
 # In[ ]:
 
 
-from google.colab import drive
-drive.mount('/content/drive')
+# Local Windows paths. No Google Colab mount is needed.
 
 
 # In[ ]:
 
 
 # import dataset
-data = pd.read_csv("/content/drive/MyDrive/DATA/Iraq.csv")
+DATA_DIR = Path(r"C:/Users/stell/Dropbox/food4thought/analysis23/data")
+INPUT_PATH = DATA_DIR / r"precoded/recipes/initial/Iraq.csv"
+OUTPUT_PATH = DATA_DIR / r"precoded/recipes/intermediate/Iraq.csv"
+UNIT_PATH = DATA_DIR / r"raw/unit_data/roster_unit.xlsx"
+
+data = pd.read_csv(INPUT_PATH, encoding="utf-8-sig")
 data.shape
 
 
@@ -66,8 +82,7 @@ type(data['List of ingredients'][0])
 # In[ ]:
 
 
-# convert string repretention of list to a list
-data['List of ingredients'] = data['List of ingredients'].apply(lambda x: ast.literal_eval(str(x)))
+# List-like columns are converted below before translation.
 data['List of ingredients']
 
 
@@ -88,25 +103,165 @@ data['List of ingredients'].head()[1]
 # In[ ]:
 
 
-# translate ingredients to English
+# translate Arabic variables to English
+def fix_mojibake(text):
+    """
+    Repair Arabic if it appears as mojibake.
+    If the text is already valid Arabic, it is returned unchanged.
+    """
+    if not isinstance(text, str):
+        return text
+    # Common UTF-8 decoded as Windows-1252/Latin-1 markers.
+    if "\u00d8" not in text and "\u00d9" not in text and "\u00c3" not in text and "\u00e2" not in text:
+        return text
+    for encoding in ("latin1", "cp1252"):
+        try:
+            return text.encode(encoding).decode("utf-8")
+        except UnicodeError:
+            pass
+    return text
+
+
+def parse_list_cell(value):
+    """
+    Convert a CSV cell that stores a Python-list-looking string into a real list.
+    """
+    if isinstance(value, list):
+        return value
+    if value is None or pd.isna(value):
+        return []
+    value = str(value).strip()
+    if value == "" or value.lower() == "nan":
+        return []
+    if value.startswith("[") and value.endswith("]"):
+        return ast.literal_eval(value)
+    return [value]
+
+
+def clean_value(value):
+    """
+    Clean either a string or a list of strings.
+    """
+    if isinstance(value, list):
+        return [clean_value(item) for item in value]
+    if pd.isna(value):
+        return value
+    return fix_mojibake(str(value)).strip()
+
+
+def clean_for_translation(text):
+    """
+    Clean text before sending it to Google Translate.
+    Handles recipe-site artifacts and Arabic diacritics that sometimes make
+    deep_translator return "No translation was found".
+    """
+    text = fix_mojibake(str(text)).strip()
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"https?://\S+", "", text)
+    text = re.sub(r"[/\\]+", " ", text)
+    text = re.sub(r"[\u064b-\u065f\u0670\u0640]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def translation_candidates(text):
+    """
+    Return candidate strings to try translating, from most faithful to most cleaned.
+    """
+    cleaned = clean_for_translation(text)
+    candidates = [fix_mojibake(str(text)).strip(), cleaned]
+
+    no_parentheses = re.sub(r"[(){}\[\]]", " ", cleaned)
+    no_parentheses = re.sub(r"\s+", " ", no_parentheses).strip()
+    candidates.append(no_parentheses)
+
+    # Preserve order and remove duplicates/empty values.
+    result = []
+    for candidate in candidates:
+        if candidate and candidate not in result:
+            result.append(candidate)
+    return result
+
+
+def translate_text(text, retries=3, sleep_seconds=1):
+    """
+    Translate one Arabic string to English, with retries and cache.
+    """
+    if pd.isna(text):
+        return text
+
+    text = fix_mojibake(str(text)).strip()
+    if text == "":
+        return ""
+
+    if text in translation_cache:
+        return translation_cache[text]
+
+    last_error = None
+    for candidate in translation_candidates(text):
+        for current_translator in (translator, auto_translator):
+            for attempt in range(retries):
+                try:
+                    translated = current_translator.translate(candidate)
+                    if translated:
+                        translation_cache[text] = translated
+                        time.sleep(0.15)
+                        return translated
+                except Exception as e:
+                    last_error = e
+                    time.sleep(sleep_seconds * (attempt + 1))
+
+    fallback = clean_for_translation(text)
+    print(f"Translation failed after fallbacks for {text}: {last_error}")
+    translation_cache[text] = fallback
+    return fallback
+
+
+def translate_value(value):
+    """
+    Translate either a string or a list of strings.
+    """
+    if isinstance(value, list):
+        return [translate_value(item) for item in value]
+    return translate_text(value)
+
+
 def transIngredient(content):
     """
     input: ingredient list of one recipe
     output: ingredient list of one recipe in English
-
     """
-      
-    ingredientEng = [GoogleTranslator(source='auto', target='english').translate(i) for i in content]
-    return ingredientEng
+    return translate_value(content)
 
-data['List of ingredients_Eng'] = data['List of ingredients'].apply(lambda x:transIngredient(x))
+
+# Convert and clean list-like columns before translating them.
+for col in ["List of ingredients", "List of instructions"]:
+    if col in data.columns:
+        data[col] = data[col].apply(parse_list_cell)
+        data[col] = data[col].apply(clean_value)
+
+# Clean regular text columns before translating them.
+for col in ["Name of the recipe", "Category"]:
+    if col in data.columns:
+        data[col] = data[col].apply(clean_value)
+
+translator = GoogleTranslator(source='arabic', target='english')
+auto_translator = GoogleTranslator(source='auto', target='english')
+translation_cache = {}
+
+# Keep the original Arabic variables and create English versions.
+
+
+data['List of ingredients_Eng'] = data['List of ingredients'].apply(lambda x: transIngredient(x))
+
+
 data.head()
 
 
 # In[ ]:
 
 
-data['List of ingredients_Eng'] = data['List of ingredients_Eng'].apply(lambda x: ast.literal_eval(str(x)))
+# List of ingredients_Eng is already a real Python list.
 
 
 # In[ ]:
@@ -201,7 +356,7 @@ def ifUnit(ingredientStr):
     result = [False]
     
     # import unit data
-    unitData = pd.ExcelFile("/content/drive/MyDrive/DATA/roster_unit.xlsx")
+    unitData = pd.ExcelFile(UNIT_PATH)
     unit = pd.read_excel(unitData)
 
     # add unit to list
@@ -669,7 +824,6 @@ def ingredientLstTagger(ingredientLst):
     return result
 
 data['Ingredient list tagger'] = data["List of ingredients_Eng"].apply(lambda x: ingredientLstTagger(x))
-data.to_csv("/content/drive/MyDrive/DATA/INTERMEDIATE/Iraq_done.csv")
 
 
 # In[ ]:
@@ -683,7 +837,8 @@ data['Ingredient list tagger'].head(9000)[6770]
 # In[ ]:
 
 
-data.to_csv("/content/drive/MyDrive/DATA/INTERMEDIATE/Iraq.csv")
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+data.to_csv(OUTPUT_PATH, index=False, encoding="utf-8-sig")
 
 
 # In[ ]:

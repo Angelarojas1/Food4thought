@@ -7,11 +7,15 @@
 
 
 # import packages
-get_ipython().system('pip install deep_translator')
-get_ipython().system('pip install fuzzywuzzy')
-get_ipython().system('pip install word2number')
-get_ipython().run_line_magic('matplotlib', 'inline')
+# If a package is missing, install it once in your environment, e.g.:
+# pip install deep_translator fuzzywuzzy word2number
+try:
+    get_ipython().run_line_magic('matplotlib', 'inline')
+except NameError:
+    pass
 import ast
+import time
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -31,15 +35,19 @@ from word2number import w2n
 # In[2]:
 
 
-from google.colab import drive
-drive.mount('/content/drive')
+# Local Windows paths. No Google Colab mount is needed.
 
 
 # In[4]:
 
 
 # import dataset
-data = pd.read_csv("/content/drive/MyDrive/DATA/Israel.csv")
+DATA_DIR = Path(r"C:/Users/stell/Dropbox/food4thought/analysis23/data")
+INPUT_PATH = DATA_DIR / r"precoded/recipes/initial/Israel.csv"
+OUTPUT_PATH = DATA_DIR / r"precoded/recipes/intermediate/Israel.csv"
+UNIT_PATH = DATA_DIR / r"raw/unit_data/roster_unit.xlsx"
+
+data = pd.read_csv(INPUT_PATH, encoding="utf-8-sig")
 data.shape
 
 
@@ -66,9 +74,7 @@ data['List of ingredients'][0]
 # In[8]:
 
 
-# convert string repretention of list to a list
-
-data['List of ingredients'] = data['List of ingredients'].apply(lambda x: ast.literal_eval(str(x)))
+# List-like columns are converted below before translation.
 data['List of ingredients']
 
 
@@ -83,25 +89,125 @@ data['List of ingredients'].tail()
 # In[11]:
 
 
-# translate ingredients to English
+# translate Hebrew variables to English
+def fix_mojibake(text):
+    """
+    Repair Hebrew if it appears as mojibake.
+    If the text is already valid Hebrew, it is returned unchanged.
+    """
+    if not isinstance(text, str):
+        return text
+    if "\u00d7" not in text and "\u00e2" not in text:
+        return text
+    for encoding in ("latin1", "cp1252"):
+        try:
+            return text.encode(encoding).decode("utf-8")
+        except UnicodeError:
+            pass
+    return text
+
+
+def parse_list_cell(value):
+    """
+    Convert a CSV cell that stores a Python-list-looking string into a real list.
+    """
+    if isinstance(value, list):
+        return value
+    if pd.isna(value):
+        return []
+    return ast.literal_eval(str(value))
+
+
+def clean_value(value):
+    """
+    Clean either a string or a list of strings.
+    """
+    if isinstance(value, list):
+        return [clean_value(item) for item in value]
+    if pd.isna(value):
+        return value
+    return fix_mojibake(str(value)).strip()
+
+
+def translate_text(text, retries=3, sleep_seconds=1):
+    """
+    Translate one Hebrew string to English, with retries and cache.
+    """
+    if pd.isna(text):
+        return text
+
+    text = fix_mojibake(str(text)).strip()
+    if text == "":
+        return ""
+
+    if text in translation_cache:
+        return translation_cache[text]
+
+    last_error = None
+    for attempt in range(retries):
+        try:
+            translated = translator.translate(text)
+            translation_cache[text] = translated
+            return translated
+        except Exception as e:
+            last_error = e
+            time.sleep(sleep_seconds * (attempt + 1))
+
+    print(f"Translation failed for {text}: {last_error}")
+    translation_cache[text] = text
+    return text
+
+
+def translate_value(value):
+    """
+    Translate either a string or a list of strings.
+    """
+    if isinstance(value, list):
+        return [translate_value(item) for item in value]
+    return translate_text(value)
+
+
 def transIngredient(content):
     """
     input: ingredient list of one recipe
     output: ingredient list of one recipe in English
-
     """
-      
-    ingredientEng = [GoogleTranslator(source='auto', target='english').translate(i) for i in content]
-    return ingredientEng
+    return translate_value(content)
 
-data['List of ingredients_Eng'] = data['List of ingredients'].apply(lambda x:transIngredient(x))
+
+# Convert and clean list-like columns before translating them.
+for col in ["List of ingredients", "List of instructions", "Category"]:
+    if col in data.columns:
+        data[col] = data[col].apply(parse_list_cell)
+        data[col] = data[col].apply(clean_value)
+
+# Clean regular text columns before translating them.
+for col in ["Name of the recipe"]:
+    if col in data.columns:
+        data[col] = data[col].apply(clean_value)
+
+translator = GoogleTranslator(source='hebrew', target='english')
+translation_cache = {}
+
+# Keep the original Hebrew variables and create English versions.
+if "Name of the recipe" in data.columns:
+    data["Name of the recipe"] = data["Name of the recipe"].apply(translate_value)
+
+data['List of ingredients_Eng'] = data['List of ingredients'].apply(lambda x: transIngredient(x))
+
+if "List of instructions" in data.columns:
+    data["List of instructions"] = data["List of instructions"].apply(translate_value)
+
+if "Category" in data.columns:
+    data["Category_Eng"] = data["Category"].apply(translate_value)
+
 data.head()
 
 
 # In[12]:
 
 
-data['List of ingredients_Eng'] = data['List of ingredients_Eng'].apply(lambda x: ast.literal_eval(str(x)))
+# List of ingredients_Eng is already a real Python list.
 type(data['List of ingredients_Eng'][0])
 
 
@@ -197,7 +303,7 @@ def ifUnit(ingredientStr):
     result = [False]
     
     # import unit data
-    unitData = pd.ExcelFile("/content/drive/MyDrive/DATA/roster_unit.xlsx")
+    unitData = pd.ExcelFile(UNIT_PATH)
     unit = pd.read_excel(unitData)
 
     # add unit to list
@@ -483,7 +589,8 @@ data['Ingredient list tagger'].head(20)[6]
 # In[30]:
 
 
-data.to_csv("/content/drive/MyDrive/DATA/INTERMEDIATE/Israel.csv")
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+data.to_csv(OUTPUT_PATH, index=False, encoding="utf-8-sig")
 
 
 # In[ ]:

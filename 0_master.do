@@ -2,7 +2,7 @@
 *                                                                      		   *
 *            	Cuisine Complexity and Female Labor Force Participation	       *
 *               Author: Girija Borker, Margarita Gáfaro, Steve Berggreen
-* 				Last date modified: June 17, 2025 						   	   *
+* 				Last date modified: October 5, 2026 						   	   *
 *				Modified by: Ángela Rojas
 *				Master dataset generation file
 * **************************************************************************** *
@@ -15,22 +15,17 @@
 	
 	** Root folder globals 
 
-	if "`c(username)'" == "stell" { // Angela
-	cd "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
-	global projectfolder "C:/Users/stell/Dropbox/food4thought/analysis23"
-	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought"
-	}
-	
-	if "`c(username)'" == "wb617321" { // Angela - WB
-	cd "C:\Users\wb617321\Documents\Food4thought"
-	global projectfolder "C:\Users\wb617321\Dropbox\food4thought\analysis23"
+	if "`c(username)'" == "wb617321" { // Angela
+	cd "C:\Users\wb617321\Dropbox\food4thought\repo_package"
+	global projectfolder "C:\Users\wb617321\Dropbox\food4thought\repo_package"
 	global github "C:\Users\wb617321\Documents\Food4thought"
 	}
 	
-	if "c(username)" == "mgafargo" { // Margarita 
-	cd "C:\Users\mgafargo\Dropbox\food4thought\analysis23\"
-	global projectfolder "C:\Users\mgafargo\Dropbox\food4thought/analysis23"
-	global github "C:\Users\mgafargo\Dropbox\food4thought/analysis23"
+	di c(username)
+	if "`c(username)'" == "" { // User
+	cd ""
+	global projectfolder "" // Data and outputs 
+	global github "" // Code
 	}
 	
 	* Dofile sub-folder globals
@@ -54,7 +49,6 @@
 	global fao_suit             "$codedata/FAO_suitability"
 	global pop                  "$codedata/population"
 
-	
 	* Output sub-folder globals
 	global outputs				"$projectfolder/outputs"
 	global tables				"$outputs/Tables"
@@ -67,26 +61,27 @@
 
 	** Install packages (run once)
 	
-	* ssc install aaplot
-	* ssc install ivreghdfe
-	* ssc install ivreg2
-	* ssc install reghdfe
-	* ssc install ftools
-	* ssc install ranktest
-	* ssc install winsor4
-	* ssc install dataex
-	* ssc install geoinpoly
-	* ssc install kountry
-	* ssc install winsor4
-	* ssc install shp2dta
-	* ssc install spmap
+	local user_commands aaplot unique kountry ivreghdfe ivreg2 reghdfe ftools require ranktest winsor4 dataex geoinpoly shp2dta spmap outreg2 asdoc matchit freqindex reclink csdid drdid coefplot
 	
+   foreach command of local user_commands {
+       cap which `command'
+       if _rc == 111 {
+           ssc install `command'
+       }
+   }
+
 // 	net install nwcommands-ado, from("${code}/ado/nwcommands-master")
 // 	findit nwcommands
-
 	
-// 	** Section to create all the folders I need in data/coded folder
-// 	* mkdir
+	** Section to create all the folders I need in data/coded folder
+	mkdir				"$codedata/recipes"
+	mkdir             	"$codedata/FLFP"
+	mkdir             	"$codedata/MLFP"
+	mkdir	            "$codedata/GDP"
+	mkdir         		"$codedata/iv_versatility"
+	mkdir               "$codedata/cookpad"
+	mkdir               "$codedata/FAO_suitability"
+	mkdir               "$codedata/population"
 //	
 // 	* ***************************************************** *
 // 	*                Recipe Data Coding                     *
@@ -94,30 +89,36 @@
 //
 // 	* Scrape recipe data by country - Python
 // 	// Don't run this part. Treat the recipe data as raw
-// 	// "$recipes/scrape_recipe_data"
+// 	// "$recipe_code/scrape_recipe_data"
 //	
 // 	* Clean recipe data by country - Python
 // 	// Don't run this part. Treat the recipe data as raw
-// 	// "$recipes/ingredient_tagger"
+// 	// "$recipe_code/ingredient_tagger"
 //	
 // 	* Construct variables - Python
 // 	// Don't run this part. Treat the recipe data as raw
-// 	// "$recipes/variable_construction"
+// 	// "$recipe_code/variable_construction"
 //	
+	* 	The purpose of this dofile is:
+	*		- Merge recipe data for 139 countries.
+	*		- Run only if you are adding a country.
+	
+		do "$code/1_merge_recipes.do" 	
+
 // 	* 	The purpose of this dofile is:
-// 	*		- Merge recipe data for 139 countries.
-// 	*		- Run only if you are adding a country.
+// 	*		- Merge recipe data from cookbooks for 57 countries.
+// 	*		- Run only if you are adding a cookbook.
 //	
-// 	*	do "$code/1_merge_recipes.do" 	
+// 	*	do "$code/merge_recipes_cookbook.do" 	
 //
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean recipes dataset
-// 	* 		- Create time, ingredients and spices variables for 
-// 	*         different percentiles (cuisine complexity variables)
-// 	*		- Country level databases
-//	
-// 		do "$code/2_cuisine_variables.do" 
-//		
+	* 	The purpose of this dofile is:
+	*		- Clean recipes dataset
+	* 		- Create time, ingredients and spices variables for 
+	*         different percentiles (cuisine complexity variables)
+	*		- Country level databases
+	
+		do "$code/2_cuisine_variables.do" 
+		
 // 	* ***************************************************** *
 // 	*     				 LFP Data Coding				    *
 // 	* ***************************************************** *
@@ -139,15 +140,15 @@
 //	
 // 		do "$code/lfp_clean.do" 	
 //		
-// 	* ***************************************************** *
-// 	*     				 GDP Data Coding				    *
-// 	* ***************************************************** *
-//
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean GDP data (per capita and total)
-// 	* 		-  countries with GDP information
-//	
-// 		do "$code/gdp_clean.do" 
+	* ***************************************************** *
+	*     				 GDP Data Coding				    *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean GDP data (per capita and total)
+	* 		-  countries with GDP information
+	
+		do "$code/gdp_clean.do" 
 //	
 // 	* ***************************************************** *
 // 	*             Population Data Coding				    *
@@ -157,7 +158,18 @@
 // 	*		- Clean population data
 //
 // 		do "$code/population_clean.do" 
+
+// 	* 	The purpose of this dofile is:
+// 	*		- Clean % of rural population data
+//
+// 		do "$code/rural_pop_clean.do" 
 //		
+
+// 	* 	The purpose of this dofile is:
+// 	*		- Clean migrant proportion data
+//
+// 		do "$code/migrants_clean.do" 
+
 // 	* ***************************************************** *
 // 	*                  CPI Data Coding	    			    *
 // 	* ***************************************************** *
@@ -195,24 +207,24 @@
 // 	*       - This is for imported versatility variable
 //
 // 		do "$code/4_distance_clean.do"	
-//		
-// 	* ***************************************************** *
-// 	*        Native ingredients clasification       	    *
-// 	* ***************************************************** *
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		-  Clean data from CIAT Map
-// 	*		-  This gets native ingredients by country and region.
-// 	*       -  Merges ingredient data with recipes and FLFP database.
-// 	*       -  136 countries with native ingredient information
-//	
-// 		do "$code/5_ciat_clean.do"  
+		
+	* ***************************************************** *
+	*        Native ingredients clasification       	    *
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	*		-  Clean data from CIAT Map
+	*		-  This gets native ingredients by country and region.
+	*       -  Merges ingredient data with recipes and FLFP database.
+	*       -  136 countries with native ingredient information
+	
+ 		do "$code/5_ciat_clean.do"  
 //
 // 	* 	The purpose of this dofile is:
 // 	*		-  Clean data from Milla data 
 // 	*		-  Creates dataset for Milla + CIAT
 //	
-// 		do "$code/crop_origin_clean.do"
+ 		do "$code/crop_origin_clean.do"
 //		
 // 	* ***************************************************** *
 // 	*              		 Suitability                	    *
@@ -223,12 +235,12 @@
 // 	*		- 136 countries with suitability data
 // 	*       - For the other 5 countries we create the suitability data
 //
-// 		do "$code/6_suitability_clean.do"
+ 		do "$code/6_suitability_clean.do"
 //		
 // 	* 	The purpose of this dofile is:
 // 	*		- Merge Milla and CIAT data with suitability data
 //
-// 		do "$code/suitability_clean_milla.do"
+		do "$code/suitability_clean_milla.do"
 //	
 // 	* ***************************************************** *
 // 	*             FAO suitability Data Coding               *
@@ -246,7 +258,7 @@
 // 	* 	The purpose of this dofile is:
 // 	*       - Creates common flavor (between 2 and 3 ingredients) files.
 //
-// 		do "$code/7_common_flavor.do"
+		do "$code/7_common_flavor.do"
 //		
 // 	* ***************************************************** *
 // 	*               Time use survey Coding                  *
@@ -266,14 +278,14 @@
 // 	*		- Clean data for calculating versatility.
 // 	*       - Creates native versatility and imported versatility files
 //
-// 		do "$code/8_versatility_clean_v2.do" 
+		do "$code/8_versatility_clean_v2.do" 
 //		
 // 	* ***************************************************** *
 //		
 // 	*	The purpose of this dofile is:
 // 	*		- Create every combination between 2 ingredients
 //		
-// 	    do "$code/32_2ingredient_combination.do"
+	    do "$code/32_2ingredient_combination.do"
 //		
 // 	* ***************************************************** *
 // 	*         Geographical Controls from Galor              *
@@ -292,7 +304,7 @@
 // 	*		- Generate geographical controls for all countries
 // 	*		- Info for 138 countries (Kosovo pending)
 //
-// 		do "$code/11_geographical_clean.do"
+//		do "$code/11_geographical_clean.do"
 //		
 // 	* ***************************************************** *
 // 	*                 Cookpad Data Coding                   *
@@ -311,13 +323,20 @@
 // 	* 	The purpose of this dofile is:
 // 	*		- Generate only native versatility measures. 
 //
-// 		do "$code/33_new_versatility_only_native_m_c.do"
+		do "$code/33_new_versatility_only_native_m_c.do"
 //		
 // 	* 	The purpose of this dofile is:
 // 	*		- Generate only imported versatility measures. 
 // 	*       - Includes distance
 //
-// 		do "$code/34_import_versatility.do"
+		do "$code/34_import_versatility.do"
+//
+// 	* 	The purpose of this dofile is:
+// 	*		- Generate versatility measure with distance.
+// 	*       - Includes suitability weight
+//
+// 		do "$code/34b_import_versatility_rank_weighted.do"
+//
 //	
 // 	* 	The purpose of this dofile is:
 // 	*		- Generate versatility by country
@@ -342,7 +361,7 @@
 // 	*		- Merge cookpad and versatility data
 // 	*		- Add a cookpad indicator to versatility dataset
 //
-// 		do "$code/35_cookpad_data.do"
+		do "$code/35_cookpad_data.do"
 //		
 // 	* ***************************************************** *
 // 	*            First Stage IV Dataset Creation            *
@@ -363,6 +382,39 @@
 //	
 // 	    do "$code/es_descriptives.do"
 //		
+// 	*********************************************************
+// 	*		       Recipes data validation
+// 	*********************************************************
+//	
+// 	* 	The purpose of this dofile is:
+// 	*		- Compare the main variables between recipes
+//			  from cookbooks to the ones from websites
+//	
+// 	    do "$code/cookbooks_vs_web.do"
+
+// 	* 	The purpose of this dofile is:
+// 	*		- Compare how many recipes are in both datasets:
+//			  cookbooks, websites
+//	
+// 	    do "$code/recipes_overlap_v2.do"
+
+// 	* 	The purpose of this dofile is:
+// 	*		- Compare proportion of recipes in food groups 
+//			  to food consumption
+//	
+// 	    do "$code/food_consumption_recipes.do"
+
+// 	* 	The purpose of this dofile is:
+// 	*		- Get number of folklore stories that talk about
+//			  food.
+//	
+// 	    do "$code/folklore.do"
+
+// 	* 	The purpose of this dofile is:
+// 	*		- See relation between heritage sites and food.
+//	
+// 	    do "$code/unesco_heritage.do"
+
 // 	*********************************************************
 // 	*					Estimations
 // 	*********************************************************
@@ -401,13 +453,13 @@
 	*		- Run individual level regressions using PCA index
 	*		- The file was created by MG for draft sent on december 8
 		
-		do "$code/temp-cookpad-mg-pca.do"
+// 		do "$code/temp-cookpad-mg-pca.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run individual level regressions
 	*		- The file was created by MG for draft sent on december 8
 		
-		do "$code/temp-cookpad-mg-v2.do"
+	*	do "$code/temp-cookpad-mg-v2.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run country level regressions about appliances
@@ -436,6 +488,12 @@
 	
 		*do "$code/temp-cookpad-mg-v2-24-55.do"
 		do "$code/temp-cookpad-mg-pca-24-55.do"
+		
+	*	The purpose of this dofile is:
+	*		- Run regs for single men
+	*		- Run regs for rural and urban people
+	
+		do "$code/temp-cookpad-mg-extra-exercises.do"
 		
 		
 	* ***************************************************** *
@@ -473,5 +531,10 @@
 //	
 // 		 do "$code/bar_time.do"
 //
+// 	* ***************************************************** *
 //	
+// 	*	The purpose of this dofile is:
+// 	*		- Create heat map of average native ingredients used in each country.
+//  *       - Creates a table of descriptive statistics of proportion of native ingredients in each recipe variable by country.
 //	
+// 		 do "$code/recipes_native.do"
