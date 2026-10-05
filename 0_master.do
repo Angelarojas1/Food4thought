@@ -22,10 +22,10 @@
 	}
 	
 	di c(username)
-	if "`c(username)'" == "" { // User
-	cd ""
-	global projectfolder "" // Data and outputs 
-	global github "" // Code
+	if "`c(username)'" == "stell" { // User
+	cd "C:\Users\stell\Dropbox\food4thought\repo_package"
+	global projectfolder "C:\Users\stell\Dropbox\food4thought\repo_package" // Data and outputs 
+	global github "C:\Users\stell\OneDrive\Escritorio\Documentos\GitHub\Food4thought" // Code
 	}
 	
 	* Dofile sub-folder globals
@@ -74,14 +74,14 @@
 // 	findit nwcommands
 	
 	** Section to create all the folders I need in data/coded folder
-	mkdir				"$codedata/recipes"
-	mkdir             	"$codedata/FLFP"
-	mkdir             	"$codedata/MLFP"
-	mkdir	            "$codedata/GDP"
-	mkdir         		"$codedata/iv_versatility"
-	mkdir               "$codedata/cookpad"
-	mkdir               "$codedata/FAO_suitability"
-	mkdir               "$codedata/population"
+// 	mkdir				"$codedata/recipes"
+// 	mkdir             	"$codedata/FLFP"
+// 	mkdir             	"$codedata/MLFP"
+// 	mkdir	            "$codedata/GDP"
+// 	mkdir         		"$codedata/iv_versatility"
+// 	mkdir               "$codedata/cookpad"
+// 	mkdir               "$codedata/FAO_suitability"
+// 	mkdir               "$codedata/population"
 //	
 // 	* ***************************************************** *
 // 	*                Recipe Data Coding                     *
@@ -197,16 +197,16 @@
 //
 // 		do "$code/price_index_clean.do" 
 //		
-// 	* ***************************************************** *
-// 	*                 Distance Data Coding                  *
-// 	* ***************************************************** *	
-//		
-// 	* 	The purpose of this dofile is:
-// 	*		- Calculate the distance between any two countries
-// 	*		- Info for 139 countries
-// 	*       - This is for imported versatility variable
-//
-// 		do "$code/4_distance_clean.do"	
+	* ***************************************************** *
+	*                 Distance Data Coding                  *
+	* ***************************************************** *	
+		
+	* 	The purpose of this dofile is:
+	*		- Calculate the distance between any two countries
+	*		- Info for 139 countries
+	*       - This is for imported versatility variable
+
+		do "$code/4_distance_clean.do"	
 		
 	* ***************************************************** *
 	*        Native ingredients clasification       	    *
@@ -219,27 +219,27 @@
 	*       -  136 countries with native ingredient information
 	
  		do "$code/5_ciat_clean.do"  
-//
-// 	* 	The purpose of this dofile is:
-// 	*		-  Clean data from Milla data 
-// 	*		-  Creates dataset for Milla + CIAT
-//	
+
+	* 	The purpose of this dofile is:
+	*		-  Clean data from Milla data 
+	*		-  Creates dataset for Milla + CIAT
+	
  		do "$code/crop_origin_clean.do"
-//		
-// 	* ***************************************************** *
-// 	*              		 Suitability                	    *
-// 	* ***************************************************** *
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean data from suitability databases
-// 	*		- 136 countries with suitability data
-// 	*       - For the other 5 countries we create the suitability data
-//
+		
+	* ***************************************************** *
+	*              		 Suitability                	    *
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	*		- Clean data from suitability databases
+	*		- 136 countries with suitability data
+	*       - For the other 5 countries we create the suitability data
+
  		do "$code/6_suitability_clean.do"
-//		
-// 	* 	The purpose of this dofile is:
-// 	*		- Merge Milla and CIAT data with suitability data
-//
+		
+	* 	The purpose of this dofile is:
+	*		- Merge Milla and CIAT data with suitability data
+
 		do "$code/suitability_clean_milla.do"
 //	
 // 	* ***************************************************** *
@@ -252,12 +252,12 @@
 // 	*  		- Don't run this part. Treat the suitability data as raw
 //	
 // 		do "$code/13_FAO_suitability.do"
-//		
-// 	* ***************************************************** *
-//	
-// 	* 	The purpose of this dofile is:
-// 	*       - Creates common flavor (between 2 and 3 ingredients) files.
-//
+		
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	*       - Creates common flavor (between 2 and 3 ingredients) files.
+
 		do "$code/7_common_flavor.do"
 //		
 // 	* ***************************************************** *
@@ -269,90 +269,68 @@
 //
 // 		do "$code/14_time_use_survey.do"	
 //
-// 	* ***************************************************** *
-// 	*              		 IV Data Coding             	    *
-// 	*               Native & Imported versatility           *
-// 	* ***************************************************** *
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean data for calculating versatility.
-// 	*       - Creates native versatility and imported versatility files
-//
+	* ***************************************************** *
+	*              		 IV Data Coding             	    *
+	*               Native & Imported versatility           *
+	* ***************************************************** *
+	
+	* 	The purpose of this dofile is:
+	*		- Clean data for calculating versatility.
+	*       - Creates native versatility and imported versatility files
+
 		do "$code/8_versatility_clean_v2.do" 
-//		
-// 	* ***************************************************** *
-//		
-// 	*	The purpose of this dofile is:
-// 	*		- Create every combination between 2 ingredients
-//		
+		
+	* ***************************************************** *
+		
+	*	The purpose of this dofile is:
+	*		- Create every combination between 2 ingredients
+		
 	    do "$code/32_2ingredient_combination.do"
-//		
-// 	* ***************************************************** *
-// 	*         Geographical Controls from Galor              *
-// 	* ***************************************************** *	
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean control variables from Galor data 
-//
-// 		do "$code/10_galor_clean.do"
-//		
-// 	* ***************************************************** *
-// 	*              Geographical Data Coding                 *
-// 	* ***************************************************** *	
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate geographical controls for all countries
-// 	*		- Info for 138 countries (Kosovo pending)
-//
-//		do "$code/11_geographical_clean.do"
-//		
-// 	* ***************************************************** *
-// 	*                 Cookpad Data Coding                   *
-// 	* ***************************************************** *
-//
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean cookpad data
-//
-// 		do "$code/12_cookpad_clean.do"
-//		
-// 	* ***************************************************** *
-// 	*              		 IV Data Analysis             	    *
-// 	*                  Versatility variables                *
-// 	* ***************************************************** *
-//		
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate only native versatility measures. 
-//
+		
+	* ***************************************************** *
+	*         Geographical Controls from Galor              *
+	* ***************************************************** *	
+	
+	* 	The purpose of this dofile is:
+	*		- Clean control variables from Galor data 
+
+		do "$code/10_galor_clean.do"
+		
+	* ***************************************************** *
+	*              Geographical Data Coding                 *
+	* ***************************************************** *	
+	
+	* 	The purpose of this dofile is:
+	*		- Generate geographical controls for all countries
+	*		- Info for 138 countries (Kosovo pending)
+
+		do "$code/11_geographical_clean.do"
+		
+	* ***************************************************** *
+	*                 Cookpad Data Coding                   *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean cookpad data
+
+		do "$code/12_cookpad_clean.do"
+		
+	* ***************************************************** *
+	*              		 IV Data Analysis             	    *
+	*                  Versatility variables                *
+	* ***************************************************** *
+		
+	* 	The purpose of this dofile is:
+	*		- Generate only native versatility measures. 
+
 		do "$code/33_new_versatility_only_native_m_c.do"
-//		
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate only imported versatility measures. 
-// 	*       - Includes distance
-//
+		
+	* 	The purpose of this dofile is:
+	*		- Generate only imported versatility measures. 
+	*       - Includes distance
+
 		do "$code/34_import_versatility.do"
-//
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate versatility measure with distance.
-// 	*       - Includes suitability weight
-//
-// 		do "$code/34b_import_versatility_rank_weighted.do"
-//
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate versatility by country
-//
-// 		*do "$code/34_new_versatility_including_native.do" // in archive folder
-//		
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate versatility by country using Milla data
-//
-// 		*do "$code/34_new_versatility_including_native_milla.do" // in archive folder	
-//		
-// 	* 	The purpose of this dofile is:
-// 	*		- Generate versatility by country using Milla + CIAT data
-//
-// 		*do "$code/34_new_versatility_including_native_milla_ciat.do" // in archive folder	
-//		
+
 // 	* ***************************************************** *
 // 	*                 Cookpad Data Coding                   *
 // 	* ***************************************************** *
