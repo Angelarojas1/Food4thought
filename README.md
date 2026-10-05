@@ -41,8 +41,25 @@ This section will outline where and how the data supporting the findings of the 
 | Data file | Source | Notes    | Provided |
 |-----------|--------|----------|---------|
 | `data/precoded/recipes/*` | Websites | The files in this folder contain lists of recipes by country. The data were collected from multiple sources and compiled using the code available in the precoded folder. However, this code should not be run again, as the websites used as data sources may have changed over time, which could result in outputs that differ from the original data. See below for more details. |  Yes  |
-| `data/raw/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_134819.csv` | [World Bank](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD) | Country level GDP per capita data from 1990 to 2019.  |  Yes  |
-| `data/raw/CIAT/food_supplies_countries_regions_all_merge.csv` | [CIAT](https://github.com/CIAT-DAPA/cwr_interdependence) | Used to identify the region each country belongs to.  |  Yes  |
+| `data/precoded/suitability/staple_suitability.dta` | FAO | Staple suitability by country. |  Yes  |
+| `data/precoded/suitability/spices_suitability.dta` | FAO | Spices suitability and geographical variables by country.|  Yes  |
+| `data/precoded/suitability/spices_suitability_10nov23.dta` | FAO | Spices suitability by country. |  Yes  |
+| `data/precoded/suitability/crop_suitability.dta` | FAO | Crops suitability and geographical variables by country. |  Yes  |
+| `data/precoded/suitability/country-vars-9nov23.csv` | FAO | Geographical variables by country. |  Yes  |
+| `data/precoded/flavor_profile/flavor_cleaned/*` | [FlavorDB](https://cosylab.iiitd.edu.in/flavordb/search) | Flavor molecules by ingredient. Using the code in the folder data/precoded/flavor_profile, the JSON files containing the ingredients and their flavor molecules were downloaded and then renamed. Since the website could change, the code should not be run again. Accessed in March 2023. |  Yes  |
+| `data/raw/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_134819.csv` | [World Bank](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD) | Country level GDP per capita data from 1990 to 2019. Accessed on October, 2025. |  Yes  |
+| `data/raw/CIAT/food_supplies_countries_regions_all_merge.csv` | [CIAT](https://github.com/CIAT-DAPA/cwr_interdependence) | Used to identify the region each country belongs to. Accessed on March, 2023. |  Yes  |
+| `data/raw/CIAT/ingredients_category.xlsx` | Created by team | List of ingredients and an indicator for fruits.  |  Yes  |
+| `data/raw/CIAT/region_ingredients.xlsx` | [CIAT](https://cgspace.cgiar.org/server/api/core/bitstreams/f84f3289-ed7d-45ab-9397-43a2683cf028/content) | Native ingredients for each region. The information from the map was manually transcribed into a database. Accessed on March, 2023. |  Yes  |
+| `data/raw/cookpad/Cookpad_032023.dta` | Cookpad | Survey database collected by Gallup. |   |
+| `data/raw/Crop_Origins_Phylo-master/Crop_Origins_Phylo_v_live\crop_origins_v_live/crop_origins_live_db.csv` | [Crop Origins and Phylo Food](https://github.com/rubenmilla/Crop_Origins_Phylo/tree/master/Crop_Origins_Phylo_v_live/crop_origins_v_live) | This database includes a comprehensive checklist of crops species cultivated for food, and data on diverse continuous and categorical descriptors of antiquity of cultivation, organ harvested for primary use, growth form, agricultural relevance, and identities, distribution and climate at origin of crops wild progenitors. Accessed on August, 2025. |  Yes  |
+| `data/raw/Crop_Origins_Phylo-master/ecoregion_country.xlsx` | [Crop Origins and Phylo Food](https://github.com/rubenmilla/Crop_Origins_Phylo/tree/master/Crop_Origins_Phylo_v_live/crop_origins_v_live) | Country and ecoregion it belongs to. Accessed on August, 2025. |  Yes  |
+| `data/raw/distance/geo_cepii.dta` | Created by team | Location information for country's capital. |  Yes |
+| `data/raw/Galor/CountryLevel.dta` | [Oded Galor and Ömer Özak](https://www.openicpsr.org/openicpsr/project/113035/version/V1/view?path=/pcms/projects/1/1/3/0/113035/V1.0.1/20150020_data/data&type=folder) | Geographical variables by country. Accessed on September, 2025 |  Yes  |
+| `data/raw/plough/Alesina_Giuliano_Nunn_QJE_2013_Replication_Materials/Replication_Materials/crosscountry_dataset.dta` | [Alberto Alesina, Paola Giuliano and Nathan Nunn](https://www.dropbox.com/scl/fi/qaacivo811xrnik5jmdz0/Alesina_Giuliano_Nunn_QJE_2013_Replication_Materials.zip?dl=0&e=1&file_subpath=%2FReplication_Materials&rlkey=n3q8pf0x2nee26vfilhmrvkqb) | Country level variables used for the paper `ON THE ORIGINS OF GENDER ROLES: WOMEN AND THE PLOUGH'. Accessed on August 5, 2026. |  No  |
+| `data/raw/roster_spices/roster_spices_edited.xlsx` | Created by team | List of spices |  Yes  |
+| `data/raw/roster_spices/spices.xlsx` | Created by team | List of spices |  Yes  |
+
 
 
 ### Precoded dataset list. 
@@ -127,7 +144,7 @@ This section provides details on the sources of the files stored in the `data/pr
 | `Latvia.csv` | [Receptes](https://receptes.eu/cuisine/latviesu) | Accessed on May 9, 2022. | Yes |
 | `Lebanon.csv` | [Feel Good Foodie](https://feelgoodfoodie.net/recipe/category/type/lebanese-inspired/) | Accessed on May 9, 2022. | Yes |
 | `Liberia.csv` | [Clean Foodie Cravings](https://cleanfoodiecravings.com/category/recipe/) | Accessed on May 9, 2022. | Yes |
-| `Libya.csv` | No URL provided in Recipe Data.xlsx | Accessed on May 17, 2022. | Yes |
+| `Libya.csv` | [Just Food](https://www.justfood.tv/%D9%88%D8%B5%D9%81%D8%A7%D8%AA/%D8%A7%D9%84%D8%A8%D9%84%D8%AF/%D8%A7%D9%83%D9%84%D8%A7%D8%AA-%D9%84%D8%A8%D9%86%D8%A7%D9%86%D9%8A%D8%A9/50)| Accessed on May 17, 2022. | Yes |
 | `Liechtenstein.csv` | [Alpine Cookbook](https://www.dropbox.com/s/icxdiexj6fdf2rf/Alpine%20cookbook%20%20comfort%20food%20from%20the%20mountains%20%28Bingemer%2C%20Susanna%20Gerlach%2C%20Hans%20Knezevic%20etc.%29%20%28z-lib.org%29.pdf?dl=0) | Accessed on June 6, 2023. | Yes |
 | `Lithuania.csv` | [La Maistas](https://www.lamaistas.lt/virtuve/lietuvos-virtuve) | Accessed on May 9, 2022. | Yes |
 | `Luxembourg.csv` | [Chefkoch](https://www.chefkoch.de/rs/s0t29,161/Europa-Luxemburg-Rezepte.html) | Accessed on January 23, 2022. | Yes |
