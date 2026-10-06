@@ -119,22 +119,22 @@
 	
 		do "$code/2_cuisine_variables.do" 
 		
-// 	* ***************************************************** *
-// 	*     				 LFP Data Coding				    *
-// 	* ***************************************************** *
-//
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean FLFP data
-// 	* 		- 134 countries with FLFP information
-//	
-// 		do "$code/3_flfp_clean.do" 	
-//
-// 	* 	The purpose of this dofile is:
-// 	*		- Clean MLFP data
-// 	* 		- 221 countries with MLFP information
-//	
-// 		do "$code/mlfp_clean.do" 	
-//		
+	* ***************************************************** *
+	*     				 LFP Data Coding				    *
+	* ***************************************************** *
+
+	* 	The purpose of this dofile is:
+	*		- Clean FLFP data
+	* 		- 134 countries with FLFP information
+	
+		do "$code/3_flfp_clean.do" 	
+
+	* 	The purpose of this dofile is:
+	*		- Clean MLFP data
+	* 		- 221 countries with MLFP information
+	
+		do "$code/mlfp_clean.do" 	
+		
 // 	* 	The purpose of this dofile is:
 // 	*		- Merges FLFP and MLFP data
 //	
@@ -329,7 +329,13 @@
 	*		- Generate only imported versatility measures. 
 	*       - Includes distance
 
-		do "$code/34_import_versatility.do"
+		do "$code/34_import_versatility.do"		
+
+	* 	The purpose of this dofile is:
+	*		- Compute import potential for each focal country 
+
+		do "$code/34c_import_potential.do"
+
 
 // 	* ***************************************************** *
 // 	*                 Cookpad Data Coding                   *
@@ -351,15 +357,15 @@
 //	
 // 		do "$code/37_FirstStage_versatility_dataset.do"
 //		
-// 	*********************************************************
-// 	*					Descriptives 
-// 	*********************************************************
-//	
-// 	* 	The purpose of this dofile is:
-// 	*		- Create desciptive statistics
-//	
-// 	    do "$code/es_descriptives.do"
-//		
+	*********************************************************
+	*					Descriptives 
+	*********************************************************
+	
+	* 	The purpose of this dofile is:
+	*		- Create desciptive statistics
+	
+	    do "$code/es_descriptives.do"
+		
 // 	*********************************************************
 // 	*		       Recipes data validation
 // 	*********************************************************
@@ -431,7 +437,7 @@
 	*		- Run individual level regressions using PCA index
 	*		- The file was created by MG for draft sent on december 8
 		
-// 		do "$code/temp-cookpad-mg-pca.do"
+		do "$code/temp-cookpad-mg-pca.do"
 		
 	* 	The purpose of this dofile is:
 	*		- Run individual level regressions
@@ -467,13 +473,13 @@
 		*do "$code/temp-cookpad-mg-v2-24-55.do"
 		do "$code/temp-cookpad-mg-pca-24-55.do"
 		
-	*	The purpose of this dofile is:
-	*		- Run regs for single men
-	*		- Run regs for rural and urban people
-	
-		do "$code/temp-cookpad-mg-extra-exercises.do"
-		
-		
+// 	*	The purpose of this dofile is:
+// 	*		- Run regs for single men
+// 	*		- Run regs for rural and urban people
+//	
+// 		do "$code/temp-cookpad-mg-extra-exercises.do"
+//		
+//		
 	* ***************************************************** *
 	*                        Graphs                         *
 	* ***************************************************** *
@@ -487,13 +493,13 @@
 //	
 // 		* do "$code/30_time_outliers.do" // in archive folder
 //		
-// 	* ***************************************************** *
-//	
-// 	*	The purpose of this dofile is:
-// 	*		- Creates heat maps for FLFP, MLFP and gap.
-//	
-// 		 do "$code/heat_maps_lfp.do" 
-//		 
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Creates heat maps for FLFP, MLFP and gap.
+	
+		 do "$code/heat_maps_lfp.do" 
+		 
 // 	* ***************************************************** *
 //	
 // 	*	The purpose of this dofile is:
@@ -508,11 +514,35 @@
 // 	*		- Uses Time Use Survey data
 //	
 // 		 do "$code/bar_time.do"
-//
-// 	* ***************************************************** *
-//	
-// 	*	The purpose of this dofile is:
-// 	*		- Create heat map of average native ingredients used in each country.
-//  *       - Creates a table of descriptive statistics of proportion of native ingredients in each recipe variable by country.
-//	
-// 		 do "$code/recipes_native.do"
+
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Build the scatterplot of share native against number of native ing.
+	
+		 do "$code/share_native_import_potential.do" 
+		 
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Create graphs of correlations between cuisine variables
+	
+		 do "$code/correlation-mg-sb.do" 
+		 
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Create graphs for native ingredients by continent
+
+		 do "$code/recipes_native.do" 
+	
+		 do "$code/native_america.do" 
+		 
+	* ***************************************************** *
+	
+	*	The purpose of this dofile is:
+	*		- Build the scatterplot for cuisine and LFP variables
+	
+		 do "$code/scatters-mg.do" 
+		 
+	* ***************************************************** *
