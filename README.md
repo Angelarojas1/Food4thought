@@ -66,8 +66,6 @@ This section will outline where and how the data supporting the findings of the 
 | `data/raw/roster_spices/spices.xlsx` | Created by team | List of spices |  Yes  |
 | `data/raw/world_admin_shp/*` | [World Bank Official Boundaries (Shapefiles)](https://datacatalog.worldbank.org/infrastructure-data/search/dataset/0038272/world-bank-official-boundaries) | World shapefiles. Accessed on February 24, 2026. |  Yes  |
 
-https://www.anderson.ucla.edu/faculty-and-research/global-economics-and-management/faculty/wacziarg#tab-publications
-
 
 ### Precoded dataset list. 
 This section provides details on the sources of the files stored in the `data/precoded/recipes/initial` folder. The files in the intermediate and final folders are derived from the information contained in these initial files.
