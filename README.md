@@ -47,7 +47,7 @@ This section will outline where and how the data supporting the findings of the 
 | `data/precoded/suitability/crop_suitability.dta` | FAO | Crops suitability and geographical variables by country. |  Yes  |
 | `data/precoded/suitability/country-vars-9nov23.csv` | FAO | Geographical variables by country. |  Yes  |
 | `data/precoded/flavor_profile/flavor_cleaned/*` | [FlavorDB](https://cosylab.iiitd.edu.in/flavordb/search) | Flavor molecules by ingredient. Using the code in the folder data/precoded/flavor_profile, the JSON files containing the ingredients and their flavor molecules were downloaded and then renamed. Since the website could change, the code should not be run again. Accessed in March 2023. |  Yes  |
-| `data/raw/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_134819.csv` | [World Bank](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD) | Country level GDP per capita data from 1990 to 2019. Accessed on October, 2025. |  Yes  |
+| `data/raw/bounty_sea/BountyOfTheSea_DataForTheWeb/data_03_crosscountry.dta` | [Carl-Johan Dalgaard, Anne Sofie B. Knudsen and Pablo Selay](https://annesofiebeckknudsen.com/bounty_data/) | Country level variables. Accessed on June 3, 2026. |  Yes  |
 | `data/raw/CIAT/food_supplies_countries_regions_all_merge.csv` | [CIAT](https://github.com/CIAT-DAPA/cwr_interdependence) | Used to identify the region each country belongs to. Accessed on March, 2023. |  Yes  |
 | `data/raw/CIAT/ingredients_category.xlsx` | Created by team | List of ingredients and an indicator for fruits.  |  Yes  |
 | `data/raw/CIAT/region_ingredients.xlsx` | [CIAT](https://cgspace.cgiar.org/server/api/core/bitstreams/f84f3289-ed7d-45ab-9397-43a2683cf028/content) | Native ingredients for each region. The information from the map was manually transcribed into a database. Accessed on March, 2023. |  Yes  |
@@ -55,11 +55,16 @@ This section will outline where and how the data supporting the findings of the 
 | `data/raw/Crop_Origins_Phylo-master/Crop_Origins_Phylo_v_live\crop_origins_v_live/crop_origins_live_db.csv` | [Crop Origins and Phylo Food](https://github.com/rubenmilla/Crop_Origins_Phylo/tree/master/Crop_Origins_Phylo_v_live/crop_origins_v_live) | This database includes a comprehensive checklist of crops species cultivated for food, and data on diverse continuous and categorical descriptors of antiquity of cultivation, organ harvested for primary use, growth form, agricultural relevance, and identities, distribution and climate at origin of crops wild progenitors. Accessed on August, 2025. |  Yes  |
 | `data/raw/Crop_Origins_Phylo-master/ecoregion_country.xlsx` | [Crop Origins and Phylo Food](https://github.com/rubenmilla/Crop_Origins_Phylo/tree/master/Crop_Origins_Phylo_v_live/crop_origins_v_live) | Country and ecoregion it belongs to. Accessed on August, 2025. |  Yes  |
 | `data/raw/distance/geo_cepii.dta` | Created by team | Location information for country's capital. |  Yes |
+| `data/raw/ethnic/2003_fractionalization.xls` | (Alberto Alesina, et al.)[https://www.anderson.ucla.edu/faculty-and-research/global-economics-and-management/faculty/wacziarg#tab-publications] | Go to Fractionalization Data in the link. Accessed on June 9, 2026. |  Yes |
 | `data/raw/Galor/CountryLevel.dta` | [Oded Galor and Ömer Özak](https://www.openicpsr.org/openicpsr/project/113035/version/V1/view?path=/pcms/projects/1/1/3/0/113035/V1.0.1/20150020_data/data&type=folder) | Geographical variables by country. Accessed on September, 2025 |  Yes  |
+| `data/raw/flfp/API_SL.TLF.CACT.FE.ZS_DS2_en_csv_v2_174037.csv` | [World Bank](https://data.worldbank.org/indicator/SL.TLF.CACT.FE.ZS) | Country level female labor force participation data from 1990 to 2024. Accessed on January 21, 2026. |  Yes  |
+| `data/raw/gdp/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_134819.csv` | [World Bank](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD) | Country level GDP per capita data from 1990 to 2024. Accessed on October, 2025. |  Yes  |
+| `data/raw/migration/matrix version 1.1.xls` | [Louis Putterman](https://sites.google.com/brown.edu/louis-putterman/world-migration-matrix-1500-2000?pli=1&authuser=0) | In the link click on Data Spreadsheet 1.1. The matrix gives, for each of 165 countries, an estimate of the proportion of the ancestors in 1500 of that country's population today that were living within what are now the borders of that and each of the other countries. Accessed on June 14, 2026. |  Yes  |
+| `data/raw/mlfp/API_SL.TLF.CACT.MA.ZS_DS2_en_excel_v2_1041624.xls` | [World Bank](https://data.worldbank.org/indicator/SL.TLF.CACT.MA.ZS) | Country level male labor force participation data from 1990 to 2024. Accessed on January 21, 2026. |  Yes  |
 | `data/raw/plough/Alesina_Giuliano_Nunn_QJE_2013_Replication_Materials/Replication_Materials/crosscountry_dataset.dta` | [Alberto Alesina, Paola Giuliano and Nathan Nunn](https://www.dropbox.com/scl/fi/qaacivo811xrnik5jmdz0/Alesina_Giuliano_Nunn_QJE_2013_Replication_Materials.zip?dl=0&e=1&file_subpath=%2FReplication_Materials&rlkey=n3q8pf0x2nee26vfilhmrvkqb) | Country level variables used for the paper `ON THE ORIGINS OF GENDER ROLES: WOMEN AND THE PLOUGH'. Accessed on August 5, 2026. |  No  |
 | `data/raw/roster_spices/roster_spices_edited.xlsx` | Created by team | List of spices |  Yes  |
 | `data/raw/roster_spices/spices.xlsx` | Created by team | List of spices |  Yes  |
-
+| `data/raw/world_admin_shp/*` | [World Bank Official Boundaries (Shapefiles)](https://datacatalog.worldbank.org/infrastructure-data/search/dataset/0038272/world-bank-official-boundaries) | World shapefiles. Accessed on February 24, 2026. |  Yes  |
 
 
 ### Precoded dataset list. 
@@ -239,18 +244,41 @@ The provided code reproduces:
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
 | Figure I | map_ancestral_vs_cookpad.png | | |
-| Table I | summary_table_recipe.tex, descriptive_gender.tex | | |
-| Table II | reg_index_ols_1_cook.tex, reg_index_ols_2_cook.tex, reg_index_ols_0_cook.tex, reg_index_ols_3_cook.tex | | |
-| Table III | reg_index_iv_1_cook.tex, reg_index_iv_2_cook.tex, reg_index_iv_0_cook.tex, reg_index_iv_3_cook.tex | | |
-| Table IV | rfulltime_index_iv_1_cook.tex, rfulltime_index_iv_2_cook.tex, rfullemployee_index_iv_1_cook.tex, rfullemployee_index_iv_2_cook.tex | | |
-| Table V | rmeals_index_iv_2_cook.tex, rmeals_index_iv_3_cook.tex, rspousecook_index_iv_2_cook.tex, rspousecook_index_iv_3_cook.tex | | |
+| Table I | summary_table_recipe.tex, descriptive_gender.tex | es_descriptives.do | Lines 105 and 230. |
+| Table II | reg_index_ols_1_cook.tex, reg_index_ols_2_cook.tex, reg_index_ols_0_cook.tex, reg_index_ols_3_cook.tex | temp-cookpad-mg-pca.do | Line 92. |
+| Table III | reg_index_iv_1_cook.tex, reg_index_iv_2_cook.tex, reg_index_iv_0_cook.tex, reg_index_iv_3_cook.tex | temp-cookpad-mg-pca.do | Line 151. |
+| Table IV | rfulltime_index_iv_1_cook.tex, rfulltime_index_iv_2_cook.tex, rfullemployee_index_iv_1_cook.tex, rfullemployee_index_iv_2_cook.tex | temp-cookpad-mg-pca.do | Line 336. |
+| Table V | rmeals_index_iv_2_cook.tex, rmeals_index_iv_3_cook.tex, rspousecook_index_iv_2_cook.tex, rspousecook_index_iv_3_cook.tex | temp-cookpad-mg-pca.do | Line 361. |
 | Figure B1 | binscatter_female_learning.png | | |
-| Table B1 | | | |
-| Table B2 | reg_index_fs_1_cook.tex, reg_index_fs_2_cook.tex, reg_index_fs_0_cook.tex, reg_index_fs_3_cook.tex | | |
-| Table B3 | reg_index_iv_1_cook_robust.tex, reg_index_iv_2_cook_robust.tex, reg_index_iv_0_cook_robust.tex, reg_index_iv_3_cook_robust.tex | | |
-| Table B4 | reg_index_fs_1_cook_robust.tex, reg_index_fs_2_cook_robust.tex, reg_index_fs_0_cook_robust.tex, reg_index_fs_3_cook_robust.tex | | |
-| Table B5 | reg_index_iv_1_cook_24_55.tex, reg_index_iv_2_cook_24_55.tex, reg_index_iv_0_cook_24_55.tex, reg_index_iv_3_cook_24_55.tex | | |
-| Table B6 | reg_index_ols_gap_5_cook.tex, reg_index_ols_gap_4_cook.tex | | |
+| Table B1 | n.a. | n.a. (no data) | Data sources.|
+| Table B2 | reg_index_fs_1_cook.tex, reg_index_fs_2_cook.tex, reg_index_fs_0_cook.tex, reg_index_fs_3_cook.tex | temp-cookpad-mg-pca.do | Line 199. |
+| Table B3 | reg_index_iv_1_cook_robust.tex, reg_index_iv_2_cook_robust.tex, reg_index_iv_0_cook_robust.tex, reg_index_iv_3_cook_robust.tex | temp-cookpad-mg-pca.do | Line 174. |
+| Table B4 | reg_index_fs_1_cook_robust.tex, reg_index_fs_2_cook_robust.tex, reg_index_fs_0_cook_robust.tex, reg_index_fs_3_cook_robust.tex | temp-cookpad-mg-pca.do | Line 223. |
+| Table B5 | reg_index_iv_1_cook_24_55.tex, reg_index_iv_2_cook_24_55.tex, reg_index_iv_0_cook_24_55.tex, reg_index_iv_3_cook_24_55.tex | temp-cookpad-mg-pca-24-55.do | Line 133. |
+| Table B6 | reg_index_ols_gap_5_cook.tex, reg_index_ols_gap_4_cook.tex | temp-cookpad-mg-pca.do | Line 117. |
+
+## List of Exhibits - Slides
+| Exhibit name | Output filename | Script | Note |
+|--------------|-----------------|--------|------|
+| Figure | res_import_vs_native.pdf | share_native_import_potential.do | Line 260. |
+| Figure | binscatter_fish_vs_coastland50.png | validate_recipes_geovariables.py | Line 368. |
+| Figure | scatter_fish_vs_suitability.pdf | validate_recipes_geovariables.py | Line 409. |
+| Figure | share_meat_density_log_log.png |  |  |
+| Figure | share_preservation.pdf |  |  |
+| Figure | scatter_gr1d_temp.pdf | correlation-mg-sb.do | Line 263. |
+| Figure | scatter_spices_temp.pdf | correlation-mg-sb.do | Line 54. |
+| Figure | american_heat_map.pdf | native_america.do | Line 699. |
+| Figure | map_migration_herfindahl.png | recipe_ethnic_diversity_ar.py | Line 1027. |
+| Figure | jaccard_mean_vs_migration_herf.png | recipe_ethnic_diversity_ar.py | Line 692. |
+| Figure | map_cookpad.png | |  |
+| Figure | flpf_heat_map.png | heat_maps_lfp.do | Line 70. |
+| Figure | pca_index_fem.png | scatters-mg.do | Line 78. |
+| Figure | median_ingredients_fem.png | scatters-mg.do | Line 78. |
+| Figure | median_totaltime_fem.png | scatters-mg.do | Line 78. |
+| Figure | pca_index_mal.png | scatters-mg.do | Line 102. |
+| Figure | median_ingredients_mal.png | scatters-mg.do | Line 102. |
+| Figure | median_totaltime_mal.png | scatters-mg.do | Line 102. |
+| Table | reg_pct_native.tex | share_native_import_potential.do | Line 226. |
 
 ## Requirements
 
@@ -294,10 +322,12 @@ An ideal folder structure for a reproducibility package should look something li
 
 ```
 Data
-  ├── Raw
-  └── Cleaned
+  ├── raw
+  └── coded
 Code
   ├── Main_dofile.do
+  │   ├── subcode
+  │   ├── py
   ├── 01_cleaning.do
   └── 02_analysis.do
 Outputs
