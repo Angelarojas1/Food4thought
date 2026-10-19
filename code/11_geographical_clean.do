@@ -42,7 +42,7 @@ import delimited using "${precodedata}/suitability/country-vars-9nov23.csv", cas
  append using `geo2'
 
  replace pt_mn = round(pt_mn, 0.01)
- replace al_mn = round(pt_mn, 0.001)
+ replace al_mn = round(al_mn, 0.001)
  duplicates drop // adm0 //, force
  
  egen n_info = rownonmiss(al_mn pt_mn ph_mn cl_md)
