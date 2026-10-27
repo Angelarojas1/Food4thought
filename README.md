@@ -261,14 +261,14 @@ The provided code reproduces:
 ## List of Exhibits - Slides
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
-| Figure | res_import_vs_native.pdf | share_native_import_potential.do | Line 260. |
+| Figure | res_import_vs_native.pdf | share_native_import_potential.do | Line 259. |
 | Figure | binscatter_fish_vs_coastland50.png | validate_recipes_geovariables.py | Line 368. |
 | Figure | scatter_fish_vs_suitability.pdf | validate_recipes_geovariables.py | Line 409. |
 | Figure | share_meat_density_log_log.png |  |  |
 | Figure | share_preservation.pdf |  |  |
-| Figure | scatter_gr1d_temp.pdf | correlation-mg-sb.do | Line 263. |
-| Figure | scatter_spices_temp.pdf | correlation-mg-sb.do | Line 54. |
-| Figure | american_heat_map.pdf | native_america.do | Line 699. |
+| Figure | scatter_gr1d_temp.pdf | correlation-mg-sb.do | Line 242. |
+| Figure | scatter_spices_temp.pdf | correlation-mg-sb.do | Line 35. |
+| Figure | american_heat_map.pdf | native_america.do | Line 692. |
 | Figure | map_migration_herfindahl.png | recipe_ethnic_diversity_ar.py | Line 1027. |
 | Figure | jaccard_mean_vs_migration_herf.png | recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | map_cookpad.png | |  |
@@ -344,7 +344,7 @@ The provided code reproduces:
 | Table | reg_ppi_pca.tex |  |  |
 | Table | languages_recipes.tex |  |  |
 | Table | cookbook_summary1.tex, cookbook_summary2.tex |  |  
-| Table | correlations.tex |  |  |
+| Table | correlations.tex | food_consumption_recipes.do | Line 438. |
 | Table | reg_gr1d_temp.tex |  |  |
 | Table | reg_time_temp.tex |  |  |
 
