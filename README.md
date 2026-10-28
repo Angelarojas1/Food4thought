@@ -273,12 +273,7 @@ The provided code reproduces:
 | Figure | jaccard_mean_vs_migration_herf.png | recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | map_cookpad.png | |  |
 | Figure | flpf_heat_map.png | heat_maps_lfp.do | Line 70. |
-| Figure | pca_index_fem.png | scatters-mg.do | Line 78. |
-| Figure | median_ingredients_fem.png | scatters-mg.do | Line 78. |
-| Figure | median_totaltime_fem.png | scatters-mg.do | Line 78. |
-| Figure | pca_index_mal.png | scatters-mg.do | Line 102. |
-| Figure | median_ingredients_mal.png | scatters-mg.do | Line 102. |
-| Figure | median_totaltime_mal.png | scatters-mg.do | Line 102. |
+| Figure | z_pca_recipe_fem.png | scatters-mg.do | Line 70. |
 | Table | reg_pct_native.tex | share_native_import_potential.do | Line 226. |
 
 ## List of Exhibits - Slides (Appendix)
@@ -295,11 +290,11 @@ The provided code reproduces:
 | Figure | canonical_entropy_norm_vs_migration_herf.png |  |  |
 | Figure | cuisine_map.png |  |  |
 | Figure | cusine_diversity.png |  |  |
-| Figure | median_ingredients_fem.png |  |  |
-| Figure | median_totaltime_fem.png |  |  |
-| Figure | pca_index_mal.png |  |  |
-| Figure | median_ingredients_mal.png |  |  |
-| Figure | median_totaltime_mal.png |  |  |
+| Figure | median_ingredients_fem.png | scatters-mg.do | Line 70. |
+| Figure | median_totaltime_fem.png | scatters-mg.do | Line 70. |
+| Figure | z_pca_recipe_mal.png | scatters-mg.do | Line 93. |
+| Figure | median_ingredients_mal.png | scatters-mg.do | Line 93. |
+| Figure | median_totaltime_mal.png | scatters-mg.do | Line 93. |
 | Figure | versatility_distance_map.png |  |  |
 | Figure | network_spices_cropped.pdf |  |  |
 | Figure | binscatter_female_learning.png |  |  |
