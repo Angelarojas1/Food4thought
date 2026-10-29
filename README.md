@@ -283,11 +283,11 @@ The provided code reproduces:
 | Figure | scatter_v3_vs_fish_seafood.png | validate_recipes.py | Line 924. |
 | Figure | map_grassland_class6.png | validate_recipes_geovariables.py | Line 602. |
 | Figure | scatter_beef_recipe_share_vs_grassland.png |  |  |
-| Figure | suit_pctrank_3_both_FE_binscatter.png |  |  |
-| Figure | canonical_entropy_norm_vs_ethnic.png |  |  |
-| Figure | canonical_entropy_norm_vs_language.png |  |  |
-| Figure | jaccard_mean_vs_migration_herf.png |  |  |
-| Figure | canonical_entropy_norm_vs_migration_herf.png |  |  |
+| Figure | suit_pctrank_3_both_FE_binscatter.png | validate_recipes_suitability.py | Line 465  |
+| Figure | canonical_entropy_norm_vs_ethnic.png | recipe_ethnic_diversity_ar.py |Line 673. |
+| Figure | canonical_entropy_norm_vs_language.png |recipe_ethnic_diversity_ar.py |Line 673. |
+| Figure | jaccard_mean_vs_migration_herf.png | recipe_ethnic_diversity_ar.py  | Line 692. |
+| Figure | canonical_entropy_norm_vs_migration_herf.png | recipe_ethnic_diversity_ar.py  | Line 692. |
 | Figure | cuisine_map.png |  |  |
 | Figure | cusine_diversity.png |  |  |
 | Figure | median_ingredients_fem.png | scatters-mg.do | Line 70. |
@@ -298,50 +298,49 @@ The provided code reproduces:
 | Figure | versatility_distance_map.png |  |  |
 | Figure | network_spices_cropped.pdf |  |  |
 | Figure | binscatter_female_learning.png |  |  |
-| Figure | scatter_time_temp.pdf |  |  |
+| Figure | scatter_time_temp.pdf | correlations-mg-sb.do | Line 143. |
 | Figure | temp_corr_cookbook_web.png |  |  |
-| Figure | masculinity_by_median.png |  |  |
-| Figure | laws_by_median.png |  |  |
-| Figure | DHS_no_controls.png |  |  |
-| Figure | DHS_controls.png |  |  |
-| Table | reg_spices_temp.tex |  |  |
-| Table | reg_patience_gt1dayTime.tex |  |  |
-| Table | reg_fs_1_cook.tex, reg_fs_2_cook.tex, reg_fs_0_cook.tex, reg_fs_3_cook.tex|  |  |
-| Table | rfulltime_iv_0_cook.tex, rfulltime_iv_3_cook.tex, rfullemployee_iv_0_cook.tex, rfullemployee_iv_3_cook.tex |  |  |
-| Table | reg_iv_1_cook_robust.tex, reg_iv_2_cook_robust.tex, reg_iv_0_cook_robust.tex, reg_iv_3_cook_robust.tex |  |  |
-| Table | reg_fs_1_cook_robust.tex, reg_fs_2_cook_robust.tex, reg_fs_0_cook_robust.tex, reg_fs_3_cook_robust.tex |  |  |
-| Table | reg_ols_1_cook.tex, reg_ols_2_cook.tex, reg_ols_0_cook.tex, reg_ols_3_cook.tex |  |  |
-| Table | reg_iv_1_cook.tex, reg_iv_2_cook.tex, reg_iv_0_cook.tex, reg_iv_3_cook.tex |  |  |
-| Table | rfulltime_iv_1_cook.tex, rfulltime_iv_2_cook.tex, rfullemployee_iv_1_cook.tex, rfullemployee_iv_2_cook.tex |  |  |
-| Table | rmeals_iv_2_cook.tex, rspousecook_iv_2_cook.tex|  |  |
-| Table | rmeals_iv_3_cook.tex, rspousecook_iv_3_cook.tex|  |  |
-| Table | reg_ols_gap_5_cook.tex, reg_ols_gap_4_cook.tex|  |  |
-| Table | rfulltime_ols_gap_5_cook.tex, rfulltime_ols_gap_4_cook.tex, rfullemployee_ols_gap_5_cook.tex, rfullemployee_ols_gap_4_cook.tex |  |  |
-| Table | rmeals_ols_gap_4_cook.tex, rspousecook_ols_gap_4_cook.tex |  |  |
-| Table | reg_time_ols_1_cook.tex, reg_time_ols_2_cook.tex, reg_time_ols_0_cook.tex, reg_time_ols_3_cook.tex |  |  |
-| Table | reg_time_iv_1_cook.tex, reg_time_iv_2_cook.tex, reg_time_iv_0_cook.tex, reg_time_iv_3_cook.tex |  |  |
-| Table | rfulltime_time_iv_1_cook.tex, rfulltime_time_iv_2_cook.tex, rfullemployee_time_iv_1_cook.tex, rfullemployee_time_iv_2_cook.tex |  |  |
-| Table | rmeals_time_iv_2_cook.tex, rspousecook_time_iv_2_cook.tex, rmeals_time_iv_3_cook.tex, rspousecook_time_iv_3_cook.tex |  |  |
-| Table | reg_time_ols_gap_5_cook.tex, reg_time_ols_gap_4_cook.tex |  |  |
-| Table | rfulltime_time_ols_gap_5_cook.tex, rfulltime_time_ols_gap_4_cook.tex, rfullemployee_time_ols_gap_5_cook.tex, rfullemployee_time_ols_gap_4_cook.tex |  |  |
-| Table | rfulltime_time_ols_gap_5_cook.tex, rfulltime_time_ols_gap_4_cook.tex, rfullemployee_time_ols_gap_5_cook.tex, rfullemployee_time_ols_gap_4_cook.tex |  |  |
-| Table | rmeals_time_ols_gap_4_cook.tex, rspousecook_time_ols_gap_4_cook.tex |  |  |
-| Table | reg_time_fs_1_cook.tex, reg_time_fs_2_cook.tex, reg_time_fs_0_cook.tex, reg_time_fs_3_cook.tex |  |  |
-| Table | reg_ing_ols_1_cook.tex, reg_ing_ols_2_cook.tex, reg_ing_ols_0_cook.tex, reg_ing_ols_3_cook.tex |  |  |
-| Table | reg_ing_iv_1_cook.tex, reg_ing_iv_2_cook.tex, reg_ing_iv_0_cook.tex, reg_ing_iv_3_cook.tex |  |  |
-| Table | rfulltime_ing_iv_1_cook.tex, rfulltime_ing_iv_2_cook.tex, rfullemployee_ing_iv_1_cook.tex, rfullemployee_ing_iv_2_cook.tex |  |  |
-| Table | rmeals_ing_iv_2_cook.tex, rspousecook_ing_iv_2_cook.tex, rmeals_ing_iv_3_cook.tex, rspousecook_ing_iv_3_cook.tex |  |  |
-| Table | reg_ing_ols_gap_5_cook.tex, reg_ing_ols_gap_4_cook.tex |  |  |
-| Table | rfulltime_ing_ols_gap_5_cook.tex, rfulltime_ing_ols_gap_4_cook.tex, rfullemployee_ing_ols_gap_5_cook.tex, rfullemployee_ing_ols_gap_4_cook.tex |  |  |
-| Table | rmeals_ing_ols_gap_4_cook.tex, rspousecook_ing_ols_gap_4_cook.tex |  |  |
-| Table | reg_ing_fs_1_cook.tex, reg_ing_fs_2_cook.tex, reg_ing_fs_0_cook.tex, reg_ing_fs_3_cook.tex |  |  |
-| Table | reg_ppi.tex |  |  |
-| Table | reg_ppi_pca.tex |  |  |
-| Table | languages_recipes.tex |  |  |
-| Table | cookbook_summary1.tex, cookbook_summary2.tex |  |  
+| Figure | masculinity_by_median.png | analysis-pca-masculinity.do | Line 85. |
+| Figure | laws_by_median.png | laws_tech.do | Line 45. |
+| Figure | DHS_no_controls.png | DHS_clean.do | Line 168. |
+| Figure | DHS_controls.png | DHS_clean.do | Line 155. |
+| Table | reg_spices_temp.tex | correlations-mg-sb.do | Line 98. |
+| Table | reg_patience_gt1dayTime.tex | correlations-mg-sb.do | Line 452. |
+| Table | reg_fs_1_cook.tex, reg_fs_2_cook.tex, reg_fs_0_cook.tex, reg_fs_3_cook.tex| temp-cookpad-mg-v2.do | Line 187. |
+| Table | rfulltime_iv_0_cook.tex, rfulltime_iv_3_cook.tex, rfullemployee_iv_0_cook.tex, rfullemployee_iv_3_cook.tex | temp-cookpad-mg-v2.do | Line 298. |
+| Table | reg_iv_1_cook_robust.tex, reg_iv_2_cook_robust.tex, reg_iv_0_cook_robust.tex, reg_iv_3_cook_robust.tex |temp-cookpad-mg-v2.do | Line 161. |
+| Table | reg_fs_1_cook_robust.tex, reg_fs_2_cook_robust.tex, reg_fs_0_cook_robust.tex, reg_fs_3_cook_robust.tex | temp-cookpad-mg-v2.do | Line 208. |
+| Table | reg_ols_1_cook.tex, reg_ols_2_cook.tex, reg_ols_0_cook.tex, reg_ols_3_cook.tex | temp-cookpad-mg-v2.do | Line 85. |
+| Table | reg_iv_1_cook.tex, reg_iv_2_cook.tex, reg_iv_0_cook.tex, reg_iv_3_cook.tex | temp-cookpad-mg-v2.do | Line 138. |
+| Table | rfulltime_iv_1_cook.tex, rfulltime_iv_2_cook.tex, rfullemployee_iv_1_cook.tex, rfullemployee_iv_2_cook.tex | temp-cookpad-mg-v2.do | Line 298. |
+| Table | rmeals_iv_2_cook.tex, rspousecook_iv_2_cook.tex| temp-cookpad-mg-v2.do | Line 298. |
+| Table | rmeals_iv_3_cook.tex, rspousecook_iv_3_cook.tex| temp-cookpad-mg-v2.do | Line 298. |
+| Table | reg_ols_gap_5_cook.tex, reg_ols_gap_4_cook.tex| temp-cookpad-mg-v2.do | Line 109. |
+| Table | rfulltime_ols_gap_5_cook.tex, rfulltime_ols_gap_4_cook.tex, rfullemployee_ols_gap_5_cook.tex, rfullemployee_ols_gap_4_cook.tex | temp-cookpad-mg-v2.do | Line 243. |
+| Table | rmeals_ols_gap_4_cook.tex, rspousecook_ols_gap_4_cook.tex |temp-cookpad-mg-v2.do | Line 243. |
+| Table | reg_time_ols_1_cook.tex, reg_time_ols_2_cook.tex, reg_time_ols_0_cook.tex, reg_time_ols_3_cook.tex | temp-cookpad-mg-v2.do | Line 386. |
+| Table | reg_time_iv_1_cook.tex, reg_time_iv_2_cook.tex, reg_time_iv_0_cook.tex, reg_time_iv_3_cook.tex | temp-cookpad-mg-v2.do | Line 438. |
+| Table | rfulltime_time_iv_1_cook.tex, rfulltime_time_iv_2_cook.tex, rfullemployee_time_iv_1_cook.tex, rfullemployee_time_iv_2_cook.tex |temp-cookpad-mg-v2.do | Line 600.|
+| Table | rmeals_time_iv_2_cook.tex, rspousecook_time_iv_2_cook.tex, rmeals_time_iv_3_cook.tex, rspousecook_time_iv_3_cook.tex | temp-cookpad-mg-v2.do | Line 600.|
+| Table | reg_time_ols_gap_5_cook.tex, reg_time_ols_gap_4_cook.tex |temp-cookpad-mg-v2.do | Line 410. |
+| Table | rfulltime_time_ols_gap_5_cook.tex, rfulltime_time_ols_gap_4_cook.tex, rfullemployee_time_ols_gap_5_cook.tex, rfullemployee_time_ols_gap_4_cook.tex |temp-cookpad-mg-v2.do | Line 544. |
+| Table | rmeals_time_ols_gap_4_cook.tex, rspousecook_time_ols_gap_4_cook.tex |temp-cookpad-mg-v2.do | Line 544.|
+| Table | reg_time_fs_1_cook.tex, reg_time_fs_2_cook.tex, reg_time_fs_0_cook.tex, reg_time_fs_3_cook.tex | temp-cookpad-mg-v2.do | Line 486. |
+| Table | reg_ing_ols_1_cook.tex, reg_ing_ols_2_cook.tex, reg_ing_ols_0_cook.tex, reg_ing_ols_3_cook.tex | temp-cookpad-mg-v2.do | Line 690 |
+| Table | reg_ing_iv_1_cook.tex, reg_ing_iv_2_cook.tex, reg_ing_iv_0_cook.tex, reg_ing_iv_3_cook.tex | temp-cookpad-mg-v2.do | Line 768. |
+| Table | rfulltime_ing_iv_1_cook.tex, rfulltime_ing_iv_2_cook.tex, rfullemployee_ing_iv_1_cook.tex, rfullemployee_ing_iv_2_cook.tex | temp-cookpad-mg-v2.do | Line 929.|
+| Table | rmeals_ing_iv_2_cook.tex, rspousecook_ing_iv_2_cook.tex, rmeals_ing_iv_3_cook.tex, rspousecook_ing_iv_3_cook.tex | temp-cookpad-mg-v2.do | Line 929. |
+| Table | reg_ing_ols_gap_5_cook.tex, reg_ing_ols_gap_4_cook.tex | temp-cookpad-mg-v2.do | Line 715.|
+| Table | rfulltime_ing_ols_gap_5_cook.tex, rfulltime_ing_ols_gap_4_cook.tex, rfullemployee_ing_ols_gap_5_cook.tex, rfullemployee_ing_ols_gap_4_cook.tex | temp-cookpad-mg-v2.do | Line 874. |
+| Table | rmeals_ing_ols_gap_4_cook.tex, rspousecook_ing_ols_gap_4_cook.tex | temp-cookpad-mg-v2.do | Line 874|
+| Table | reg_ing_fs_1_cook.tex, reg_ing_fs_2_cook.tex, reg_ing_fs_0_cook.tex, reg_ing_fs_3_cook.tex | temp-cookpad-mg-v2.do | Line 741. |
+| Table | reg_ppi.tex | reg-appliances-mg.do | Line 71. |
+| Table | reg_ppi_pca.tex | reg-appliances-mg.do | Line 92. |
+| Table | languages_recipes.tex |  | Using chatGPT. |
+| Table | cookbook_summary1.tex, cookbook_summary2.tex | recipes_overlap_v2.do | Lines 148 and 152.| 
 | Table | correlations.tex | food_consumption_recipes.do | Line 438. |
-| Table | reg_gr1d_temp.tex |  |  |
-| Table | reg_time_temp.tex |  |  |
+| Table | reg_gr1d_temp.tex | correlations-mg-sb.do | Line 307. |
+| Table | reg_time_temp.tex | correlations-mg-sb.do | Line 184. |
 
 ## Requirements
 
