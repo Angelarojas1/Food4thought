@@ -250,7 +250,7 @@ The provided code reproduces:
 | Table IV | rfulltime_index_iv_1_cook.tex, rfulltime_index_iv_2_cook.tex, rfullemployee_index_iv_1_cook.tex, rfullemployee_index_iv_2_cook.tex | temp-cookpad-mg-pca.do | Line 336. |
 | Table V | rmeals_index_iv_2_cook.tex, rmeals_index_iv_3_cook.tex, rspousecook_index_iv_2_cook.tex, rspousecook_index_iv_3_cook.tex | temp-cookpad-mg-pca.do | Line 361. |
 | Figure B1 | binscatter_female_learning.png | | |
-| Figure B2 | bar_cook_time.pdf | | |
+| Figure B2 | bar_cook_time.pdf | bar_time.do | Line 31. |
 | Table B1 | n.a. | n.a. (no data) | Data sources.|
 | Table B2 | reg_index_fs_1_cook.tex, reg_index_fs_2_cook.tex, reg_index_fs_0_cook.tex, reg_index_fs_3_cook.tex | temp-cookpad-mg-pca.do | Line 199. |
 | Table B3 | reg_index_iv_1_cook_robust.tex, reg_index_iv_2_cook_robust.tex, reg_index_iv_0_cook_robust.tex, reg_index_iv_3_cook_robust.tex | temp-cookpad-mg-pca.do | Line 174. |
@@ -279,9 +279,9 @@ The provided code reproduces:
 ## List of Exhibits - Slides (Appendix)
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
-| Figure | scatter_v41_vs_dairy.png |  |  |
-| Figure | scatter_v3_vs_fish_seafood.png |  |  |
-| Figure | map_grassland_class6.png |  |  |
+| Figure | scatter_v41_vs_dairy.png | validate_recipes.py | Line 924. |
+| Figure | scatter_v3_vs_fish_seafood.png | validate_recipes.py | Line 924. |
+| Figure | map_grassland_class6.png | validate_recipes_geovariables.py | Line 602. |
 | Figure | scatter_beef_recipe_share_vs_grassland.png |  |  |
 | Figure | suit_pctrank_3_both_FE_binscatter.png |  |  |
 | Figure | canonical_entropy_norm_vs_ethnic.png |  |  |
