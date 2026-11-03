@@ -265,13 +265,13 @@ The provided code reproduces:
 | Figure | binscatter_fish_vs_coastland50.png | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 368. |
 | Figure | scatter_fish_vs_suitability.pdf | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 409. |
 | Figure | share_meat_density_log_log.png |  |  |
-| Figure | share_preservation.pdf |  |  |
+| Figure | share_preservation.pdf | spices_fermentation_temperature.do | Line 79. Not yet in this repo. |
 | Figure | scatter_gr1d_temp.pdf | correlation-mg-sb.do | Line 242. |
 | Figure | scatter_spices_temp.pdf | correlation-mg-sb.do | Line 35. |
 | Figure | american_heat_map.pdf | native_america.do | Line 692. |
 | Figure | map_migration_herfindahl.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 1027. |
 | Figure | jaccard_mean_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
-| Figure | map_cookpad.png | |  |
+| Figure | map_cookpad.png | code/py/6_ethnographic_cooking/cooking_maps.py | Line 359. |
 | Figure | flpf_heat_map.png | heat_maps_lfp.do | Line 70. |
 | Figure | z_pca_recipe_fem.png | scatters-mg.do | Line 70. |
 | Table | reg_pct_native.tex | share_native_import_potential.do | Line 226. |
@@ -288,7 +288,7 @@ The provided code reproduces:
 | Figure | jaccard_mean_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | canonical_entropy_norm_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | cuisine_map.png |  |  |
-| Figure | cusine_diversity.png |  |  |
+| Figure | cuisine_diversity_script.png (replaces the QGIS map cusine_diversity.png) | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 1104. |
 | Figure | median_ingredients_fem.png | scatters-mg.do | Line 70. |
 | Figure | median_totaltime_fem.png | scatters-mg.do | Line 70. |
 | Figure | z_pca_recipe_mal.png | scatters-mg.do | Line 93. |

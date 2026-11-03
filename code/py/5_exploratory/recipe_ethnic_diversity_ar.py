@@ -1035,4 +1035,80 @@ except ImportError:
 except Exception as e:
     print(f"  World map skipped: {e}")
 
+# ===========================================================================
+# WORLD MAP: cuisine diversity (mean pairwise Jaccard dissimilarity)
+# ===========================================================================
+
+print("\nGenerating world map of cuisine diversity (Jaccard dissimilarity) ...")
+
+try:
+    import geopandas as gpd
+    import urllib.request
+    from matplotlib.colors import BoundaryNorm, ListedColormap
+    from matplotlib.patches import Patch
+
+    NE_URL    = ("https://naturalearth.s3.amazonaws.com/110m_cultural/"
+                 "ne_110m_admin_0_countries.zip")
+    _ne_local = OUTPUT_DIR / "ne_110m_admin_0_countries.zip"
+    if not _ne_local.exists():
+        print("  Downloading Natural Earth 110m countries shapefile ...")
+        urllib.request.urlretrieve(NE_URL, str(_ne_local))
+    world_cd = gpd.read_file(f"zip://{_ne_local}")
+    if "CONTINENT" in world_cd.columns:
+        world_cd = world_cd[world_cd["CONTINENT"] != "Antarctica"]
+
+    # Match recipe-country names to Natural Earth polygons (first column that matches wins)
+    name_cols = [c for c in ["NAME", "ADMIN", "NAME_LONG", "SOVEREIGNT",
+                             "FORMAL_EN", "NAME_EN", "BRK_NAME"]
+                 if c in world_cd.columns]
+    name_to_row = {}
+    for col in name_cols:
+        for idx, nm in world_cd[col].dropna().str.casefold().items():
+            name_to_row.setdefault(nm, idx)
+
+    cd = merged[[COUNTRY_COL, "jaccard_mean"]].dropna().copy()
+    cd["_row"] = cd[COUNTRY_COL].str.strip().str.casefold().map(name_to_row)
+    not_drawn = cd.loc[cd["_row"].isna(), COUNTRY_COL].tolist()
+    if not_drawn:
+        print(f"  Not on the 110m map (too small): {not_drawn}")
+    cd = cd.dropna(subset=["_row"])
+    world_cd["jaccard_mean"] = np.nan
+    world_cd.loc[cd["_row"].astype(int).values, "jaccard_mean"] = cd["jaccard_mean"].values
+
+    # Five equal-interval classes between the min and max of the data (YlOrRd)
+    class_colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"]
+    edges = np.linspace(cd["jaccard_mean"].min(), cd["jaccard_mean"].max(), 6)
+    cmap_cd = ListedColormap(class_colors)
+    norm_cd = BoundaryNorm(edges, cmap_cd.N)
+
+    fig, ax = plt.subplots(figsize=(16, 6.6))
+    world_cd[world_cd["jaccard_mean"].isna()].plot(
+        ax=ax, color="white", edgecolor="#666666", linewidth=0.5
+    )
+    world_cd[world_cd["jaccard_mean"].notna()].plot(
+        column="jaccard_mean", ax=ax, cmap=cmap_cd, norm=norm_cd,
+        edgecolor="#444444", linewidth=0.4,
+    )
+    ax.legend(
+        handles=[Patch(facecolor=class_colors[i], edgecolor="#444444", linewidth=0.4,
+                       label=f"{edges[i]:.3f} - {edges[i + 1]:.3f}")
+                 for i in range(5)],
+        title="Cuisine Diversity", title_fontsize=12, fontsize=10,
+        loc="lower left", bbox_to_anchor=(0.08, 0.02), frameon=False,
+        alignment="left",
+    )
+    ax.set_xlim(-180, 180)
+    ax.set_ylim(-58, 85)
+    ax.axis("off")
+    plt.tight_layout()
+    map_out = OUTPUT_DIR.parents[1] / "maps" / "cuisine_diversity_script.png"
+    plt.savefig(map_out, dpi=300, bbox_inches="tight")
+    plt.close()
+    print(f"  Saved -> {map_out}")
+
+except ImportError:
+    print("  geopandas not installed - skipping cuisine diversity map.")
+except Exception as e:
+    print(f"  Cuisine diversity map skipped: {e}")
+
 print("\nDone.")

@@ -326,4 +326,38 @@ plt.tight_layout()
 plt.savefig(
     r"C:\Users\stevebc\Dropbox\food4thought\analysis23\outputs\Figures\maps\ancestral_vs_cookpad.png",
     dpi=300, bbox_inches="tight")
+
+# -------------------------------------------------------------------
+# Contemporary (Cookpad) panel on its own -> map_cookpad.png
+# -------------------------------------------------------------------
+
+fig2, ax2 = plt.subplots(figsize=(10, 5.5), dpi=200)
+
+world.plot(ax=ax2, color="lightgray", edgecolor="black", linewidth=0.3)
+world_cookpad.plot(
+    ax=ax2,
+    column="female_share",
+    cmap=cmap,
+    norm=mcolors.Normalize(vmin=0.52, vmax=0.92),
+    edgecolor="black",
+    linewidth=0.3
+)
+ax2.set_title("Contemporary Cooking (Cookpad)", fontsize=15)
+
+divider2 = make_axes_locatable(ax2)
+cax2 = divider2.append_axes("bottom", size="5%", pad=0.2)
+cbar2 = fig2.colorbar(sm1, cax=cax2, orientation="horizontal")
+cbar2.set_label("Female Cooking Share")
+
+ax2.set_xlim(-180, 180)
+ax2.set_ylim(-60, 90)
+ax2.set_xticklabels([])
+ax2.set_yticklabels([])
+ax2.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+
+fig2.tight_layout()
+fig2.savefig(
+    r"C:\Users\stevebc\Dropbox\food4thought\analysis23\outputs\Figures\maps\map_cookpad.png",
+    dpi=200, bbox_inches="tight")
+
 plt.show()
