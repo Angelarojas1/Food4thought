@@ -262,15 +262,15 @@ The provided code reproduces:
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
 | Figure | res_import_vs_native.pdf | share_native_import_potential.do | Line 259. |
-| Figure | binscatter_fish_vs_coastland50.png | validate_recipes_geovariables.py | Line 368. |
-| Figure | scatter_fish_vs_suitability.pdf | validate_recipes_geovariables.py | Line 409. |
+| Figure | binscatter_fish_vs_coastland50.png | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 368. |
+| Figure | scatter_fish_vs_suitability.pdf | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 409. |
 | Figure | share_meat_density_log_log.png |  |  |
 | Figure | share_preservation.pdf |  |  |
 | Figure | scatter_gr1d_temp.pdf | correlation-mg-sb.do | Line 242. |
 | Figure | scatter_spices_temp.pdf | correlation-mg-sb.do | Line 35. |
 | Figure | american_heat_map.pdf | native_america.do | Line 692. |
-| Figure | map_migration_herfindahl.png | recipe_ethnic_diversity_ar.py | Line 1027. |
-| Figure | jaccard_mean_vs_migration_herf.png | recipe_ethnic_diversity_ar.py | Line 692. |
+| Figure | map_migration_herfindahl.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 1027. |
+| Figure | jaccard_mean_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | map_cookpad.png | |  |
 | Figure | flpf_heat_map.png | heat_maps_lfp.do | Line 70. |
 | Figure | z_pca_recipe_fem.png | scatters-mg.do | Line 70. |
@@ -279,15 +279,14 @@ The provided code reproduces:
 ## List of Exhibits - Slides (Appendix)
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
-| Figure | scatter_v41_vs_dairy.png | validate_recipes.py | Line 924. |
-| Figure | scatter_v3_vs_fish_seafood.png | validate_recipes.py | Line 924. |
-| Figure | map_grassland_class6.png | validate_recipes_geovariables.py | Line 602. |
-| Figure | scatter_beef_recipe_share_vs_grassland.png |  |  |
-| Figure | suit_pctrank_3_both_FE_binscatter.png | validate_recipes_suitability.py | Line 465  |
-| Figure | canonical_entropy_norm_vs_ethnic.png | recipe_ethnic_diversity_ar.py |Line 673. |
-| Figure | canonical_entropy_norm_vs_language.png |recipe_ethnic_diversity_ar.py |Line 673. |
-| Figure | jaccard_mean_vs_migration_herf.png | recipe_ethnic_diversity_ar.py  | Line 692. |
-| Figure | canonical_entropy_norm_vs_migration_herf.png | recipe_ethnic_diversity_ar.py  | Line 692. |
+| Figure | coefplot_focused_*_min{cutoff}.png (replaces scatter_v41_vs_dairy.png and scatter_v3_vs_fish_seafood.png) | code/py/4_validate_ethnographic/validate_recipes_atlas_coefplot_focused_standalone.py | Lines 524-527. Variant to be confirmed. |
+| Figure | map_grassland_class6.png | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 602. |
+| Figure | scatter_pooled_animal_to_grassland.png (replaces scatter_beef_recipe_share_vs_grassland.png) | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 972. To be confirmed. |
+| Figure | suit_pctrank_3_both_FE_binscatter.png | code/py/3_validate_geography/validate_recipes_suitability.py | Line 465. |
+| Figure | canonical_entropy_norm_vs_ethnic.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 673. |
+| Figure | canonical_entropy_norm_vs_language.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 673. |
+| Figure | jaccard_mean_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
+| Figure | canonical_entropy_norm_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | cuisine_map.png |  |  |
 | Figure | cusine_diversity.png |  |  |
 | Figure | median_ingredients_fem.png | scatters-mg.do | Line 70. |
@@ -295,7 +294,7 @@ The provided code reproduces:
 | Figure | z_pca_recipe_mal.png | scatters-mg.do | Line 93. |
 | Figure | median_ingredients_mal.png | scatters-mg.do | Line 93. |
 | Figure | median_totaltime_mal.png | scatters-mg.do | Line 93. |
-| Figure | versatility_distance_map.png |  |  |
+| Figure | versatility_distance_map_NEW.png | code/py/5_exploratory/plot_IV_maps.py | Line 157. |
 | Figure | network_spices_cropped.pdf |  |  |
 | Figure | binscatter_female_learning.png |  |  |
 | Figure | scatter_time_temp.pdf | correlations-mg-sb.do | Line 143. |
