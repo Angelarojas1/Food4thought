@@ -264,7 +264,7 @@ The provided code reproduces:
 | Figure | res_import_vs_native.pdf | share_native_import_potential.do | Line 259. |
 | Figure | binscatter_fish_vs_coastland50.png | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 368. |
 | Figure | scatter_fish_vs_suitability.pdf | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 409. |
-| Figure | share_meat_density_log_log.png |  |  |
+| Figure | share_meat_density_log_log.png | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 973. Rebuilt section; reproduces n = 217 (r = 0.326 vs 0.330 in the June 2026 version). |
 | Figure | share_preservation.pdf | spices_fermentation_temperature.do | Line 79. Not yet in this repo. |
 | Figure | scatter_gr1d_temp.pdf | correlation-mg-sb.do | Line 242. |
 | Figure | scatter_spices_temp.pdf | correlation-mg-sb.do | Line 35. |
@@ -279,7 +279,7 @@ The provided code reproduces:
 ## List of Exhibits - Slides (Appendix)
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
-| Figure | coefplot_focused_*_min{cutoff}.png (replaces scatter_v41_vs_dairy.png and scatter_v3_vs_fish_seafood.png) | code/py/4_validate_ethnographic/validate_recipes_atlas_coefplot_focused_standalone.py | Lines 524-527. Variant to be confirmed. |
+| Figure | EA_validation_FINAL.png = coefplot_focused_labeled_xrange_above_min10.png, manually cropped to remove the title and footnote (replaces scatter_v41_vs_dairy.png and scatter_v3_vs_fish_seafood.png) | code/py/4_validate_ethnographic/validate_recipes_atlas_coefplot_focused_standalone.py | Lines 524-527. Minimum 10 recipes per country, unweighted. |
 | Figure | map_grassland_class6.png | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 602. |
 | Figure | scatter_pooled_animal_to_grassland.png (replaces scatter_beef_recipe_share_vs_grassland.png) | code/py/3_validate_geography/validate_recipes_geovariables.py | Line 972. To be confirmed. |
 | Figure | suit_pctrank_3_both_FE_binscatter.png | code/py/3_validate_geography/validate_recipes_suitability.py | Line 465. |

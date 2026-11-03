@@ -48,15 +48,15 @@ BOUNTY_PATH = Path(
 # Landcover classes for shrubs and grassland
 
 
-# TODO: change to Dropbox\food4thought\analysis23\data\raw\landcover
-RASTER_5 = Path(r"C:\Users\stevebc\Downloads\consensus_full_class_5.tif")
-RASTER_6 = Path(r"C:\Users\stevebc\Downloads\consensus_full_class_6.tif")
-RASTER_7 = Path(r"C:\Users\stevebc\Downloads\consensus_full_class_7.tif")
+# EarthEnv consensus land cover (https://www.earthenv.org/landcover)
+RAW_DIR = Path(r"C:\Users\stevebc\Dropbox\food4thought\analysis23\data\raw")
+RASTER_6 = RAW_DIR / "landcover" / "consensus_full_class_6.tif"
+RASTER_7 = RAW_DIR / "landcover" / "consensus_full_class_7.tif"
 
-# TODO: change to Dropbox\food4thought\analysis23\data\raw\livestock
-RASTER_CATTLE = Path(r"C:\Users\stevebc\Downloads\GLW4-2020.D-DA.CTL.tif")
-RASTER_SHEEP  = Path(r"C:\Users\stevebc\Downloads\GLW4-2020.D-DA.SHP.tif")
-RASTER_PIGS   = Path(r"C:\Users\stevebc\Downloads\GLW4-2020.D-DA.PGS.tif")
+# FAO Gridded Livestock of the World 4 (2020), dasymetric density
+RASTER_CATTLE = RAW_DIR / "livestock" / "GLW4-2020.D-DA.CTL.tif"
+RASTER_SHEEP  = RAW_DIR / "livestock" / "GLW4-2020.D-DA.SHP.tif"
+RASTER_PIGS   = RAW_DIR / "livestock" / "GLW4-2020.D-DA.PGS.tif"
 
 # TODO: change output path
 OUTPUT_DIR = Path(
@@ -924,6 +924,56 @@ plt.savefig(str(out_name).replace(".pdf", ".png"), dpi=150, bbox_inches="tight")
 print(f"  Saved → {out_name}")
 plt.show()
 
+
+
+# ------------------------------------------------------------------
+# POOLED scatter: beef/cattle, mutton/sheep, pork/pig — log(share) vs log(density)
+# ------------------------------------------------------------------
+
+pooled_dens_rows = []
+for y_col, x_col, y_label in [
+    ("beef_recipe_share",   "cattle_density_mean", "Beef recipe share (%)"),
+    ("mutton_recipe_share", "sheep_density_mean",  "Mutton recipe share (%)"),
+    ("pork_recipe_share",   "pig_density_mean",    "Pork recipe share (%)"),
+]:
+    sub = meat_df[[y_col, x_col]].dropna().copy()
+    sub = sub[(sub[y_col] > 0) & (sub[x_col] > 0)]
+    sub["y"] = np.log(sub[y_col])
+    sub["x"] = np.log(sub[x_col])
+    sub["animal"] = y_label
+    sub["adm0"] = sub.index
+    pooled_dens_rows.append(sub[["adm0", "animal", "x", "y"]])
+
+pooled_dens = pd.concat(pooled_dens_rows, ignore_index=True)
+print(f"  Pooled (log-log density) n = {len(pooled_dens)} (across beef/cattle, mutton/sheep, pork/pig)")
+
+fig, ax = plt.subplots(figsize=(8, 6))
+
+colors = {"Beef recipe share (%)": "#2171b5", "Mutton recipe share (%)": "#e63946", "Pork recipe share (%)": "#2ca02c"}
+
+for animal, group in pooled_dens.groupby("animal"):
+    ax.scatter(group["x"], group["y"],
+               s=30, alpha=0.65, color=colors[animal],
+               edgecolors="white", linewidths=0.3, zorder=3, label=animal)
+
+r_val, p_val = stats.pearsonr(pooled_dens["x"], pooled_dens["y"])
+
+m, b_coef = np.polyfit(pooled_dens["x"], pooled_dens["y"], 1)
+x_line = np.linspace(pooled_dens["x"].min(), pooled_dens["x"].max(), 200)
+ax.plot(x_line, m * x_line + b_coef, color="black", linewidth=1.5, zorder=4)
+
+ax.set_title(f"Pooled: r = {r_val:.3f}, p = {p_val:.3f}  (n = {len(pooled_dens)})", fontsize=10)
+ax.set_xlabel("log(species density, country mean)", fontsize=10)
+ax.set_ylabel("log(recipe share)", fontsize=10)
+ax.legend(fontsize=8, frameon=False)
+ax.tick_params(labelsize=8)
+ax.spines[["top", "right"]].set_visible(False)
+
+plt.tight_layout()
+out_name = OUTPUT_DIR / "share_meat_density_log_log.png"
+plt.savefig(out_name, dpi=150, bbox_inches="tight")
+print(f"  Saved → {out_name}")
+plt.show()
 
 
 # ------------------------------------------------------------------
