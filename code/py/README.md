@@ -10,6 +10,7 @@ Scripts are grouped by stage of the pipeline. Nothing has been moved here yet; t
 | `3_validate_geography/` | Validate recipes against geographic data (bounty of the sea, coastal access, grassland / livestock, crop suitability) | `validate_recipes_geovariables`, `validate_recipes_suitability` |
 | `4_validate_ethnographic/` | Validate recipes against the Ethnographic Atlas (Giuliano-Nunn) and cultural data | `validate_recipes_atlas_coefplot_focused_standalone` (self-contained; replaces the old per-pair scatters `scatter_v41_vs_dairy.png`, `scatter_v3_vs_fish_seafood.png`), `pca_culture_correlations` |
 | `5_exploratory/` | Cuisine diversity vs. ethnic / linguistic diversity and migration, IV maps, spice hypotheses | `recipe_ethnic_diversity_ar`, `plot_IV_maps`, `spice_use_causes` |
+| `6_ethnographic_cooking/` | Who cooks in ancestral societies (SCCS) vs. today (Cookpad): ancestral vs. contemporary cooking map, female-learning binscatter | `cooking_maps`, `historical_cooking_by_gender` |
 | `_archive/` | Superseded versions, kept out of the replication run | `clean_ingredients` (if replaced), `merge_countries_maps` (v1), `pair_ingredients` (v1), `recipe_ethnic_diversity` (non-`_ar`), `validate_recipes_atlas`, `_targeted`, `_staples`, `_coefplot`, `_coefplot_controls`, `_coefplot_focused` (all superseded by the standalone coefplot script) |
 
 Raw recipe scraping lives in `precode/`, not here.

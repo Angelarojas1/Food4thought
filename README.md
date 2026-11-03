@@ -243,13 +243,13 @@ The provided code reproduces:
 
 | Exhibit name | Output filename | Script | Note |
 |--------------|-----------------|--------|------|
-| Figure I | map_ancestral_vs_cookpad.png | | |
+| Figure I | ancestral_vs_cookpad.png | code/py/6_ethnographic_cooking/cooking_maps.py | Line 326. |
 | Table I | summary_table_recipe.tex, descriptive_gender.tex | es_descriptives.do | Lines 105 and 230. |
 | Table II | reg_index_ols_1_cook.tex, reg_index_ols_2_cook.tex, reg_index_ols_0_cook.tex, reg_index_ols_3_cook.tex | temp-cookpad-mg-pca.do | Line 92. |
 | Table III | reg_index_iv_1_cook.tex, reg_index_iv_2_cook.tex, reg_index_iv_0_cook.tex, reg_index_iv_3_cook.tex | temp-cookpad-mg-pca.do | Line 151. |
 | Table IV | rfulltime_index_iv_1_cook.tex, rfulltime_index_iv_2_cook.tex, rfullemployee_index_iv_1_cook.tex, rfullemployee_index_iv_2_cook.tex | temp-cookpad-mg-pca.do | Line 336. |
 | Table V | rmeals_index_iv_2_cook.tex, rmeals_index_iv_3_cook.tex, rspousecook_index_iv_2_cook.tex, rspousecook_index_iv_3_cook.tex | temp-cookpad-mg-pca.do | Line 361. |
-| Figure B1 | binscatter_female_learning.png | | |
+| Figure B1 | binscatter_female_learning.png | code/py/6_ethnographic_cooking/historical_cooking_by_gender.py | Line 374. |
 | Figure B2 | bar_cook_time.pdf | bar_time.do | Line 31. |
 | Table B1 | n.a. | n.a. (no data) | Data sources.|
 | Table B2 | reg_index_fs_1_cook.tex, reg_index_fs_2_cook.tex, reg_index_fs_0_cook.tex, reg_index_fs_3_cook.tex | temp-cookpad-mg-pca.do | Line 199. |
@@ -296,7 +296,7 @@ The provided code reproduces:
 | Figure | median_totaltime_mal.png | scatters-mg.do | Line 93. |
 | Figure | versatility_distance_map_NEW.png | code/py/5_exploratory/plot_IV_maps.py | Line 157. |
 | Figure | network_spices_cropped.pdf |  |  |
-| Figure | binscatter_female_learning.png |  |  |
+| Figure | binscatter_female_learning.png | code/py/6_ethnographic_cooking/historical_cooking_by_gender.py | Line 374. |
 | Figure | scatter_time_temp.pdf | correlations-mg-sb.do | Line 143. |
 | Figure | temp_corr_cookbook_web.png |  |  |
 | Figure | masculinity_by_median.png | analysis-pca-masculinity.do | Line 85. |
