@@ -287,7 +287,7 @@ The provided code reproduces:
 | Figure | canonical_entropy_norm_vs_language.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 673. |
 | Figure | jaccard_mean_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
 | Figure | canonical_entropy_norm_vs_migration_herf.png | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 692. |
-| Figure | cuisine_map.png |  |  |
+| Figure | cuisine_map.png | NA | Created manually using QGis. |
 | Figure | cuisine_diversity_script.png (replaces the QGIS map cusine_diversity.png) | code/py/5_exploratory/recipe_ethnic_diversity_ar.py | Line 1104. |
 | Figure | median_ingredients_fem.png | scatters-mg.do | Line 70. |
 | Figure | median_totaltime_fem.png | scatters-mg.do | Line 70. |
@@ -295,7 +295,7 @@ The provided code reproduces:
 | Figure | median_ingredients_mal.png | scatters-mg.do | Line 93. |
 | Figure | median_totaltime_mal.png | scatters-mg.do | Line 93. |
 | Figure | versatility_distance_map_NEW.png | code/py/5_exploratory/plot_IV_maps.py | Line 157. |
-| Figure | network_spices_cropped.pdf |  |  |
+| Figure | network_spices_cropped.pdf | NA | Created manually using Gephi. |
 | Figure | binscatter_female_learning.png | code/py/6_ethnographic_cooking/historical_cooking_by_gender.py | Line 374. |
 | Figure | scatter_time_temp.pdf | correlations-mg-sb.do | Line 143. |
 | Figure | temp_corr_cookbook_web.png |  |  |
