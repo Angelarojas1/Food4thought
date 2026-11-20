@@ -298,7 +298,7 @@ The provided code reproduces:
 | Figure | network_spices_cropped.pdf | NA | Created manually using Gephi. |
 | Figure | binscatter_female_learning.png | code/py/6_ethnographic_cooking/historical_cooking_by_gender.py | Line 374. |
 | Figure | scatter_time_temp.pdf | correlations-mg-sb.do | Line 143. |
-| Figure | temp_corr_cookbook_web.png |  |  |
+| Figure | temp_corr_cookbook_web.png | cookbook_vs_web.do | Line 410 |
 | Figure | masculinity_by_median.png | analysis-pca-masculinity.do | Line 85. |
 | Figure | laws_by_median.png | laws_tech.do | Line 45. |
 | Figure | DHS_no_controls.png | DHS_clean.do | Line 168. |
